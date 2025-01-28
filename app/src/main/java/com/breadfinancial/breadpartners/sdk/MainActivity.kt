@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.view.Display
+import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.TextView
@@ -196,26 +197,34 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-//        val config2 = PlacementsConfiguration(
-//            configModel = BreadPartnerDefaults().textPlacementRequestType4,
-//            textPlacementStyling = textPlacementStyling,
-//            popUpStyling = popUpStyling,
-//        )
-//
-//        BreadPartnersSDK.getInstance().submitRTPS(config2, this) { event ->
-//            when (event) {
-//                is BreadPartnerEvent.RenderPopupView -> {
-//                    val view = event.view
-//                    view.show(this.supportFragmentManager, "PopupDialog")
-//                    print("BreadPartnerSDK::Successfully rendered PopupView.")
-//                }
-//
-//                else -> {
-//
-//                }
-//            }
-//        }
+    }
 
+    fun preScreenCheck(view: View) {
+        BreadPartnersSDK.getInstance().setup(
+            sdkSetup = BreadPartnersSDKSetup(
+                integrationKey = "", buyer = BreadPartnerDefaults().buyer, enableLog = true
+            ), applicationContent = application
+        )
+
+        val config2 = PlacementsConfiguration(
+            configModel = BreadPartnerDefaults().textPlacementRequestType4,
+            textPlacementStyling = null,
+            popUpStyling = null,
+        )
+
+        BreadPartnersSDK.getInstance().submitRTPS(config2, this) { event ->
+            when (event) {
+                is BreadPartnerEvent.RenderPopupView -> {
+                    val view = event.view
+                    view.show(this.supportFragmentManager, "PopupDialog")
+                    print("BreadPartnerSDK::Successfully rendered PopupView.")
+                }
+
+                else -> {
+
+                }
+            }
+        }
     }
 }
 

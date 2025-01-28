@@ -51,3 +51,5 @@ dependencies {
     implementation(libs.coordinatorlayout)
     implementation(libs.constraintlayout)
 }
+
+version = "0.0.1"
