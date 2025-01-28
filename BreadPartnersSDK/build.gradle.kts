@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         minSdk = 24
-
+        multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -42,14 +42,15 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
 //    #Change-breadpartnersdk
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.jsoup)
-    implementation(libs.gson)
-    implementation(libs.glide)
+    api(libs.kotlinx.serialization.json)
+    api(libs.jsoup)
+    api(libs.gson)
+    api(libs.glide)
     annotationProcessor(libs.glide.compiler)
-    implementation(libs.recaptcha)
-    implementation(libs.coordinatorlayout)
-    implementation(libs.constraintlayout)
+    api(libs.recaptcha)
+    api(libs.coordinatorlayout)
+    api(libs.constraintlayout)
+    api(libs.androidx.multidex)
 }
 
 version = "0.0.1"

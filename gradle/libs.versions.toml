@@ -39,6 +39,7 @@ recaptcha = { group = "com.google.android.recaptcha", name = "recaptcha", versio
 coordinatorlayout = { group = "androidx.coordinatorlayout", name = "coordinatorlayout", version = "1.2.0" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version = "2.2.0" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+androidx-multidex = { module = "androidx.multidex:multidex", version = "2.0.1" }
 
 #breadpartners = { module = "com.breadfinancial.breadpartners.sdk:BreadPartnersSDK", version = "0.0.1" }
 
