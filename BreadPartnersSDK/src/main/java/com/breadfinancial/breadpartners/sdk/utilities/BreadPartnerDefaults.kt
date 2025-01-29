@@ -1,7 +1,10 @@
+@file:Suppress("unused")
+
 package com.breadfinancial.breadpartners.sdk.utilities
 
 import android.graphics.Color
 import android.graphics.Typeface
+import android.view.ViewGroup
 import com.breadfinancial.breadpartners.sdk.core.models.Address
 import com.breadfinancial.breadpartners.sdk.core.models.Buyer
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
@@ -91,15 +94,13 @@ class BreadPartnerDefaults {
     val textPlacementRequestType4 = PlacementRequest(
         placements = listOf(
             PlacementRequestBody(
-                id = "",
-                context = ContextRequestBody(
+                id = "", context = ContextRequestBody(
                     ENV = "STAGE",
                     LOCATION = "RTPS-Approval",
                     embeddedUrl = "https://acquire1uat.comenity.net/prescreen/offer?mockMO=success&mockPA=success&mockVL=success&embedded=true&clientKey=8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7&prescreenId=79233069&cardType=&urlPath=%2F&firstName=Carol&lastName=Jones&address1=3075%20Loyalty%20Cir&city=Columbus&state=OH&zip=43219&storeNumber=2009&location=checkout&channel=O"
                 )
             )
-        ),
-        brandId = "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7"
+        ), brandId = "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7"
     )
 
     val dashboardWebViewURL =
@@ -173,11 +174,11 @@ class BreadPartnerDefaults {
 
     val textPlacementStyling = TextPlacementStyling(
         normalFont = Typeface.BOLD,
-        normalTextColor = Color.parseColor("#0000FF"),
+        normalTextColor = Color.BLACK,
         clickableFont = Typeface.BOLD,
-        clickableTextColor = Color.parseColor("#0000FF"),
+        clickableTextColor = Color.parseColor("#d50132"),
         textViewFrame = TextViewFrame(
-            width = 300, height = 200
+            width = ViewGroup.LayoutParams.MATCH_PARENT, height = 200
         )
     )
     val popUpStyling = PopUpStyling(

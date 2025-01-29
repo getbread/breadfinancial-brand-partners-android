@@ -52,7 +52,7 @@ class HTMLContentRenderer(
         interactiveText.configure(textPlacementModel, sdkConfiguration.textPlacementStyling!!) {
             handleLinkInteraction(textPlacementModel, responseModel)
         }
-        callback(BreadPartnerEvent.RenderTextView(view = interactiveText))
+        callback(BreadPartnerEvent.RenderTextView(appCompatTextView = interactiveText))
     }
 
     private fun handleLinkInteraction(
@@ -108,7 +108,7 @@ class HTMLContentRenderer(
     }
 
     private fun configurePopupPresentation(popupDialog: PopupDialog) {
-        callback(BreadPartnerEvent.RenderPopupView(view = popupDialog))
+        callback(BreadPartnerEvent.RenderPopupView(dialogFragment = popupDialog))
     }
 
     private fun showAlert(title: String, message: String) {

@@ -4,12 +4,8 @@ import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Typeface
 import android.os.Bundle
-import android.util.DisplayMetrics
-import android.view.Display
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.breadfinancial.breadpartners.sdk.core.BreadPartnerEvent
@@ -22,22 +18,9 @@ import com.breadfinancial.breadpartners.sdk.core.models.TextPlacementStyling
 import com.breadfinancial.breadpartners.sdk.core.models.TextViewFrame
 import com.breadfinancial.breadpartners.sdk.databinding.ActivityMainBinding
 import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnerDefaults
+import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnersExtensions.replaceTextView
 
 class MainActivity : AppCompatActivity() {
-
-    private fun getScreenWidth(context: Context): Int {
-        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val display: Display = windowManager.defaultDisplay
-
-        val metrics = DisplayMetrics()
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-            display.getRealMetrics(metrics)
-        } else {
-            @Suppress("DEPRECATION") display.getMetrics(metrics)
-        }
-
-        return metrics.widthPixels
-    }
 
     private lateinit var binding: ActivityMainBinding
 
@@ -68,7 +51,7 @@ class MainActivity : AppCompatActivity() {
             clickableFont = Typeface.BOLD,
             clickableTextColor = styleStructSet.clickableTextColor,
             textViewFrame = TextViewFrame(
-                width = getScreenWidth(this), height = 200
+                width = ViewGroup.LayoutParams.MATCH_PARENT, height = 200
             )
         )
 
@@ -130,27 +113,24 @@ class MainActivity : AppCompatActivity() {
 
         val config = PlacementsConfiguration(
             configModel = textPlacementRequest,
-            textPlacementStyling = textPlacementStyling,
-            popUpStyling = popUpStyling,
+            textPlacementStyling = null,
+            popUpStyling = null,
         )
 
         BreadPartnersSDK.getInstance().registerPlacements(config, this) { event ->
             when (event) {
                 is BreadPartnerEvent.RenderTextView -> {
-                    val view = event.view
-                    val textViewId = binding.interactiveTextOne.id
-                    val textView = findViewById<TextView>(
-                        textViewId
+                    val textView = binding.interactiveTextOne
+                    val parent = textView.parent as ViewGroup
+                    parent.replaceTextView(
+                        textView, event.appCompatTextView
                     )
-                    val parent = textView?.parent as ViewGroup
-                    val index = parent.indexOfChild(textView)
-                    parent.removeViewAt(index)
-                    parent.addView(view, index)
+
                     print("BreadPartnerSDK::Successfully rendered view.")
                 }
 
                 is BreadPartnerEvent.RenderPopupView -> {
-                    val view = event.view
+                    val view = event.dialogFragment
                     showYesNoAlert(this) { userConfirmed ->
                         if (userConfirmed) {
                             view.show(this.supportFragmentManager, "PopupDialog")
@@ -215,7 +195,7 @@ class MainActivity : AppCompatActivity() {
         BreadPartnersSDK.getInstance().submitRTPS(config2, this) { event ->
             when (event) {
                 is BreadPartnerEvent.RenderPopupView -> {
-                    val view = event.view
+                    val view = event.dialogFragment
                     view.show(this.supportFragmentManager, "PopupDialog")
                     print("BreadPartnerSDK::Successfully rendered PopupView.")
                 }

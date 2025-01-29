@@ -1,11 +1,11 @@
 package com.breadfinancial.breadpartners.sdk.core
 
-import android.view.View
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.DialogFragment
 
 sealed class BreadPartnerEvent {
-    data class RenderTextView(val view: View) : BreadPartnerEvent()
-    data class RenderPopupView(val view: DialogFragment) : BreadPartnerEvent()
+    data class RenderTextView(val appCompatTextView: AppCompatTextView) : BreadPartnerEvent()
+    data class RenderPopupView(val dialogFragment: DialogFragment) : BreadPartnerEvent()
     object TextClicked : BreadPartnerEvent()
     object ActionButtonTapped : BreadPartnerEvent()
     data class ScreenName(val name: String) : BreadPartnerEvent()

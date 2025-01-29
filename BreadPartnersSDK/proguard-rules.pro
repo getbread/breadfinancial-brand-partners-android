@@ -37,8 +37,9 @@
 -keep class android.graphics.drawable.** { *; }
 -dontwarn android.graphics.drawable.**
 
-# Keep entire class public
--keep public class com.breadfinancial.breadpartners.sdk.core.BreadPartnerEvent { *; }
-
 # Or keep all classes in a package public
 -keep public class com.breadfinancial.breadpartners.sdk.core.** { *; }
+
+-keep class androidx.multidex.** { *; }
+
+-dontwarn javax.annotation.**
