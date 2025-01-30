@@ -1,6 +1,6 @@
 package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.extensions
 
-import com.breadfinancial.breadpartners.sdk.core.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupDialog
 
 fun PopupDialog.closeButtonTapped() {

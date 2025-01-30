@@ -1,11 +1,15 @@
 package com.breadfinancial.breadpartners.sdk.utilities
 
 import android.os.Handler
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersRtpsConfig
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
+import com.breadfinancial.breadpartners.sdk.networking.APIUrl
+import com.breadfinancial.breadpartners.sdk.networking.APIUrlType
 import com.google.gson.Gson
+import java.net.URL
 
 class CommonUtils(
-    private val handler: Handler,
-    private val alertHandler: AlertHandler
+    private val handler: Handler, private val alertHandler: AlertHandler
 ) {
 
     // Executes a given block after a specified delay.
@@ -39,7 +43,9 @@ class CommonUtils(
         return dateFormatter.format(currentDate)
     }
 
-    fun <T> decodeJSON(jsonString: String, clazz: Class<T>, onSuccess: (T) -> Unit, onError: (Exception) -> Unit) {
+    fun <T> decodeJSON(
+        jsonString: String, clazz: Class<T>, onSuccess: (T) -> Unit, onError: (Exception) -> Unit
+    ) {
         try {
             val gson = Gson()
             val result = gson.fromJson(jsonString, clazz)
@@ -48,4 +54,40 @@ class CommonUtils(
             onError(error)
         }
     }
+
+    fun buildRTPSWebURL(
+        setupConfig: BreadPartnersSetupConfig, rtpsConfig: BreadPartnersRtpsConfig
+    ): URL? {
+        val queryParams = mapOf(
+            "mockMO" to rtpsConfig.mockResponse?.value,
+            "mockPA" to rtpsConfig.mockResponse?.value,
+            "mockVL" to rtpsConfig.mockResponse?.value,
+            "embedded" to "true",
+            "clientKey" to setupConfig.integrationKey,
+            "prescreenId" to rtpsConfig.prescreenId,
+            "cardType" to rtpsConfig.cardType,
+            "urlPath" to "screen name", // Replace with actual value if necessary
+            "firstName" to setupConfig.buyer?.givenName,
+            "lastName" to setupConfig.buyer?.familyName,
+            "address1" to setupConfig.buyer?.billingAddress?.address1,
+            "city" to setupConfig.buyer?.billingAddress?.locality,
+            "state" to setupConfig.buyer?.billingAddress?.region,
+            "zip" to setupConfig.buyer?.billingAddress?.postalCode,
+            "storeNumber" to setupConfig.storeNumber,
+            "location" to rtpsConfig.locationType?.name,
+            "channel" to rtpsConfig.channel
+        )
+
+        return try {
+            val urlComponents = URL(APIUrl(urlType = APIUrlType.RTPSWebURL("offer")).url)
+            val queryString =
+                queryParams.filterValues { !it.isNullOrEmpty() }.map { "${it.key}=${it.value}" }
+                    .joinToString("&")
+
+            URL("$urlComponents?$queryString")
+        } catch (e: Exception) {
+            null
+        }
+    }
+
 }

@@ -6,7 +6,8 @@ import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchBrandConfig
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSDKSetup
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentParser
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentRenderer
@@ -62,29 +63,22 @@ class BreadPartnersSDK private constructor() {
             alertHandler = alertHandler, htmlParser = jsoupHTMLParser
         )
     }
-    internal val htmlContentRenderer: HTMLContentRenderer by lazy {
-        HTMLContentRenderer(
-            htmlContentParser = htmlContentParser,
-            analyticsManager = analyticsManager,
-            logger = logger,
-            apiClient = apiClient,
-            alertHandler = alertHandler,
-            commonUtils = commonUtils,
-            callback = callback
-        )
-    }
+
+
     private val breadPartnerDefaults: BreadPartnerDefaults by lazy { BreadPartnerDefaults() }
     internal val coroutineScope: CoroutineScope by lazy { CoroutineScope(Dispatchers.Main) }
 
+    internal var htmlContentRenderer: HTMLContentRenderer? = null
     internal lateinit var application: Application
     internal lateinit var thisContext: AppCompatActivity
-    internal var breadPartnersSDKSetup: BreadPartnersSDKSetup? = null
+
+    internal var setupConfig: BreadPartnersSetupConfig? = null
     internal var placementsConfiguration: PlacementsConfiguration? = null
     internal var brandConfiguration: BrandConfigResponse? = null
     internal var rtpsFlow: Boolean = false
     internal var prescreenId: String? = null
 
-    fun setUpInjectables() {
+    private fun setUpInjectables() {
         placementsConfiguration?.textPlacementStyling ?: run {
             placementsConfiguration?.textPlacementStyling =
                 breadPartnerDefaults.textPlacementStyling
@@ -94,11 +88,24 @@ class BreadPartnersSDK private constructor() {
             placementsConfiguration?.popUpStyling = breadPartnerDefaults.popUpStyling
         }
         alertHandler.initialize(thisContext)
+
+        htmlContentRenderer = HTMLContentRenderer(
+            htmlContentParser = htmlContentParser,
+            analyticsManager = analyticsManager,
+            logger = logger,
+            apiClient = apiClient,
+            alertHandler = alertHandler,
+            commonUtils = commonUtils,
+            callback = callback,
+            setupConfig = setupConfig,
+            placementsConfiguration = placementsConfiguration,
+            brandConfiguration = brandConfiguration
+        )
     }
 
-    fun setup(sdkSetup: BreadPartnersSDKSetup, applicationContent: Application) {
-        breadPartnersSDKSetup = sdkSetup
-        logger.loggingEnabled = sdkSetup.enableLog
+    fun setup(setupConfig: BreadPartnersSetupConfig, applicationContent: Application) {
+        this.setupConfig = setupConfig
+        logger.loggingEnabled = setupConfig.enableLog
         this.application = applicationContent
     }
 

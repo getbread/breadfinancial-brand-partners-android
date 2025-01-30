@@ -2,7 +2,8 @@ package com.breadfinancial.breadpartners.sdk.htmlhandling
 
 import androidx.appcompat.app.AppCompatActivity
 import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
-import com.breadfinancial.breadpartners.sdk.core.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.InteractiveText
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupDialog
@@ -11,6 +12,7 @@ import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.Pla
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.TextPlacementModel
 import com.breadfinancial.breadpartners.sdk.networking.APIClient
+import com.breadfinancial.breadpartners.sdk.networking.models.BrandConfigResponse
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementsResponse
 import com.breadfinancial.breadpartners.sdk.utilities.AlertHandler
 import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
@@ -24,6 +26,9 @@ class HTMLContentRenderer(
     private val commonUtils: CommonUtils,
     private val logger: Logger,
     private val apiClient: APIClient,
+    private var setupConfig: BreadPartnersSetupConfig?,
+    private var placementsConfiguration: PlacementsConfiguration?,
+    private var brandConfiguration: BrandConfigResponse?,
     private val callback: (BreadPartnerEvent) -> Unit?
 ) {
 
@@ -102,7 +107,10 @@ class HTMLContentRenderer(
             commonUtils = commonUtils,
             apiClient = apiClient,
             htmlContentParser = htmlContentParser,
-            callback = callback
+            callback = callback,
+            setupConfig = setupConfig,
+            placementsConfiguration = placementsConfiguration,
+            brandConfiguration = brandConfiguration
         )
         configurePopupPresentation(popupDialog)
     }

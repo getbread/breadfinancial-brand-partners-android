@@ -1,8 +1,7 @@
 package com.breadfinancial.breadpartners.sdk.core.extensions
 
 import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
-import com.breadfinancial.breadpartners.sdk.core.models.RTPSRequest
-import com.breadfinancial.breadpartners.sdk.core.models.RTPSResponse
+import com.breadfinancial.breadpartners.sdk.core.models.LocationType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
 import com.breadfinancial.breadpartners.sdk.networking.APIUrl
@@ -10,7 +9,13 @@ import com.breadfinancial.breadpartners.sdk.networking.APIUrlType
 import com.breadfinancial.breadpartners.sdk.networking.HTTPMethod
 import com.breadfinancial.breadpartners.sdk.networking.Result
 import com.breadfinancial.breadpartners.sdk.networking.models.BrandConfigResponse
+import com.breadfinancial.breadpartners.sdk.networking.models.ContextRequestBody
+import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequest
+import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequestBody
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementsResponse
+import com.breadfinancial.breadpartners.sdk.networking.models.RTPSResponse
+import com.breadfinancial.breadpartners.sdk.networking.requestbuilders.PlacementRequestBuilder
+import com.breadfinancial.breadpartners.sdk.networking.requestbuilders.RTPSRequestBuilder
 import com.breadfinancial.breadpartners.sdk.utilities.Constants
 import com.google.android.recaptcha.RecaptchaAction
 import kotlinx.coroutines.launch
@@ -18,12 +23,10 @@ import kotlinx.coroutines.launch
 fun BreadPartnersSDK.fetchBrandConfig() {
     coroutineScope.launch {
         val apiUrl = APIUrl(
-            urlType = APIUrlType.BrandConfig(placementsConfiguration?.configModel?.brandId ?: "")
+            urlType = APIUrlType.BrandConfig(setupConfig?.integrationKey ?: "")
         ).url
         apiClient.request(
-            urlString = apiUrl,
-            method = HTTPMethod.POST,
-            body = placementsConfiguration?.configModel
+            urlString = apiUrl, method = HTTPMethod.GET, body = null
         ) { result ->
             when (result) {
                 is Result.Success -> {
@@ -89,25 +92,10 @@ fun BreadPartnersSDK.preScreenLookupCall(token: String) {
         val apiUrl = APIUrl(
             urlType = if (prescreenId == null) APIUrlType.PreScreen else APIUrlType.VirtualLookup
         ).url
-        val rtpsRequest = RTPSRequest(
-            urlPath = "/cart",
-            firstName = "Carol",
-            lastName = "Jones",
-            address1 = "3075 Loyalty Cir",
-            city = "Columbus",
-            state = "OH",
-            zip = "43219",
-            storeNumber = "2009",
-            location = "checkout",
-            channel = "O",
-            subchannel = "M",
-            reCaptchaToken = token,
-            mockResponse = "success",
-            overrideConfig = RTPSRequest.OverrideConfig(
-                enhancedPresentment = true
-            ),
-            prescreenId = null
+        val rtpsRequestBuilder = RTPSRequestBuilder(
+            setupConfig!!, placementsConfiguration?.rtpsConfig!!
         )
+        val rtpsRequest = rtpsRequestBuilder.build()
         rtpsRequest.reCaptchaToken = token
 
         apiClient.request(
@@ -118,8 +106,7 @@ fun BreadPartnersSDK.preScreenLookupCall(token: String) {
                     commonUtils.decodeJSON(result.data.toString(),
                         RTPSResponse::class.java,
                         onSuccess = { response ->
-                            val preScreenLookupResponse = response
-                            println("PreScreenID::${preScreenLookupResponse.prescreenId}")
+                            println("PreScreenID::${response.prescreenId}")
                             fetchPlacementData()
                         },
                         onError = { error ->
@@ -151,12 +138,34 @@ fun BreadPartnersSDK.fetchPlacementData() {
     val apiUrl = APIUrl(
         urlType = APIUrlType.GeneratePlacements
     ).url
+    var placementRequest: Any? = null
+    if (placementsConfiguration?.placementConfig != null) {
+        val builder = PlacementRequestBuilder(setupConfig, placementsConfiguration?.placementConfig)
+        placementRequest = builder.build()
+    } else {
+        val rtpsWebURL = commonUtils.buildRTPSWebURL(
+            setupConfig = setupConfig!!, rtpsConfig = placementsConfiguration?.rtpsConfig!!
+        )?.toString()
+
+        val location = when (placementsConfiguration?.rtpsConfig?.locationType) {
+            LocationType.CHECKOUT -> "RTPS-Approval"
+            else -> ""
+        }
+
+        placementRequest = PlacementRequest(
+            placements = listOf(
+                PlacementRequestBody(
+                    context = ContextRequestBody(
+                        ENV = "", LOCATION = location, embeddedUrl = rtpsWebURL
+                    )
+                )
+            ), brandId = setupConfig?.integrationKey
+        )
+    }
 
     coroutineScope.launch {
         apiClient.request(
-            urlString = apiUrl,
-            method = HTTPMethod.POST,
-            body = placementsConfiguration?.configModel
+            urlString = apiUrl, method = HTTPMethod.POST, body = placementRequest
         ) { result ->
             when (result) {
                 is Result.Success -> {
@@ -210,12 +219,12 @@ fun BreadPartnersSDK.handlePlacementResponse(response: Any) {
                     disclosure = "",
                     primaryActionButtonAttributes = null
                 )
-                htmlContentRenderer.createPopupOverlay(
+                htmlContentRenderer?.createPopupOverlay(
                     popupPlacementModel = popupPlacementModel,
                     overlayType = PlacementOverlayType.EMBEDDED_OVERLAY
                 )
             } else {
-                htmlContentRenderer.handleTextPlacement(
+                htmlContentRenderer?.handleTextPlacement(
                     placementsResponse, placementsConfiguration!!, thisContext
                 )
             }

@@ -5,7 +5,7 @@ import android.graphics.Color
 import android.view.View
 import android.widget.LinearLayout
 import com.breadfinancial.breadpartners.sdk.R
-import com.breadfinancial.breadpartners.sdk.core.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.BreadFinancialWebViewInterstitial

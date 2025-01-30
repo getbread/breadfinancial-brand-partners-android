@@ -14,13 +14,16 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.breadfinancial.breadpartners.sdk.R
-import com.breadfinancial.breadpartners.sdk.core.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
+import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentParser
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.BreadFinancialWebViewInterstitial
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.extensions.setupUI
 import com.breadfinancial.breadpartners.sdk.networking.APIClient
+import com.breadfinancial.breadpartners.sdk.networking.models.BrandConfigResponse
 import com.breadfinancial.breadpartners.sdk.utilities.AlertHandler
 import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
 import com.breadfinancial.breadpartners.sdk.utilities.LoaderIndicator
@@ -35,6 +38,9 @@ class PopupDialog(
     internal val commonUtils: CommonUtils,
     internal val htmlContentParser: HTMLContentParser,
     internal val logger: Logger,
+    internal var setupConfig: BreadPartnersSetupConfig?,
+    internal var placementsConfiguration: PlacementsConfiguration?,
+    internal var brandConfiguration: BrandConfigResponse?,
     internal val callback: (BreadPartnerEvent) -> Unit?
 ) : DialogFragment() {
 

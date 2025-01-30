@@ -1,36 +1,31 @@
 package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.extensions
 
-import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupDialog
 import com.breadfinancial.breadpartners.sdk.networking.APIUrl
 import com.breadfinancial.breadpartners.sdk.networking.APIUrlType
 import com.breadfinancial.breadpartners.sdk.networking.HTTPMethod
 import com.breadfinancial.breadpartners.sdk.networking.Result
-import com.breadfinancial.breadpartners.sdk.networking.models.ContextRequestBody
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequest
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequestBody
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementsResponse
+import com.breadfinancial.breadpartners.sdk.networking.requestbuilders.PlacementRequestBuilder
 import com.breadfinancial.breadpartners.sdk.utilities.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 fun PopupDialog.fetchWebViewPlacement() {
-    val configuration = BreadPartnersSDK.getInstance().placementsConfiguration
+
+    val builder = PlacementRequestBuilder(setupConfig, placementsConfiguration?.placementConfig)
+    val placementRequest = builder.build()
+
     val request = PlacementRequest(
         placements = listOf(
             PlacementRequestBody(
                 id = popupModel.primaryActionButtonAttributes?.dataContentFetch,
-                context = ContextRequestBody(
-                    SDK_TID = configuration!!.configModel.placements?.firstOrNull()?.context?.SDK_TID,
-                    ENV = configuration.configModel.placements?.firstOrNull()?.context?.ENV,
-                    LOCATION = configuration.configModel.placements?.firstOrNull()?.context?.LOCATION,
-                    channel = configuration.configModel.placements?.firstOrNull()?.context?.channel,
-                    subchannel = configuration.configModel.placements?.firstOrNull()?.context?.subchannel,
-                    ALLOW_CHECKOUT = configuration.configModel.placements?.firstOrNull()?.context?.ALLOW_CHECKOUT
-                )
+                context = placementRequest.placements?.firstOrNull()?.context
             )
-        ), brandId = configuration.configModel.brandId
+        ), brandId = setupConfig?.integrationKey
     )
 
     fetchData(request)

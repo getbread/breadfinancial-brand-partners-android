@@ -1,8 +1,5 @@
-package com.breadfinancial.breadpartners.sdk.core.models
+package com.breadfinancial.breadpartners.sdk.networking.models
 
-import kotlinx.serialization.Serializable
-
-@Serializable
 data class RTPSRequest(
     val urlPath: String? = null,
     val firstName: String? = null,
@@ -20,7 +17,7 @@ data class RTPSRequest(
     val overrideConfig: OverrideConfig? = null,
     val prescreenId: String? = null
 ) {
-    @Serializable
+
     data class OverrideConfig(
         val enhancedPresentment: Boolean? = null
     )

@@ -5,15 +5,16 @@ import android.graphics.Typeface
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequest
 
 data class PlacementsConfiguration(
-    val configModel: PlacementRequest,
-    var textPlacementStyling: TextPlacementStyling?,
-    var popUpStyling: PopUpStyling?,
+    val placementConfig: BreadPartnersPlacementConfig? = null,
+    val rtpsConfig: BreadPartnersRtpsConfig? = null,
+    var textPlacementStyling: TextPlacementStyling? = null,
+    var popUpStyling: PopUpStyling? = null,
 )
 
 data class TextPlacementStyling(
     val normalFont: Int = Typeface.NORMAL,
     val normalTextColor: Int = Color.BLACK,
-    val clickableFont:Int = Typeface.NORMAL,
+    val clickableFont: Int = Typeface.NORMAL,
     val clickableTextColor: Int = Color.BLUE,
     val textViewFrame: TextViewFrame
 )

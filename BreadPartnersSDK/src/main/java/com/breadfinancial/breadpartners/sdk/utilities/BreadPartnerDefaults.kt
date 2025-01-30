@@ -5,8 +5,18 @@ package com.breadfinancial.breadpartners.sdk.utilities
 import android.graphics.Color
 import android.graphics.Typeface
 import android.view.ViewGroup
-import com.breadfinancial.breadpartners.sdk.core.models.Address
-import com.breadfinancial.breadpartners.sdk.core.models.Buyer
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersAddress
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersBuyer
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersMockOptions
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersPlacementConfig
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersRtpsConfig
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
+import com.breadfinancial.breadpartners.sdk.core.models.CurrencyValue
+import com.breadfinancial.breadpartners.sdk.core.models.FinancingType
+import com.breadfinancial.breadpartners.sdk.core.models.LocationType
+import com.breadfinancial.breadpartners.sdk.core.models.Name
+import com.breadfinancial.breadpartners.sdk.core.models.Order
+import com.breadfinancial.breadpartners.sdk.core.models.PickupInformation
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
 import com.breadfinancial.breadpartners.sdk.core.models.PopupTextStyle
 import com.breadfinancial.breadpartners.sdk.core.models.StyleStruct
@@ -18,14 +28,14 @@ import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequestBo
 
 class BreadPartnerDefaults {
 
-    val buyer = Buyer(
+    val buyer = BreadPartnersBuyer(
         givenName = "John",
         familyName = "Smith",
         additionalName = "C.",
         birthDate = "1974-08-21",
         email = "jsmith@breadfinance.com",
         phone = "2123344141",
-        billingAddress = Address(
+        billingAddress = BreadPartnersAddress(
             address1 = "323 something lane",
             address2 = "apt. B",
             country = "US",
@@ -33,7 +43,7 @@ class BreadPartnerDefaults {
             region = "NY",
             postalCode = "11222"
         ),
-        shippingAddress = Address(
+        shippingAddress = BreadPartnersAddress(
             address1 = "323 something lane",
             address2 = "apt. B",
             country = "US",
@@ -224,4 +234,82 @@ class BreadPartnerDefaults {
         ),
         actionButtonColor = Color.parseColor("#d50132")
     )
+
+    val setupConfig1 = BreadPartnersSetupConfig(
+        enableLog = true,
+        integrationKey = "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7",
+        buyer = BreadPartnersBuyer(
+            givenName = "Jack",
+            familyName = "Seamus",
+            additionalName = "C.",
+            birthDate = "1974-08-21",
+            email = "johncseamus@gmail.com",
+            phone = "+13235323423",
+            billingAddress = BreadPartnersAddress(
+                address1 = "323 something lane",
+                address2 = "apt. B",
+                country = "USA",
+                locality = "NYC",
+                region = "NY",
+                postalCode = "11222"
+            ),
+            shippingAddress = null
+        ),
+        loyaltyID = "xxxxxx",
+        storeNumber = "1234567",
+        env = "STAGE",
+        channel = "P",
+        subchannel = "X"
+    )
+
+    val placementConfig1 = BreadPartnersPlacementConfig(
+        financingType = FinancingType.INSTALLMENTS,
+        locationType = LocationType.CATEGORY,
+        placementId = "03d69ff1-f90c-41b2-8a27-836af7f1eb98",
+        domID = "123",
+        order = Order(
+            subTotal = CurrencyValue(currency = "USD", value = 50000.0),
+            totalDiscounts = CurrencyValue(currency = "USD", value = 50000.0),
+            totalPrice = CurrencyValue(currency = "USD", value = 73900.0),
+            totalShipping = CurrencyValue(currency = "USD", value = 50000.0),
+            totalTax = CurrencyValue(currency = "USD", value = 50000.0),
+            discountCode = "string",
+            pickupInformation = PickupInformation(
+                name = Name(
+                    givenName = "John", familyName = "Doe"
+                ), phone = "+14539842345", address = BreadPartnersAddress(
+                    address1 = "156 5th Avenue",
+                    locality = "New York",
+                    postalCode = "10019",
+                    region = "US-NY",
+                    country = "US"
+                ), email = "john.doe@gmail.com"
+            ),
+            fulfillmentType = "type",
+            items = emptyList()
+        )
+    )
+    val setupConfig2 = BreadPartnersSetupConfig(
+        enableLog = true,
+        integrationKey = "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7",
+        buyer = BreadPartnersBuyer(
+            givenName = "Carol",
+            familyName = "Jones",
+            additionalName = "C.",
+            birthDate = "1974-08-21",
+            billingAddress = BreadPartnersAddress(
+                address1 = "3075 Loyalty Cir",
+                locality = "Columbus",
+                region = "OH",
+                postalCode = "43219"
+            )
+        ),
+        storeNumber = "2009"
+    )
+
+    val rtpsConfig1 = BreadPartnersRtpsConfig(
+        locationType = LocationType.CHECKOUT,
+        mockResponse = BreadPartnersMockOptions.SUCCESS
+    )
 }
+

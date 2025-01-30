@@ -1,21 +1,14 @@
 package com.breadfinancial.breadpartners.sdk.networking.models
 
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class PlacementRequest(
-    val placements: List<PlacementRequestBody>? = null,
-    val brandId: String? = null
+    val placements: List<PlacementRequestBody>? = null, val brandId: String? = null
 )
 
-@Serializable
 data class PlacementRequestBody(
-    val id: String? = null,
-    val context: ContextRequestBody? = null
+    val id: String? = null, val context: ContextRequestBody? = null
 )
 
-
-@Serializable
 data class ContextRequestBody(
     val SDK_TID: String? = null,
     val ENV: String? = null,
@@ -24,7 +17,7 @@ data class ContextRequestBody(
     val PREQUAL_ID: String? = null,
     val PREQUAL_CREDIT_LIMIT: String? = null,
     val LOCATION: String? = null,
-    val PRICE: Int? = null,
+    val PRICE: Long? = null,
     val EXISTING_CH: Boolean? = null,
     val OVERRIDE_KEY: String? = null,
     val CLIENT_VAR_4: String? = null,

@@ -1,27 +1,20 @@
 package com.breadfinancial.breadpartners.sdk.networking.models
 
-import kotlinx.serialization.Serializable
-
-@Serializable
 data class PlacementsResponse(
     val placements: List<PlacementsModel>? = null,
     val placementContent: List<PlacementContentModel>? = null
 )
 
-@Serializable
 data class PlacementsModel(
     val id: String? = null,
     val content: PlacementContentReferenceModel? = null,
     val renderContext: RenderContextModel? = null
 )
 
-@Serializable
 data class PlacementContentReferenceModel(
     val contentId: String? = null
 )
 
-@Suppress("CASE_INSENSITIVE_FILE_NAMES")
-@Serializable
 data class RenderContextModel(
     val LOCATION: String? = null,
     val subchannel: String? = null,
@@ -38,7 +31,6 @@ data class RenderContextModel(
     val embeddedUrl: String? = null
 )
 
-@Serializable
 data class PlacementContentModel(
     val id: String? = null,
     val contentType: String? = null,
@@ -46,12 +38,10 @@ data class PlacementContentModel(
     val metadata: MetadataModel? = null
 )
 
-@Serializable
 data class ContentDataModel(
     val htmlContent: String? = null
 )
 
-@Serializable
 data class MetadataModel(
     val placementId: String? = null,
     val productType: String? = null,

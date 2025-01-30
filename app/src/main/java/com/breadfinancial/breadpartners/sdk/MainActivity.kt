@@ -8,9 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.breadfinancial.breadpartners.sdk.core.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSDKSetup
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
 import com.breadfinancial.breadpartners.sdk.core.models.PopupTextStyle
@@ -34,14 +33,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupAndFetchPlacementUI() {
 
-
         BreadPartnersSDK.getInstance().setup(
-            sdkSetup = BreadPartnersSDKSetup(
-                integrationKey = "", buyer = BreadPartnerDefaults().buyer, enableLog = true
-            ), applicationContent = application
+            setupConfig = BreadPartnerDefaults().setupConfig1, applicationContent = application
         )
-
-        val textPlacementRequest = BreadPartnerDefaults().textPlacementRequestType1
 
         val styleStructSet = BreadPartnerDefaults().styleSet1
 
@@ -112,7 +106,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         val config = PlacementsConfiguration(
-            configModel = textPlacementRequest,
+            placementConfig = BreadPartnerDefaults().placementConfig1,
             textPlacementStyling = null,
             popUpStyling = null,
         )
@@ -181,13 +175,11 @@ class MainActivity : AppCompatActivity() {
 
     fun preScreenCheck(view: View) {
         BreadPartnersSDK.getInstance().setup(
-            sdkSetup = BreadPartnersSDKSetup(
-                integrationKey = "", buyer = BreadPartnerDefaults().buyer, enableLog = true
-            ), applicationContent = application
+            setupConfig = BreadPartnerDefaults().setupConfig2, applicationContent = application
         )
 
         val config2 = PlacementsConfiguration(
-            configModel = BreadPartnerDefaults().textPlacementRequestType4,
+            rtpsConfig = BreadPartnerDefaults().rtpsConfig1,
             textPlacementStyling = null,
             popUpStyling = null,
         )

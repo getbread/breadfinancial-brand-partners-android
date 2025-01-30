@@ -1,4 +1,4 @@
-package com.breadfinancial.breadpartners.sdk.core
+package com.breadfinancial.breadpartners.sdk.core.models
 
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.DialogFragment

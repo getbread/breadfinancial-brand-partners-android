@@ -1,8 +1,5 @@
-package com.breadfinancial.breadpartners.sdk.core.models
+package com.breadfinancial.breadpartners.sdk.networking.models
 
-import kotlinx.serialization.Serializable
-
-@Serializable
 data class RTPSResponse(
     val returnCode: Int,
     val errorMessage: String,
@@ -21,7 +18,6 @@ data class RTPSResponse(
     val hasExistingAccount: Boolean? = null,
     val debug: DebugInfo? = null
 ) {
-    @Serializable
     data class DebugInfo(
         val requests: String? = null
     )
