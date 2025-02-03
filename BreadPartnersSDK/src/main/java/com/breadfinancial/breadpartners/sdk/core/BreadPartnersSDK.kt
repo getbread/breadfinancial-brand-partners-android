@@ -77,6 +77,7 @@ class BreadPartnersSDK private constructor() {
     internal var brandConfiguration: BrandConfigResponse? = null
     internal var rtpsFlow: Boolean = false
     internal var prescreenId: String? = null
+    private var splitTextAndAction: Boolean = false
 
     private fun setUpInjectables() {
         placementsConfiguration?.textPlacementStyling ?: run {
@@ -86,6 +87,10 @@ class BreadPartnersSDK private constructor() {
 
         placementsConfiguration?.popUpStyling ?: run {
             placementsConfiguration?.popUpStyling = breadPartnerDefaults.popUpStyling
+        }
+        placementsConfiguration?.popUpStyling ?: run {
+            placementsConfiguration?.popUpStyling?.actionButtonStyle =
+                breadPartnerDefaults.actionButtonStyle
         }
         alertHandler.initialize(thisContext)
 
@@ -99,7 +104,8 @@ class BreadPartnersSDK private constructor() {
             callback = callback,
             setupConfig = setupConfig,
             placementsConfiguration = placementsConfiguration,
-            brandConfiguration = brandConfiguration
+            brandConfiguration = brandConfiguration,
+            splitTextAndAction = splitTextAndAction
         )
     }
 
@@ -112,9 +118,11 @@ class BreadPartnersSDK private constructor() {
     fun registerPlacements(
         placementsConfiguration: PlacementsConfiguration,
         viewContext: AppCompatActivity,
+        splitTextAndAction: Boolean = false,
         callback: (BreadPartnerEvent) -> Unit
     ) {
         this.placementsConfiguration = placementsConfiguration
+        this.splitTextAndAction = splitTextAndAction
         this.callback = callback
         this.thisContext = viewContext
         setUpInjectables()

@@ -3,6 +3,7 @@
 package com.breadfinancial.breadpartners.sdk.utilities
 
 import android.graphics.Color
+import android.graphics.Rect
 import android.graphics.Typeface
 import android.view.ViewGroup
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersAddress
@@ -18,10 +19,11 @@ import com.breadfinancial.breadpartners.sdk.core.models.Name
 import com.breadfinancial.breadpartners.sdk.core.models.Order
 import com.breadfinancial.breadpartners.sdk.core.models.PickupInformation
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
+import com.breadfinancial.breadpartners.sdk.core.models.PopupActionButtonStyle
 import com.breadfinancial.breadpartners.sdk.core.models.PopupTextStyle
 import com.breadfinancial.breadpartners.sdk.core.models.StyleStruct
 import com.breadfinancial.breadpartners.sdk.core.models.TextPlacementStyling
-import com.breadfinancial.breadpartners.sdk.core.models.TextViewFrame
+import com.breadfinancial.breadpartners.sdk.core.models.ViewFrame
 import com.breadfinancial.breadpartners.sdk.networking.models.ContextRequestBody
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequest
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequestBody
@@ -182,12 +184,45 @@ class BreadPartnerDefaults {
         popupDisclosureFont = Typeface.create("Arial-BoldMT", Typeface.BOLD)
     )
 
+    val styleSet3 = StyleStruct(
+        parsedRedColor = Color.parseColor("#000000"),
+        parsedGreyColor = Color.parseColor("#ececec"),
+        loaderColor = Color.parseColor("#0f2233"),
+        crossColor = Color.parseColor("#000000"),
+        dividerColor = Color.parseColor("#ececec"),
+        borderColor = Color.parseColor("#ececec"),
+        headerBgColor = Color.parseColor("#ececec"),
+        actionButtonColor = Color.parseColor("#000000"),
+
+        baseFontFamily = "Arial-BoldMT",
+        textSizeBold = 17.0f,
+        textSizeSemiBold = 15.0f,
+        textSizeRegular = 13.0f,
+        textSizeSmall = 11.0f,
+
+        normalTextColor = Color.BLACK,
+        clickableTextColor = Color.parseColor("#000000"),
+        titleTextColor = Color.BLACK,
+        subTitleTextColor = Color.GRAY,
+        headerTextColor = Color.GRAY,
+        paragraphTextColor = Color.GRAY,
+        connectorTextColor = Color.BLACK,
+        disclosureTextColor = Color.GRAY,
+
+        popupHeaderFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
+        popupTitleFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
+        popupSubTitleFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
+        popupParagraphFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
+        popupConnectorFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
+        popupDisclosureFont = Typeface.create("Arial-BoldMT", Typeface.BOLD)
+    )
+
     val textPlacementStyling = TextPlacementStyling(
         normalFont = Typeface.BOLD,
         normalTextColor = Color.BLACK,
         clickableFont = Typeface.BOLD,
         clickableTextColor = Color.parseColor("#d50132"),
-        textViewFrame = TextViewFrame(
+        textViewFrame = ViewFrame(
             width = ViewGroup.LayoutParams.MATCH_PARENT, height = 200
         )
     )
@@ -232,7 +267,23 @@ class BreadPartnerDefaults {
             textColor = Color.GRAY,
             textSize = 10.0f
         ),
-        actionButtonColor = Color.parseColor("#d50132")
+        actionButtonStyle = PopupActionButtonStyle(
+            font = Typeface.BOLD,
+            textColor = Color.WHITE,
+            frame = ViewFrame(width = 150, height = 50),
+            padding = Rect(16, 0, 16, 0),
+            backgroundColor = Color.BLUE,
+            cornerRadius = 12.0F
+        )
+    )
+
+    val actionButtonStyle = PopupActionButtonStyle(
+        font = Typeface.BOLD,
+        textColor = Color.WHITE,
+        frame = ViewFrame(width = 200, height = 50),
+        backgroundColor = Color.parseColor("#d50132"),
+        cornerRadius = 8.0F,
+        padding = Rect(16, 8, 16, 8)
     )
 
     val setupConfig1 = BreadPartnersSetupConfig(
@@ -308,8 +359,7 @@ class BreadPartnerDefaults {
     )
 
     val rtpsConfig1 = BreadPartnersRtpsConfig(
-        locationType = LocationType.CHECKOUT,
-        mockResponse = BreadPartnersMockOptions.SUCCESS
+        locationType = LocationType.CHECKOUT, mockResponse = BreadPartnersMockOptions.SUCCESS
     )
 }
 

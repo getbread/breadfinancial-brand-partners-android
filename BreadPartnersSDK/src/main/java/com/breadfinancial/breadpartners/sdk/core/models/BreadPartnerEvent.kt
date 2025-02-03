@@ -1,10 +1,17 @@
 package com.breadfinancial.breadpartners.sdk.core.models
 
+import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.DialogFragment
 
 sealed class BreadPartnerEvent {
-    data class RenderTextView(val appCompatTextView: AppCompatTextView) : BreadPartnerEvent()
+    data class RenderTextViewWithLink(val appCompatTextView: AppCompatTextView) :
+        BreadPartnerEvent()
+
+    data class RenderSeparateTextAndButton(val textView: TextView, val button: Button) :
+        BreadPartnerEvent()
+
     data class RenderPopupView(val dialogFragment: DialogFragment) : BreadPartnerEvent()
     object TextClicked : BreadPartnerEvent()
     object ActionButtonTapped : BreadPartnerEvent()

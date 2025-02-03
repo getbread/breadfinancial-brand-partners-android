@@ -5,12 +5,13 @@ import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
-import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.InteractiveText
-import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupDialog
-import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementActionType
+import com.breadfinancial.breadpartners.sdk.core.models.TextPlacementStyling
+import com.breadfinancial.breadpartners.sdk.htmlhandling.extensions.renderSingleTextView
+import com.breadfinancial.breadpartners.sdk.htmlhandling.extensions.renderTextAndButton
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.TextPlacementModel
+import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupDialog
 import com.breadfinancial.breadpartners.sdk.networking.APIClient
 import com.breadfinancial.breadpartners.sdk.networking.models.BrandConfigResponse
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementsResponse
@@ -20,59 +21,48 @@ import com.breadfinancial.breadpartners.sdk.utilities.Constants
 import com.breadfinancial.breadpartners.sdk.utilities.Logger
 
 class HTMLContentRenderer(
-    private val htmlContentParser: HTMLContentParser,
-    private val analyticsManager: AnalyticsManager,
-    private val alertHandler: AlertHandler,
-    private val commonUtils: CommonUtils,
-    private val logger: Logger,
-    private val apiClient: APIClient,
-    private var setupConfig: BreadPartnersSetupConfig?,
-    private var placementsConfiguration: PlacementsConfiguration?,
-    private var brandConfiguration: BrandConfigResponse?,
-    private val callback: (BreadPartnerEvent) -> Unit?
+    val htmlContentParser: HTMLContentParser,
+    val analyticsManager: AnalyticsManager,
+    val alertHandler: AlertHandler,
+    val commonUtils: CommonUtils,
+    val logger: Logger,
+    val apiClient: APIClient,
+    var setupConfig: BreadPartnersSetupConfig?,
+    var placementsConfiguration: PlacementsConfiguration?,
+    var brandConfiguration: BrandConfigResponse?,
+    var splitTextAndAction: Boolean = false,
+    val callback: (BreadPartnerEvent) -> Unit?
 ) {
+
+    var textPlacementModel: TextPlacementModel? = null
+    var responseModel: PlacementsResponse? = null
+    var textPlacementStyling: TextPlacementStyling? = null
+    var thisContext: AppCompatActivity? = null
 
     fun handleTextPlacement(
         responseModel: PlacementsResponse,
-        sdkConfiguration: PlacementsConfiguration,
         thisContext: AppCompatActivity
     ) {
+        this.responseModel = responseModel
+        this.thisContext = thisContext
         val indexOfPlacement = 0
-        val textPlacementModel = htmlContentParser.extractTextPlacementModel(
+        textPlacementModel = htmlContentParser.extractTextPlacementModel(
             htmlContent = responseModel.placementContent?.get(indexOfPlacement)?.contentData?.htmlContent
                 ?: ""
         )
-        logger.logTextPlacementModelDetails(textPlacementModel)
+        textPlacementStyling = placementsConfiguration?.textPlacementStyling
+
+        logger.logTextPlacementModelDetails(textPlacementModel!!)
         analyticsManager.sendViewPlacement(responseModel)
-        createTextView(textPlacementModel, responseModel, sdkConfiguration, thisContext)
-    }
-
-    private fun createTextView(
-        textPlacementModel: TextPlacementModel,
-        responseModel: PlacementsResponse,
-        sdkConfiguration: PlacementsConfiguration,
-        thisContext: AppCompatActivity
-    ) {
-        val interactiveText = InteractiveText(thisContext)
-        interactiveText.configure(textPlacementModel, sdkConfiguration.textPlacementStyling!!) {
-            handleLinkInteraction(textPlacementModel, responseModel)
-        }
-        callback(BreadPartnerEvent.RenderTextView(appCompatTextView = interactiveText))
-    }
-
-    private fun handleLinkInteraction(
-        textPlacementModel: TextPlacementModel, responseModel: PlacementsResponse
-    ) {
-        val actionType =
-            textPlacementModel.actionType?.let { htmlContentParser.handleActionType(it) }
-        if (actionType == PlacementActionType.SHOW_OVERLAY) {
-            handlePopupPlacement(textPlacementModel, responseModel)
+        if (splitTextAndAction) {
+            renderTextAndButton()
         } else {
-            showAlert(Constants.nativeSDKAlertTitle(), Constants.missingTextPlacementError)
+            renderSingleTextView()
         }
+
     }
 
-    private fun handlePopupPlacement(
+    fun handlePopupPlacement(
         textPlacementModel: TextPlacementModel, responseModel: PlacementsResponse
     ) {
         val popupPlacementHTMLContent = responseModel.placementContent?.find {
@@ -115,11 +105,11 @@ class HTMLContentRenderer(
         configurePopupPresentation(popupDialog)
     }
 
-    private fun configurePopupPresentation(popupDialog: PopupDialog) {
+    fun configurePopupPresentation(popupDialog: PopupDialog) {
         callback(BreadPartnerEvent.RenderPopupView(dialogFragment = popupDialog))
     }
 
-    private fun showAlert(title: String, message: String) {
+    fun showAlert(title: String, message: String) {
         alertHandler.showAlert(title = title, message = message, showOkButton = true)
     }
 }

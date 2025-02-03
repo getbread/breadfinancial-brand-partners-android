@@ -1,5 +1,6 @@
 package com.breadfinancial.breadpartners.sdk.utilities
 
+import android.graphics.Color
 import android.os.Handler
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersRtpsConfig
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
@@ -90,4 +91,11 @@ class CommonUtils(
         }
     }
 
+    fun darkerColor(color: Int): Int {
+        val factor = 0.8f
+        val r = (Color.red(color) * factor).toInt()
+        val g = (Color.green(color) * factor).toInt()
+        val b = (Color.blue(color) * factor).toInt()
+        return Color.rgb(r, g, b)
+    }
 }

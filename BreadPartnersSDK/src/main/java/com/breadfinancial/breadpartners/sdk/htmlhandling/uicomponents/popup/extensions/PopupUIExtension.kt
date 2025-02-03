@@ -2,11 +2,13 @@ package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.ext
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.StateListDrawable
 import android.view.View
 import android.widget.LinearLayout
 import com.breadfinancial.breadpartners.sdk.R
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.BreadFinancialWebViewInterstitial
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
@@ -20,6 +22,7 @@ fun PopupDialog.setupUI() {
 
     val configModel = BreadPartnersSDK.getInstance().placementsConfiguration
     val popupStyle = configModel!!.popUpStyling
+    val buttonStyle = popupStyle?.actionButtonStyle
 
     closeButton = popupView.findViewById(R.id.close_button)
     brandLogo = popupView.findViewById(R.id.brand_logo)
@@ -55,12 +58,32 @@ fun PopupDialog.setupUI() {
     headerLabel.applyTextStyle(popupStyle.headerPopupTextStyle)
 
     actionButton.text = popupModel.primaryActionButtonAttributes?.buttonText ?: "Action"
-    actionButton.setBackgroundColor(popupStyle.actionButtonColor)
+
+    val drawable = GradientDrawable().apply {
+        shape = GradientDrawable.RECTANGLE
+        cornerRadius = buttonStyle!!.cornerRadius
+        setColor(buttonStyle.backgroundColor)
+    }
+
+    val pressedDrawable = GradientDrawable().apply {
+        shape = GradientDrawable.RECTANGLE
+        cornerRadius = buttonStyle!!.cornerRadius
+        setColor(commonUtils.darkerColor(buttonStyle.backgroundColor))
+    }
+
+    val states = StateListDrawable().apply {
+        addState(intArrayOf(android.R.attr.state_pressed), pressedDrawable)
+        addState(intArrayOf(), drawable)
+    }
+
+    actionButton.background = states
+
 
     actionButton.setOnClickListener {
         callback(BreadPartnerEvent.PopupClosed)
 
-        onActionButtonTapped() }
+        onActionButtonTapped()
+    }
 
     context?.let {
         webViewManager = BreadFinancialWebViewInterstitial(it)

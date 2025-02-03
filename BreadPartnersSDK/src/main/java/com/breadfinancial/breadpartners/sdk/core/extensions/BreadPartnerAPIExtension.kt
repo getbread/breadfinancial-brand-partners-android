@@ -225,7 +225,7 @@ fun BreadPartnersSDK.handlePlacementResponse(response: Any) {
                 )
             } else {
                 htmlContentRenderer?.handleTextPlacement(
-                    placementsResponse, placementsConfiguration!!, thisContext
+                    placementsResponse, thisContext
                 )
             }
         },

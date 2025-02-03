@@ -1,28 +1,25 @@
 package com.breadfinancial.breadpartners.sdk.utilities
 
-import android.util.Log
 import android.view.Gravity
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 
 object BreadPartnersExtensions {
     fun ViewGroup.replaceTextView(
-        oldTextView: TextView?, newTextView: AppCompatTextView
+        oldTextView: TextView?, newTextView: TextView
     ) {
         val index = this.indexOfChild(oldTextView)
         if (index != -1 && oldTextView != null) {
 
-            // Remove old view
             removeViewAt(index)
 
-            // Configure the new TextView
             newTextView.apply {
                 id = oldTextView.id
 
-
-                Log.d("TextViewDebug", "New layoutParams without check: ${oldTextView.layoutParams}")
-                // Ensure layoutParams are preserved and width/height are set to wrap_content
                 this.layoutParams.apply {
                     width = oldTextView.layoutParams.width
                     height = oldTextView.layoutParams.height
@@ -30,7 +27,6 @@ object BreadPartnersExtensions {
                     if (this is ViewGroup.MarginLayoutParams) {
                         val oldMargins = oldTextView.layoutParams as? ViewGroup.MarginLayoutParams
                         oldMargins?.let {
-                            // Copy margins from oldTextView to the new TextView
                             setMargins(
                                 it.leftMargin, it.topMargin, it.rightMargin, it.bottomMargin
                             )
@@ -38,11 +34,9 @@ object BreadPartnersExtensions {
                     }
                 }
 
-                // Copy properties like gravity, text alignment
                 gravity = (oldTextView as? AppCompatTextView)?.gravity ?: Gravity.START
                 textAlignment = oldTextView.textAlignment
 
-                // Copy padding, background, and visibility
                 setPadding(
                     oldTextView.paddingLeft,
                     oldTextView.paddingTop,
@@ -54,8 +48,47 @@ object BreadPartnersExtensions {
 
             }
 
-            // Add the new view at the same index
             addView(newTextView, index)
         }
     }
+
+    fun ViewGroup.replaceButton(oldButton: Button?, newButton: Button) {
+        val index = this.indexOfChild(oldButton)
+        if (index != -1 && oldButton != null) {
+
+            when (val oldLayoutParams = oldButton.layoutParams) {
+                is LinearLayout.LayoutParams -> {
+                    val newLayoutParams = LinearLayout.LayoutParams(oldLayoutParams)
+                    newLayoutParams.gravity = oldLayoutParams.gravity
+                    newButton.layoutParams = newLayoutParams
+                }
+
+                is FrameLayout.LayoutParams -> {
+                    val newLayoutParams = FrameLayout.LayoutParams(oldLayoutParams)
+                    newLayoutParams.gravity = oldLayoutParams.gravity
+                    newButton.layoutParams = newLayoutParams
+                }
+
+                else -> {
+                    newButton.layoutParams = oldLayoutParams
+                }
+            }
+
+            newButton.layoutParams.apply {
+                width = oldButton.layoutParams.width
+                height = oldButton.layoutParams.height
+            }
+
+            removeViewAt(index)
+
+            newButton.setPadding(
+                newButton.paddingLeft,
+                newButton.paddingTop,
+                newButton.paddingRight,
+                newButton.paddingBottom
+            )
+            addView(newButton, index)
+        }
+    }
 }
+
