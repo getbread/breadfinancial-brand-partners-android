@@ -22,7 +22,6 @@ import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
 import com.breadfinancial.breadpartners.sdk.core.models.PopupActionButtonStyle
 import com.breadfinancial.breadpartners.sdk.core.models.PopupTextStyle
 import com.breadfinancial.breadpartners.sdk.core.models.StyleStruct
-import com.breadfinancial.breadpartners.sdk.core.models.TextPlacementStyling
 import com.breadfinancial.breadpartners.sdk.core.models.ViewFrame
 import com.breadfinancial.breadpartners.sdk.networking.models.ContextRequestBody
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequest
@@ -217,15 +216,6 @@ class BreadPartnerDefaults {
         popupDisclosureFont = Typeface.create("Arial-BoldMT", Typeface.BOLD)
     )
 
-    val textPlacementStyling = TextPlacementStyling(
-        normalFont = Typeface.BOLD,
-        normalTextColor = Color.BLACK,
-        clickableFont = Typeface.BOLD,
-        clickableTextColor = Color.parseColor("#d50132"),
-        textViewFrame = ViewFrame(
-            width = ViewGroup.LayoutParams.MATCH_PARENT, height = 200
-        )
-    )
     val popUpStyling = PopUpStyling(
         loaderColor = Color.parseColor("#0f2233"),
         crossColor = Color.BLACK,
@@ -287,8 +277,6 @@ class BreadPartnerDefaults {
     )
 
     val setupConfig1 = BreadPartnersSetupConfig(
-        enableLog = true,
-        integrationKey = "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7",
         buyer = BreadPartnersBuyer(
             givenName = "Jack",
             familyName = "Seamus",
@@ -341,8 +329,6 @@ class BreadPartnerDefaults {
         )
     )
     val setupConfig2 = BreadPartnersSetupConfig(
-        enableLog = true,
-        integrationKey = "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7",
         buyer = BreadPartnersBuyer(
             givenName = "Carol",
             familyName = "Jones",

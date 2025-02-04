@@ -57,14 +57,16 @@ class CommonUtils(
     }
 
     fun buildRTPSWebURL(
-        setupConfig: BreadPartnersSetupConfig, rtpsConfig: BreadPartnersRtpsConfig
+        integrationKey: String,
+        setupConfig: BreadPartnersSetupConfig,
+        rtpsConfig: BreadPartnersRtpsConfig
     ): URL? {
         val queryParams = mapOf(
             "mockMO" to rtpsConfig.mockResponse?.value,
             "mockPA" to rtpsConfig.mockResponse?.value,
             "mockVL" to rtpsConfig.mockResponse?.value,
             "embedded" to "true",
-            "clientKey" to setupConfig.integrationKey,
+            "clientKey" to integrationKey,
             "prescreenId" to rtpsConfig.prescreenId,
             "cardType" to rtpsConfig.cardType,
             "urlPath" to "screen name", // Replace with actual value if necessary

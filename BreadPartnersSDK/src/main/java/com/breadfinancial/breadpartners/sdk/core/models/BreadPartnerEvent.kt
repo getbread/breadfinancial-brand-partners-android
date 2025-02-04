@@ -1,23 +1,51 @@
 package com.breadfinancial.breadpartners.sdk.core.models
 
+import android.text.Spannable
 import android.widget.Button
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.fragment.app.DialogFragment
 
+/// Enum representing different events supported by BreadPartnerSDK.
 sealed class BreadPartnerEvent {
-    data class RenderTextViewWithLink(val appCompatTextView: AppCompatTextView) :
-        BreadPartnerEvent()
 
-    data class RenderSeparateTextAndButton(val textView: TextView, val button: Button) :
-        BreadPartnerEvent()
+    /// Renders a text view containing a clickable hyperlink.
+    /// - Parameter spannableText: A Spannable object containing the text with a clickable link.
+    data class RenderTextViewWithLink(val spannableText: Spannable) : BreadPartnerEvent()
 
+    /// Renders text and a button separately on the screen.
+    /// - Parameters:
+    ///   - textView: A TextView for displaying text.
+    ///   - button: A Button for user interactions.
+    data class RenderSeparateTextAndButton(val textView: TextView, val button: Button) : BreadPartnerEvent()
+
+    /// Displays a popup interface on the screen.
+    /// - Parameter dialogFragment: A DialogFragment that presents the popup.
     data class RenderPopupView(val dialogFragment: DialogFragment) : BreadPartnerEvent()
+
+    /// Detects when a text element is clicked.
+    /// This allows brand partners to trigger any specific action.
     object TextClicked : BreadPartnerEvent()
+
+    /// Detects when an action button inside a popup is tapped.
+    /// This provides a callback for brand partners to handle the button tap.
     object ActionButtonTapped : BreadPartnerEvent()
+
+    /// Provides a callback for tracking screen names, typically for analytics.
+    /// - Parameter name: The name of the current screen.
     data class ScreenName(val name: String) : BreadPartnerEvent()
+
+    /// Provides a success result from the web view, such as approval confirmation.
+    /// - Parameter result: The result object returned on success.
     data class WebViewSuccess(val result: Any) : BreadPartnerEvent()
+
+    /// Provides an error result from the web view, such as a failure response.
+    /// - Parameter error: The error object detailing the issue.
     data class WebViewFailure(val error: Throwable) : BreadPartnerEvent()
+
+    /// Detects when the popup is closed at any point and provides a callback.
     object PopupClosed : BreadPartnerEvent()
+
+    /// Provides information about any SDK-related errors.
+    /// - Parameter error: The error object detailing the issue.
     data class SdkError(val error: Throwable) : BreadPartnerEvent()
 }

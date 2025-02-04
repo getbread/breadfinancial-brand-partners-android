@@ -1,6 +1,7 @@
 package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents
 
 import android.content.Context
+import android.graphics.Typeface
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
@@ -10,7 +11,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatTextView
-import com.breadfinancial.breadpartners.sdk.core.models.TextPlacementStyling
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.TextPlacementModel
 
 class InteractiveText @JvmOverloads constructor(
@@ -18,6 +18,8 @@ class InteractiveText @JvmOverloads constructor(
 ) : AppCompatTextView(context, attrs, defStyleAttr) {
 
     private var tapHandler: ((String) -> Unit)? = null
+    private var normalText = ""
+    private var clickableText = ""
 
     init {
         isClickable = true
@@ -26,49 +28,41 @@ class InteractiveText @JvmOverloads constructor(
     }
 
     fun configure(
-        textPlacementModel: TextPlacementModel,
-        textPlacementStyling: TextPlacementStyling,
-        link: ((String) -> Unit)? = null
-    ) {
+        textPlacementModel: TextPlacementModel, link: ((String) -> Unit)? = null
+    ): Spannable {
         this.tapHandler = link
 
-        val normalText = textPlacementModel.contentText ?: ""
-        val clickableText = textPlacementModel.actionLink ?: ""
+        normalText = textPlacementModel.contentText ?: ""
+        clickableText = textPlacementModel.actionLink ?: ""
 
-        val spannableContent = createSpannableText(normalText, clickableText, textPlacementStyling)
+        val spannableContent = createSpannableText("$normalText ", clickableText)
 
         text = spannableContent
+        return spannableContent
     }
 
     private fun createSpannableText(
-        normalText: String, clickableText: String, textPlacementStyling: TextPlacementStyling
+        normalText: String, clickableText: String
     ): Spannable {
 
         textSize = 16.0F
 
-        setTextColor(textPlacementStyling.normalTextColor)
-
         val layoutParams = LinearLayout.LayoutParams(
-            (textPlacementStyling.textViewFrame.width), (textPlacementStyling.textViewFrame.height)
+            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
         )
         this.layoutParams = layoutParams
-
-        setLinkTextColor(textPlacementStyling.clickableTextColor)
 
         val spannableString = SpannableString(normalText + clickableText)
 
         val normalTextEndIndex = normalText.length
         spannableString.setSpan(
-            StyleSpan(textPlacementStyling.normalFont),
-            0,
-            normalTextEndIndex,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            StyleSpan(Typeface.NORMAL), 0, normalTextEndIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
         val clickableTextEndIndex = normalTextEndIndex + clickableText.length
 
         spannableString.setSpan(
-            StyleSpan(textPlacementStyling.clickableFont),
+            StyleSpan(Typeface.BOLD),
             normalTextEndIndex,
             clickableTextEndIndex,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE

@@ -7,28 +7,7 @@ import android.graphics.Typeface
 data class PlacementsConfiguration(
     val placementConfig: BreadPartnersPlacementConfig? = null,
     val rtpsConfig: BreadPartnersRtpsConfig? = null,
-    var textPlacementStyling: TextPlacementStyling? = null,
     var popUpStyling: PopUpStyling? = null,
-)
-
-data class TextPlacementStyling(
-    val normalFont: Int = Typeface.NORMAL,
-    val normalTextColor: Int = Color.BLACK,
-    val clickableFont: Int = Typeface.NORMAL,
-    val clickableTextColor: Int = Color.BLUE,
-    val textViewFrame: ViewFrame = ViewFrame(width = 100, height = 100),
-
-    val buttonFont: Int = Typeface.NORMAL,
-    val buttonTextColor: Int = Color.WHITE,
-    val buttonFrame: ViewFrame = ViewFrame(width = 100, height = 100),
-    val buttonPadding: Rect = Rect(0, 0, 100, 100),
-    val buttonBackgroundColor: Int = Color.BLACK,
-    val buttonCornerRadius: Float = 8.0F,
-    val buttonTextSize: Float = 12F,
-)
-
-data class ViewFrame(
-    val width: Int, val height: Int
 )
 
 data class PopUpStyling(
@@ -59,6 +38,10 @@ data class PopupActionButtonStyle(
     val padding: Rect = Rect(0, 0, 0, 0),
     val backgroundColor: Int = Color.BLACK,
     val cornerRadius: Float = 8.0F
+)
+
+data class ViewFrame(
+    val width: Int, val height: Int
 )
 
 data class StyleStruct(

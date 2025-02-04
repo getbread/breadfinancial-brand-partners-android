@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 fun BreadPartnersSDK.fetchBrandConfig() {
     coroutineScope.launch {
         val apiUrl = APIUrl(
-            urlType = APIUrlType.BrandConfig(setupConfig?.integrationKey ?: "")
+            urlType = APIUrlType.BrandConfig(integrationKey)
         ).url
         apiClient.request(
             urlString = apiUrl, method = HTTPMethod.GET, body = null
@@ -44,13 +44,6 @@ fun BreadPartnersSDK.fetchBrandConfig() {
                                 showOkButton = true
                             )
                         })
-                    if (rtpsFlow) {
-//                        executeSecurityCheck()
-//                        preScreenLookupCall(token= "")
-                        fetchPlacementData()
-                    } else {
-                        fetchPlacementData()
-                    }
                 }
 
                 is Result.Failure -> {
@@ -140,10 +133,15 @@ fun BreadPartnersSDK.fetchPlacementData() {
     ).url
     var placementRequest: Any? = null
     if (placementsConfiguration?.placementConfig != null) {
-        val builder = PlacementRequestBuilder(setupConfig, placementsConfiguration?.placementConfig)
+        val builder = PlacementRequestBuilder(
+            integrationKey = integrationKey,
+            setupConfig,
+            placementsConfiguration?.placementConfig
+        )
         placementRequest = builder.build()
     } else {
         val rtpsWebURL = commonUtils.buildRTPSWebURL(
+            integrationKey = integrationKey,
             setupConfig = setupConfig!!, rtpsConfig = placementsConfiguration?.rtpsConfig!!
         )?.toString()
 
@@ -159,7 +157,7 @@ fun BreadPartnersSDK.fetchPlacementData() {
                         ENV = "", LOCATION = location, embeddedUrl = rtpsWebURL
                     )
                 )
-            ), brandId = setupConfig?.integrationKey
+            ), brandId = integrationKey
         )
     }
 

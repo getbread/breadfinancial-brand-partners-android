@@ -7,10 +7,12 @@ import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequest
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequestBody
 
 class PlacementRequestBuilder(
-    setupConfig: BreadPartnersSetupConfig?, placementConfig: BreadPartnersPlacementConfig?
+    integrationKey: String,
+    setupConfig: BreadPartnersSetupConfig?,
+    placementConfig: BreadPartnersPlacementConfig?
 ) {
     private var placements: MutableList<PlacementRequestBody> = mutableListOf()
-    private var brandId: String = setupConfig?.integrationKey.orEmpty()
+    private var brandId: String = integrationKey
 
     init {
         createPlacementRequestBody(setupConfig, placementConfig)

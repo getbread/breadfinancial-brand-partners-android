@@ -6,6 +6,7 @@ import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchBrandConfig
+import com.breadfinancial.breadpartners.sdk.core.extensions.fetchPlacementData
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
@@ -33,6 +34,9 @@ class BreadPartnersSDK private constructor() {
             return instance!!
         }
     }
+
+    internal lateinit var integrationKey: String
+    private var enableLog: Boolean = false
 
     private lateinit var callback: ((BreadPartnerEvent) -> Unit?)
     private val logger: Logger by lazy {
@@ -80,10 +84,6 @@ class BreadPartnersSDK private constructor() {
     private var splitTextAndAction: Boolean = false
 
     private fun setUpInjectables() {
-        placementsConfiguration?.textPlacementStyling ?: run {
-            placementsConfiguration?.textPlacementStyling =
-                breadPartnerDefaults.textPlacementStyling
-        }
 
         placementsConfiguration?.popUpStyling ?: run {
             placementsConfiguration?.popUpStyling = breadPartnerDefaults.popUpStyling
@@ -95,6 +95,7 @@ class BreadPartnersSDK private constructor() {
         alertHandler.initialize(thisContext)
 
         htmlContentRenderer = HTMLContentRenderer(
+            integrationKey = integrationKey,
             htmlContentParser = htmlContentParser,
             analyticsManager = analyticsManager,
             logger = logger,
@@ -109,36 +110,91 @@ class BreadPartnersSDK private constructor() {
         )
     }
 
-    fun setup(setupConfig: BreadPartnersSetupConfig, applicationContent: Application) {
-        this.setupConfig = setupConfig
-        logger.loggingEnabled = setupConfig.enableLog
+    /**
+     * Call this function when the app launches.
+     *
+     * @param integrationKey A unique key specific to the brand.
+     * @param enableLog Set this to `true` if you want to see debug logs.
+     * @param applicationContent `Application` context for the entire app.
+     *
+     */
+    fun setup(integrationKey: String, enableLog: Boolean = false, applicationContent: Application) {
+        this.integrationKey = integrationKey
+        logger.loggingEnabled = enableLog
         this.application = applicationContent
+
+        fetchBrandConfig()
     }
 
+    /**
+     * Use this function to display text placements in your app's UI.
+     *
+     * @param setupConfig Provide user account details in this configuration.
+     * @param placementsConfiguration Specify the pre-defined placement details required for building the UI.
+     * @param splitTextAndAction Set this to `true` if you want the placement to return either text with a link or a combination of text and button.
+     * @param viewContext The current `AppCompatActivity` context where the view will be displayed.
+     * @param callback A function that handles user interactions and ongoing events related to the placements.
+     */
     fun registerPlacements(
+        setupConfig: BreadPartnersSetupConfig,
         placementsConfiguration: PlacementsConfiguration,
         viewContext: AppCompatActivity,
         splitTextAndAction: Boolean = false,
         callback: (BreadPartnerEvent) -> Unit
     ) {
+        this.setupConfig = setupConfig
         this.placementsConfiguration = placementsConfiguration
         this.splitTextAndAction = splitTextAndAction
         this.callback = callback
         this.thisContext = viewContext
+
         setUpInjectables()
-        fetchBrandConfig()
+
+        if (brandConfiguration == null) {
+            callback.invoke(
+                BreadPartnerEvent.SdkError(
+                    error = Exception("Brand configurations are missing or unavailable.")
+                )
+            )
+        }
+
+        fetchPlacementData()
+
     }
 
+    /**
+     * Call this function to check if the user qualifies for a pre-screen card application.
+     *
+     * @param setupConfig Provide user account details in this configuration.
+     * @param placementsConfiguration Specify the pre-defined placement details required for building the UI.
+     * @param viewContext The current `AppCompatActivity` context where the view will be displayed.
+     * @param callback A function that handles user interactions and ongoing events related to the placements.
+     */
     fun submitRTPS(
+        setupConfig: BreadPartnersSetupConfig,
         placementsConfiguration: PlacementsConfiguration,
         viewContext: AppCompatActivity,
         callback: (BreadPartnerEvent) -> Unit
     ) {
+        this.setupConfig = setupConfig
         this.placementsConfiguration = placementsConfiguration
         this.callback = callback
         this.thisContext = viewContext
         this.rtpsFlow = true
+
         setUpInjectables()
-        fetchBrandConfig()
+
+        if (brandConfiguration == null) {
+            callback.invoke(
+                BreadPartnerEvent.SdkError(
+                    error = Exception("Brand configurations are missing or unavailable.")
+                )
+            )
+        }
+
+//                        executeSecurityCheck()
+//                        preScreenLookupCall(token= "")
+        fetchPlacementData()
+
     }
 }

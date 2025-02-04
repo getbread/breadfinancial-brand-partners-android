@@ -5,7 +5,6 @@ import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
-import com.breadfinancial.breadpartners.sdk.core.models.TextPlacementStyling
 import com.breadfinancial.breadpartners.sdk.htmlhandling.extensions.renderSingleTextView
 import com.breadfinancial.breadpartners.sdk.htmlhandling.extensions.renderTextAndButton
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
@@ -21,6 +20,7 @@ import com.breadfinancial.breadpartners.sdk.utilities.Constants
 import com.breadfinancial.breadpartners.sdk.utilities.Logger
 
 class HTMLContentRenderer(
+    val integrationKey: String,
     val htmlContentParser: HTMLContentParser,
     val analyticsManager: AnalyticsManager,
     val alertHandler: AlertHandler,
@@ -36,7 +36,6 @@ class HTMLContentRenderer(
 
     var textPlacementModel: TextPlacementModel? = null
     var responseModel: PlacementsResponse? = null
-    var textPlacementStyling: TextPlacementStyling? = null
     var thisContext: AppCompatActivity? = null
 
     fun handleTextPlacement(
@@ -50,7 +49,6 @@ class HTMLContentRenderer(
             htmlContent = responseModel.placementContent?.get(indexOfPlacement)?.contentData?.htmlContent
                 ?: ""
         )
-        textPlacementStyling = placementsConfiguration?.textPlacementStyling
 
         logger.logTextPlacementModelDetails(textPlacementModel!!)
         analyticsManager.sendViewPlacement(responseModel)
@@ -90,6 +88,7 @@ class HTMLContentRenderer(
         popupPlacementModel: PopupPlacementModel, overlayType: PlacementOverlayType
     ) {
         val popupDialog = PopupDialog(
+            integrationKey,
             popupPlacementModel,
             overlayType,
             alertHandler = alertHandler,

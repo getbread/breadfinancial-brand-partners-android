@@ -1,8 +1,6 @@
 package com.breadfinancial.breadpartners.sdk.core.models
 
 data class BreadPartnersSetupConfig(
-    var enableLog: Boolean = false,
-    var integrationKey: String? = null,
     var buyer: BreadPartnersBuyer? = null,
     var loyaltyID: String? = null,
     var storeNumber: String? = null,

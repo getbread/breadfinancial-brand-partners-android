@@ -31,6 +31,7 @@ import com.breadfinancial.breadpartners.sdk.utilities.Logger
 import com.bumptech.glide.Glide
 
 class PopupDialog(
+    internal val integrationKey: String,
     internal val popupModel: PopupPlacementModel,
     internal val overlayType: PlacementOverlayType,
     internal val apiClient: APIClient,
