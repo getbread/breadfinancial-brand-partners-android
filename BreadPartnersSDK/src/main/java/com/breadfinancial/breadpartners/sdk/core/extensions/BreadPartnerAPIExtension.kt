@@ -20,6 +20,9 @@ import com.breadfinancial.breadpartners.sdk.utilities.Constants
 import com.google.android.recaptcha.RecaptchaAction
 import kotlinx.coroutines.launch
 
+/**
+ * Retrieves brand-specific configurations, such as the Recaptcha key.
+ */
 fun BreadPartnersSDK.fetchBrandConfig() {
     coroutineScope.launch {
         val apiUrl = APIUrl(
@@ -58,6 +61,10 @@ fun BreadPartnersSDK.fetchBrandConfig() {
     }
 }
 
+/**
+ * Performs a bot behavior check using the Recaptcha v3 SDK
+ * to protect against malicious attacks.
+ */
 fun BreadPartnersSDK.executeSecurityCheck() {
     coroutineScope.launch {
 //        val siteKey = brandConfiguration?.config?.recaptchaSiteKeyQA
@@ -80,6 +87,14 @@ fun BreadPartnersSDK.executeSecurityCheck() {
     }
 }
 
+/**
+ * Once the Recaptcha token is obtained, makes the pre-screen lookup API call.
+ *
+ * - If `prescreenId` was previously saved by the brand partner when calling the pre-screen endpoint,
+ *   triggers `virtualLookup`.
+ * - Otherwise, calls the pre-screen endpoint to fetch the `prescreenId`.
+ * - Both endpoints require user details to build the request payload.
+ */
 fun BreadPartnersSDK.preScreenLookupCall(token: String) {
     coroutineScope.launch {
         val apiUrl = APIUrl(
@@ -126,7 +141,10 @@ fun BreadPartnersSDK.preScreenLookupCall(token: String) {
     }
 }
 
-
+/**
+ * Fetches placement data to be displayed as a text view with a clickable button
+ * in the brand partner's UI.
+ */
 fun BreadPartnersSDK.fetchPlacementData() {
     val apiUrl = APIUrl(
         urlType = APIUrlType.GeneratePlacements

@@ -5,6 +5,9 @@ import com.google.android.recaptcha.Recaptcha
 import com.google.android.recaptcha.RecaptchaAction
 import com.google.android.recaptcha.RecaptchaException
 
+/**
+ * `RecaptchaManager` handles the process of executing a reCAPTCHA for verifying user actions.
+ */
 class RecaptchaManager {
 
     suspend fun executeReCaptcha(

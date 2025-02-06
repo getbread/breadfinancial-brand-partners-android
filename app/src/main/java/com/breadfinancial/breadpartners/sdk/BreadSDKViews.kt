@@ -3,13 +3,10 @@ package com.breadfinancial.breadpartners.sdk
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.StateListDrawable
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.setPadding
-import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnersExtensions.replaceButton
-import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnersExtensions.replaceTextView
 
 class BreadSDKViews {
 

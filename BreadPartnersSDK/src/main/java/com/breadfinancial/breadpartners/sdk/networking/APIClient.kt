@@ -30,11 +30,23 @@ interface APIClientProtocol {
     )
 }
 
+/**
+ * A utility class for making HTTP API requests.
+ */
 class APIClient(
     private val coroutineScope: CoroutineScope,
     private val logger: Logger
 ) : APIClientProtocol {
 
+    /**
+     * Generic API call function.
+     *
+     * - Parameters:
+     *   - urlString: The URL endpoint as a string.
+     *   - method: HTTP method (e.g., "GET", "POST").
+     *   - body: Optional request body, can be a map (`Map<String, Any>`) or a model that implements `Serializable`.
+     *   - completion: A lambda to handle the result, returning success with response or failure with error.
+     */
     override fun request(
         urlString: String,
         method: HTTPMethod,

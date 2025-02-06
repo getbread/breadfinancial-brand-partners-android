@@ -12,6 +12,11 @@ import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * BallSpinFadeLoader class.
+ *
+ * Handles the animation or behavior for a ball spin fade loader, typically used for showing loading states.
+ */
 class LoaderIndicator @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,

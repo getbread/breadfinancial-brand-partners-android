@@ -1,6 +1,9 @@
 package com.breadfinancial.breadpartners.sdk.core
 
 import android.app.Application
+import android.graphics.Color
+import android.graphics.Rect
+import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +13,10 @@ import com.breadfinancial.breadpartners.sdk.core.extensions.fetchPlacementData
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
+import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
+import com.breadfinancial.breadpartners.sdk.core.models.PopupActionButtonStyle
+import com.breadfinancial.breadpartners.sdk.core.models.PopupTextStyle
+import com.breadfinancial.breadpartners.sdk.core.models.ViewFrame
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentParser
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentRenderer
 import com.breadfinancial.breadpartners.sdk.htmlhandling.JsoupHTMLParser
@@ -17,7 +24,6 @@ import com.breadfinancial.breadpartners.sdk.networking.APIClient
 import com.breadfinancial.breadpartners.sdk.networking.models.BrandConfigResponse
 import com.breadfinancial.breadpartners.sdk.security.RecaptchaManager
 import com.breadfinancial.breadpartners.sdk.utilities.AlertHandler
-import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnerDefaults
 import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
 import com.breadfinancial.breadpartners.sdk.utilities.Logger
 import kotlinx.coroutines.CoroutineScope
@@ -68,8 +74,6 @@ class BreadPartnersSDK private constructor() {
         )
     }
 
-
-    private val breadPartnerDefaults: BreadPartnerDefaults by lazy { BreadPartnerDefaults() }
     internal val coroutineScope: CoroutineScope by lazy { CoroutineScope(Dispatchers.Main) }
 
     internal var htmlContentRenderer: HTMLContentRenderer? = null
@@ -85,12 +89,68 @@ class BreadPartnersSDK private constructor() {
 
     private fun setUpInjectables() {
 
+        // region Default Popup action button Style
+        val actionButtonStyle = PopupActionButtonStyle(
+            font = Typeface.BOLD,
+            textColor = Color.WHITE,
+            frame = ViewFrame(width = 200, height = 50),
+            backgroundColor = Color.parseColor("#d50132"),
+            cornerRadius = 8.0F,
+            padding = Rect(16, 8, 16, 8)
+        )
+        // endregion
+
+        // region Default Popup Style
+        val popUpStyling = PopUpStyling(
+            loaderColor = Color.parseColor("#0f2233"),
+            crossColor = Color.BLACK,
+            dividerColor = Color.parseColor("#ececec"),
+            borderColor = Color.parseColor("#ececec"),
+            titlePopupTextStyle = PopupTextStyle(
+                font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
+                textColor = Color.BLACK,
+                textSize = 16.0f
+            ),
+            subTitlePopupTextStyle = PopupTextStyle(
+                font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
+                textColor = Color.GRAY,
+                textSize = 12.0f
+            ),
+            headerPopupTextStyle = PopupTextStyle(
+                font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
+                textColor = Color.GRAY,
+                textSize = 14.0f
+            ),
+            headerBgColor = Color.parseColor("#ececec"),
+            headingThreePopupTextStyle = PopupTextStyle(
+                font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
+                textColor = Color.parseColor("#d50132"),
+                textSize = 14.0f
+            ),
+            paragraphPopupTextStyle = PopupTextStyle(
+                font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
+                textColor = Color.GRAY,
+                textSize = 10.0f
+            ),
+            connectorPopupTextStyle = PopupTextStyle(
+                font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
+                textColor = Color.BLACK,
+                textSize = 14.0f
+            ),
+            disclosurePopupTextStyle = PopupTextStyle(
+                font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
+                textColor = Color.GRAY,
+                textSize = 10.0f
+            ),
+            actionButtonStyle = actionButtonStyle
+        )
+        //endregion
+
         placementsConfiguration?.popUpStyling ?: run {
-            placementsConfiguration?.popUpStyling = breadPartnerDefaults.popUpStyling
+            placementsConfiguration?.popUpStyling = popUpStyling
         }
         placementsConfiguration?.popUpStyling ?: run {
-            placementsConfiguration?.popUpStyling?.actionButtonStyle =
-                breadPartnerDefaults.actionButtonStyle
+            placementsConfiguration?.popUpStyling?.actionButtonStyle = actionButtonStyle
         }
         alertHandler.initialize(thisContext)
 

@@ -4,12 +4,26 @@ import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.Typeface
 
+/**
+ * Data class that provides configurations for the `registerPlacement` or `submitRTPS` methods.
+ *
+ * @property placementConfig Defines text placements on the brand partner screen for the `registerPlacementFlow`.
+ * @property rtpsConfig Specifies the real-time pre-screen configuration for the prescreen flow.
+ * @property popUpStyling Configures the popup styling for each element rendered within the popup.
+ */
 data class PlacementsConfiguration(
     val placementConfig: BreadPartnersPlacementConfig? = null,
     val rtpsConfig: BreadPartnersRtpsConfig? = null,
     var popUpStyling: PopUpStyling? = null,
 )
 
+/**
+ * Structure used to provide styling configurations for the `PopupController`.
+ *
+ * - Colors are defined using `UIColor` or `CGColor` for various popup elements like header background, border.
+ * - Text styles are configured using `PopupTextStyle` structure for titles, headers, and other text elements.
+ * - Button style can be optionally specified using `PopupActionButtonStyle`.
+ */
 data class PopUpStyling(
     val loaderColor: Int = Color.BLACK,
     val crossColor: Int = Color.BLACK,
@@ -26,10 +40,27 @@ data class PopUpStyling(
     var actionButtonStyle: PopupActionButtonStyle? = null,
 )
 
+/**
+ * Structure that defines text styling config for popup elements.
+ *
+ * - `font`: Specifies the font family and font size for the text.
+ * - `textColor`: Specifies the color of the text.
+ * - `textSize`: Specifies the size of the text.
+ */
 data class PopupTextStyle(
     val font: Typeface? = null, val textColor: Int? = null, val textSize: Float? = null
 )
 
+/**
+ * Structure that defines style configurations for action buttons in popups.
+ *
+ * - `font`: Specifies the font for the button title.
+ * - `textColor`: Specifies the color of the button title text.
+ * - `frame`: Specifies the frame dimensions for the button.
+ * - `backgroundColor`: Specifies the background color of the button.
+ * - `cornerRadius`: Specifies the corner radius for rounded button edges.
+ * - `padding`: Specifies the padding within the button and title.
+ */
 data class PopupActionButtonStyle(
     val font: Int = Typeface.NORMAL,
     val textColor: Int = Color.WHITE,
@@ -42,41 +73,4 @@ data class PopupActionButtonStyle(
 
 data class ViewFrame(
     val width: Int, val height: Int
-)
-
-data class StyleStruct(
-    // Colors
-    val parsedRedColor: Int, // Use Int for Color (Android equivalent of UIColor)
-    val parsedGreyColor: Int,
-    val loaderColor: Int,
-    val crossColor: Int,
-    val dividerColor: Int,
-    val borderColor: Int,
-    val headerBgColor: Int,
-    val actionButtonColor: Int,
-
-    // Fonts
-    val baseFontFamily: String,
-    val textSizeBold: Float, // Use Float for text sizes (Android equivalent of CGFloat)
-    val textSizeSemiBold: Float,
-    val textSizeRegular: Float,
-    val textSizeSmall: Float,
-
-    // Text Colors
-    val normalTextColor: Int,
-    val clickableTextColor: Int,
-    val titleTextColor: Int,
-    val subTitleTextColor: Int,
-    val headerTextColor: Int,
-    val paragraphTextColor: Int,
-    val connectorTextColor: Int,
-    val disclosureTextColor: Int,
-
-    // Popup-specific elements
-    val popupHeaderFont: Typeface?, // Use Typeface for fonts (Android equivalent of UIFont)
-    val popupTitleFont: Typeface?,
-    val popupSubTitleFont: Typeface?,
-    val popupParagraphFont: Typeface?,
-    val popupConnectorFont: Typeface?,
-    val popupDisclosureFont: Typeface?
 )

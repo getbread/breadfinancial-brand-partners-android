@@ -6,6 +6,9 @@ import org.json.JSONObject
 import java.io.OutputStream
 import java.nio.charset.StandardCharsets
 
+/**
+ * Class responsible for logging information for debugging and tracking purposes.
+ */
 class Logger(
     private val outputStream: OutputStream,
     private var isLoggingEnabled: Boolean

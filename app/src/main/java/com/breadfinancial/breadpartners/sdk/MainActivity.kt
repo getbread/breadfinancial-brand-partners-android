@@ -23,11 +23,22 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersAddress
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersBuyer
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersMockOptions
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersPlacementConfig
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersRtpsConfig
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
+import com.breadfinancial.breadpartners.sdk.core.models.CurrencyValue
+import com.breadfinancial.breadpartners.sdk.core.models.FinancingType
+import com.breadfinancial.breadpartners.sdk.core.models.LocationType
+import com.breadfinancial.breadpartners.sdk.core.models.Name
+import com.breadfinancial.breadpartners.sdk.core.models.Order
+import com.breadfinancial.breadpartners.sdk.core.models.PickupInformation
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
 import com.breadfinancial.breadpartners.sdk.core.models.PopupActionButtonStyle
 import com.breadfinancial.breadpartners.sdk.core.models.PopupTextStyle
-import com.breadfinancial.breadpartners.sdk.core.models.StyleStruct
 import com.breadfinancial.breadpartners.sdk.core.models.ViewFrame
 import com.breadfinancial.breadpartners.sdk.databinding.ActivityMainBinding
 import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnerDefaults
@@ -37,7 +48,7 @@ import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnersExtensions.re
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var styleStructSet: StyleStruct
+    private lateinit var style: Map<String, Any>
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,90 +62,185 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setupAndFetchPlacementUI() {
 
+        // MARK:For development purposes
+        // These configurations are used to test different types of placement requests.
+        // Each placement type corresponds to a specific configuration that includes parameters
+        // like placement ID, SDK transaction ID, environment, price, and brand ID.
+        // This allows testing of various placement setups by fetching specific configurations
+        // based on the placement type key.
+        val placementRequestType =
+            BreadPartnerDefaults.shared.placementConfigurations["textPlacementRequestType1"]
+        val placementID = placementRequestType!!["placementID"] as String
+        val price = placementRequestType["price"] as Int
+        val brandId = placementRequestType["brandId"] as String
+
+        // MARK: For development purposes
+        style = BreadPartnerDefaults.shared.styleStruct["cadet"]!!
+
+        val primaryColor = style["primaryColor"] as String
+        val secondaryColor = style["secondaryColor"] as String
+        val tertiaryColor = style["tertiaryColor"] as String
+        val blackColor = "#000000"
+
+        val fontFamily = style["fontFamily"] as String
+
+        val smallTextSize = style["small"] as Int
+        val mediumTextSize = style["medium"] as Int
+        val largeTextSize = style["large"] as Int
+        val xlargeTextSize = style["xlarge"] as Int
+
+        val customFont = ResourcesCompat.getFont(
+            this,
+            this.resources.getIdentifier(fontFamily, "font", this.packageName)
+        )
+
+        binding.preScreenBtn.typeface = customFont
+        binding.preScreenBtn.textSize = largeTextSize.toFloat()
+        binding.preScreenBtn.setTextColor(Color.parseColor(primaryColor))
+
+        /**
+         * `setup` method must be placed at app launch.
+         *
+         * @param integrationKey A unique key specific to the brand.
+         */
         BreadPartnersSDK.getInstance().setup(
             enableLog = true,
-            integrationKey = "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7",
+            integrationKey = brandId,
             applicationContent = application
         )
 
-        styleStructSet = BreadPartnerDefaults().styleSet3
-
+        /**
+         * Prepares a popup styling configuration object for each style element.
+         */
         val popUpStyling = PopUpStyling(
-            loaderColor = styleStructSet.loaderColor,
-            crossColor = styleStructSet.crossColor,
-            dividerColor = styleStructSet.dividerColor,
-            borderColor = styleStructSet.borderColor,
+            loaderColor = Color.parseColor(primaryColor),
+            crossColor = Color.parseColor(primaryColor),
+            dividerColor = Color.parseColor(tertiaryColor),
+            borderColor = Color.parseColor(tertiaryColor),
             titlePopupTextStyle = PopupTextStyle(
                 font = Typeface.create(
-                    styleStructSet.baseFontFamily, Typeface.BOLD
-                ), textColor = styleStructSet.titleTextColor, textSize = styleStructSet.textSizeBold
+                    fontFamily, Typeface.BOLD
+                ), textColor = Color.parseColor(blackColor), textSize = xlargeTextSize.toFloat()
             ),
             subTitlePopupTextStyle = PopupTextStyle(
                 font = Typeface.create(
-                    styleStructSet.baseFontFamily, Typeface.NORMAL
-                ),
-                textColor = styleStructSet.subTitleTextColor,
-                textSize = styleStructSet.textSizeRegular
+                    fontFamily, Typeface.NORMAL
+                ), textColor = Color.parseColor(blackColor), textSize = mediumTextSize.toFloat()
             ),
             headerPopupTextStyle = PopupTextStyle(
                 font = Typeface.create(
-                    styleStructSet.baseFontFamily, Typeface.BOLD
-                ),
-                textColor = styleStructSet.headerTextColor,
-                textSize = styleStructSet.textSizeSemiBold
+                    fontFamily, Typeface.BOLD
+                ), textColor = Color.parseColor(blackColor), textSize = mediumTextSize.toFloat()
             ),
-            headerBgColor = styleStructSet.headerBgColor,
+            headerBgColor = Color.parseColor(tertiaryColor),
             headingThreePopupTextStyle = PopupTextStyle(
                 font = Typeface.create(
-                    styleStructSet.baseFontFamily, Typeface.BOLD
-                ),
-                textColor = styleStructSet.parsedRedColor,
-                textSize = styleStructSet.textSizeSemiBold
+                    fontFamily, Typeface.BOLD
+                ), textColor = Color.parseColor(primaryColor), textSize = largeTextSize.toFloat()
             ),
             paragraphPopupTextStyle = PopupTextStyle(
                 font = Typeface.create(
-                    styleStructSet.baseFontFamily, Typeface.BOLD
-                ),
-                textColor = styleStructSet.paragraphTextColor,
-                textSize = styleStructSet.textSizeSmall
+                    fontFamily, Typeface.BOLD
+                ), textColor = Color.parseColor(secondaryColor), textSize = smallTextSize.toFloat()
             ),
             connectorPopupTextStyle = PopupTextStyle(
                 font = Typeface.create(
-                    styleStructSet.baseFontFamily, Typeface.BOLD
-                ),
-                textColor = styleStructSet.connectorTextColor,
-                textSize = styleStructSet.textSizeSemiBold
+                    fontFamily, Typeface.BOLD
+                ), textColor = Color.parseColor(primaryColor), textSize = smallTextSize.toFloat()
             ),
             disclosurePopupTextStyle = PopupTextStyle(
                 font = Typeface.create(
-                    styleStructSet.baseFontFamily, Typeface.BOLD
-                ),
-                textColor = styleStructSet.disclosureTextColor,
-                textSize = styleStructSet.textSizeSmall
+                    fontFamily, Typeface.BOLD
+                ), textColor = Color.parseColor(secondaryColor), textSize = smallTextSize.toFloat()
             ),
             actionButtonStyle = PopupActionButtonStyle(
                 font = Typeface.BOLD,
                 textColor = Color.WHITE,
                 frame = ViewFrame(width = 100, height = 50),
                 padding = Rect(2, 2, 2, 2),
-                backgroundColor = styleStructSet.clickableTextColor,
+                backgroundColor = Color.parseColor(primaryColor),
                 cornerRadius = 60.0F
             )
         )
 
-        val config = PlacementsConfiguration(
-            placementConfig = BreadPartnerDefaults().placementConfig1,
-            popUpStyling = popUpStyling,
+        /**
+         * Configuration for defining placement options in BreadPartners.
+         *
+         * Modify the Placement ID and total price to test different placements.
+         */
+        val placement = BreadPartnersPlacementConfig(
+            financingType = FinancingType.INSTALLMENTS,
+            locationType = LocationType.CATEGORY,
+            placementId = placementID,
+            domID = "123",
+            order = Order(
+                subTotal = CurrencyValue(currency = "USD", value = 0.0),
+                totalDiscounts = CurrencyValue(currency = "USD", value = 0.0),
+                totalPrice = CurrencyValue(currency = "USD", value = price.toDouble()),
+                totalShipping = CurrencyValue(currency = "USD", value = 0.0),
+                totalTax = CurrencyValue(currency = "USD", value = 0.0),
+                discountCode = "string",
+                pickupInformation = PickupInformation(
+                    name = Name(
+                        givenName = "John", familyName = "Doe"
+                    ), phone = "+14539842345", address = BreadPartnersAddress(
+                        address1 = "156 5th Avenue",
+                        locality = "New York",
+                        postalCode = "10019",
+                        region = "US-NY",
+                        country = "US"
+                    ), email = "john.doe@gmail.com"
+                ),
+                fulfillmentType = "type",
+                items = emptyList()
+            )
+        )
+
+        /**
+         * Provides configurations for `registerPlacement` and `submitRTPS` methods.
+         */
+        val placementsConfiguration = PlacementsConfiguration(
+            placementConfig = placement,
+            popUpStyling = popUpStyling
         )
 
         BreadPartnersSDK.getInstance().registerPlacements(
-            setupConfig = BreadPartnerDefaults().setupConfig1,
-            config,
-            this,
-            splitTextAndAction = false
+            setupConfig = BreadPartnersSetupConfig(
+                buyer = BreadPartnersBuyer(
+                    givenName = "Jack",
+                    familyName = "Seamus",
+                    additionalName = "C.",
+                    birthDate = "1974-08-21",
+                    email = "johncseamus@gmail.com",
+                    phone = "+13235323423",
+                    billingAddress = BreadPartnersAddress(
+                        address1 = "323 something lane",
+                        address2 = "apt. B",
+                        country = "USA",
+                        locality = "NYC",
+                        region = "NY",
+                        postalCode = "11222"
+                    ),
+                    shippingAddress = null
+                ),
+                loyaltyID = "xxxxxx",
+                storeNumber = "1234567",
+                env = "STAGE",
+                channel = "P",
+                subchannel = "X"
+            ), placementsConfiguration, this, splitTextAndAction = true
         ) { event ->
             when (event) {
                 is BreadPartnerEvent.RenderTextViewWithLink -> {
+                    Log.i("BreadPartnerSDK::", "Successfully rendered text with link.")
+
+                    /**
+                     * Handles rendering of a text view with a clickable link.
+                     *
+                     * - Modifies the font, text color, and link color for the text view.
+                     * - Adds the text view to the main view and sets up its layout constraints.
+                     */
+
                     val textView = binding.textView
 
                     val spannable = event.spannableText
@@ -159,7 +265,7 @@ class MainActivity : AppCompatActivity() {
                         )
 
                         setSpan(
-                            ForegroundColorSpan(styleStructSet.clickableTextColor),
+                            ForegroundColorSpan(Color.parseColor(primaryColor)),
                             normalTextEndIndex,
                             spannable.length,
                             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -174,17 +280,20 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     textView.text = spannable
+                    textView.typeface = customFont
                     textView.movementMethod = LinkMovementMethod.getInstance()
-
-                    Log.i("BreadPartnerSDK", "::Successfully RenderTextViewWithLink.")
                 }
 
 
                 is BreadPartnerEvent.RenderSeparateTextAndButton -> {
-                    val customFont = ResourcesCompat.getFont(
-                        this,
-                        this.resources.getIdentifier("josefinsans_bold", "font", this.packageName)
-                    )
+                    Log.i("BreadPartnerSDK::", "Successfully rendered text and button.")
+
+                    /**
+                     * Handles rendering of a popup view.
+                     *
+                     * - Modifies the font, text color for the text view, and the button's title color, font, and background.
+                     * - Adds the text view and button to the main view and sets up their layout constraints.
+                     */
                     event.textView.apply {
                         setTextColor(Color.BLACK)
                         textSize = 24f
@@ -195,18 +304,18 @@ class MainActivity : AppCompatActivity() {
                         setTextColor(Color.WHITE)
                         textSize = 24f
                         typeface = customFont
-                        setPadding(50, 10, 50, 25)
+                        setPadding(50, 0, 50, 0)
 
                         val drawable = GradientDrawable().apply {
                             shape = GradientDrawable.RECTANGLE
                             cornerRadius = 55.0f
-                            setColor(styleStructSet.clickableTextColor)
+                            setColor(Color.parseColor(primaryColor))
                         }
 
                         val pressedDrawable = GradientDrawable().apply {
                             shape = GradientDrawable.RECTANGLE
                             cornerRadius = 55.0f
-                            setColor(styleStructSet.clickableTextColor)
+                            setColor(Color.parseColor(primaryColor))
                         }
 
                         val states = StateListDrawable().apply {
@@ -222,10 +331,18 @@ class MainActivity : AppCompatActivity() {
                     parent.replaceTextView(binding.textView, event.textView)
                     parent.replaceButton(binding.actionButton, event.button)
 
-                    Log.i("BreadPartnerSDK", "::Successfully RenderSeparateTextAndButton.")
                 }
 
                 is BreadPartnerEvent.RenderPopupView -> {
+                    Log.i("BreadPartnerSDK::", "Successfully rendered PopupView.")
+
+                    /**
+                     * Handles rendering of a popup view.
+                     *
+                     * Example:
+                     * Implement some process prior to loading the WebView popup
+                     * (e.g., checking if the customer is authenticated).
+                     */
                     val view = event.dialogFragment
                     showYesNoAlert(this) { userConfirmed ->
                         if (userConfirmed) {
@@ -234,11 +351,10 @@ class MainActivity : AppCompatActivity() {
                             println("User canceled No")
                         }
                     }
-                    Log.i("BreadPartnerSDK", "::Successfully rendered PopupView.")
                 }
 
                 else -> {
-                    Log.i("BreadPartnerSDK", "::Event:${event}")
+                    Log.i("BreadPartnerSDK::", "Event:${event}")
                 }
             }
         }
@@ -247,28 +363,55 @@ class MainActivity : AppCompatActivity() {
 
     fun preScreenCheck(view: View) {
         val config2 = PlacementsConfiguration(
-            rtpsConfig = BreadPartnerDefaults().rtpsConfig1,
+            rtpsConfig = BreadPartnersRtpsConfig(
+                locationType = LocationType.CHECKOUT,
+                mockResponse = BreadPartnersMockOptions.SUCCESS
+            ),
             popUpStyling = null,
         )
 
         BreadPartnersSDK.getInstance().submitRTPS(
-            setupConfig = BreadPartnerDefaults().setupConfig1, config2, this
+            setupConfig = BreadPartnersSetupConfig(
+                buyer = BreadPartnersBuyer(
+                    givenName = "Jack",
+                    familyName = "Seamus",
+                    additionalName = "C.",
+                    birthDate = "1974-08-21",
+                    email = "johncseamus@gmail.com",
+                    phone = "+13235323423",
+                    billingAddress = BreadPartnersAddress(
+                        address1 = "323 something lane",
+                        address2 = "apt. B",
+                        country = "USA",
+                        locality = "NYC",
+                        region = "NY",
+                        postalCode = "11222"
+                    ),
+                    shippingAddress = null
+                ),
+                loyaltyID = "xxxxxx",
+                storeNumber = "1234567",
+                env = "STAGE",
+                channel = "P",
+                subchannel = "X"
+            ), config2, this
         ) { event ->
             when (event) {
                 is BreadPartnerEvent.RenderPopupView -> {
                     val view = event.dialogFragment
                     view.show(this.supportFragmentManager, "PopupDialog")
-                    Log.i("BreadPartnerSDK", "::Successfully rendered PopupView.")
+                    Log.i("BreadPartnerSDK::", "Successfully rendered PopupView.")
                 }
 
                 else -> {
-
+                    Log.i("BreadPartnerSDK::", "Event:${event}")
                 }
             }
         }
     }
 
     private fun showYesNoAlert(context: Context, onResult: (Boolean) -> Unit) {
+        val primaryColor = style["primaryColor"] as String
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Are you authenticated?")
 
@@ -286,9 +429,9 @@ class MainActivity : AppCompatActivity() {
         alertDialog.show()
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            ?.setTextColor(styleStructSet.clickableTextColor)
+            ?.setTextColor(Color.parseColor(primaryColor))
         alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-            ?.setTextColor(styleStructSet.clickableTextColor)
+            ?.setTextColor(Color.parseColor(primaryColor))
     }
 }
 

@@ -1,351 +1,82 @@
-@file:Suppress("unused")
-
 package com.breadfinancial.breadpartners.sdk.utilities
 
-import android.graphics.Color
-import android.graphics.Rect
-import android.graphics.Typeface
-import android.view.ViewGroup
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersAddress
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersBuyer
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersMockOptions
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersPlacementConfig
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersRtpsConfig
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
-import com.breadfinancial.breadpartners.sdk.core.models.CurrencyValue
-import com.breadfinancial.breadpartners.sdk.core.models.FinancingType
-import com.breadfinancial.breadpartners.sdk.core.models.LocationType
-import com.breadfinancial.breadpartners.sdk.core.models.Name
-import com.breadfinancial.breadpartners.sdk.core.models.Order
-import com.breadfinancial.breadpartners.sdk.core.models.PickupInformation
-import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
-import com.breadfinancial.breadpartners.sdk.core.models.PopupActionButtonStyle
-import com.breadfinancial.breadpartners.sdk.core.models.PopupTextStyle
-import com.breadfinancial.breadpartners.sdk.core.models.StyleStruct
-import com.breadfinancial.breadpartners.sdk.core.models.ViewFrame
-import com.breadfinancial.breadpartners.sdk.networking.models.ContextRequestBody
-import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequest
-import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequestBody
+/**
+ * `BreadPartnerDefaults` class provides default configurations/styles/properties
+ * used across the BreadPartner SDK.
+ */
+class BreadPartnerDefaults private constructor() {
 
-class BreadPartnerDefaults {
+    companion object {
+        val shared: BreadPartnerDefaults by lazy { BreadPartnerDefaults() }
+    }
 
-    val buyer = BreadPartnersBuyer(
-        givenName = "John",
-        familyName = "Smith",
-        additionalName = "C.",
-        birthDate = "1974-08-21",
-        email = "jsmith@breadfinance.com",
-        phone = "2123344141",
-        billingAddress = BreadPartnersAddress(
-            address1 = "323 something lane",
-            address2 = "apt. B",
-            country = "US",
-            locality = "NYC",
-            region = "NY",
-            postalCode = "11222"
-        ),
-        shippingAddress = BreadPartnersAddress(
-            address1 = "323 something lane",
-            address2 = "apt. B",
-            country = "US",
-            locality = "NYC",
-            region = "NY",
-            postalCode = "11222"
+    val placementConfigurations: Map<String, Map<String, Any>> = mapOf(
+        "textPlacementRequestType1" to mapOf(
+            "placementID" to "03d69ff1-f90c-41b2-8a27-836af7f1eb98",
+            "sdkTid" to "69d7bfdd-a06c-4e16-adfb-58e03a3c7dbe",
+            "env" to "STAGE",
+            "price" to 73900,
+            "channel" to "P",
+            "subchannel" to "X",
+            "allowCheckout" to false,
+            "brandId" to "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7"
+        ), "textPlacementRequestType2" to mapOf(
+            "placementID" to "8828d6d9-e993-41cc-8744-fa3857c12c4a",
+            "sdkTid" to "6f42d67e-cff4-4575-802a-e90a838981bb",
+            "env" to "STAGE",
+            "location" to "Category",
+            "price" to 119900,
+            "channel" to "A",
+            "subchannel" to "X",
+            "allowCheckout" to false,
+            "brandId" to "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7"
+        ), "textPlacementRequestType3" to mapOf(
+            "placementID" to "03d69ff1-f90c-41b2-8a27-836af7f1eb98",
+            "sdkTid" to "6f42d67e-cff4-4575-802a-e90a838981ss",
+            "env" to "STAGE",
+            "location" to "Product",
+            "price" to 119900,
+            "channel" to "A",
+            "subchannel" to "X",
+            "allowCheckout" to false,
+            "brandId" to "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7"
+        ), "textPlacementRequestType4" to mapOf(
+            "brandId" to "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7",
+            "location" to "RTPS-Approval",
+            "embeddedUrl" to "https://acquire1uat.comenity.net/prescreen/offer?mockMO=success&mockPA=success&mockVL=success&embedded=true&clientKey=8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7&prescreenId=79233069&cardType=&urlPath=%2F&firstName=Carol&lastName=Jones&address1=3075%20Loyalty%20Cir&city=Columbus&state=OH&zip=43219&storeNumber=2009&location=checkout&channel=O"
         )
     )
 
-
-    val textPlacementRequestType1 = PlacementRequest(
-        placements = listOf(
-            PlacementRequestBody(
-                id = "03d69ff1-f90c-41b2-8a27-836af7f1eb98", context = ContextRequestBody(
-                    SDK_TID = "69d7bfdd-a06c-4e16-adfb-58e03a3c7dbe",
-                    ENV = "STAGE",
-                    PRICE = 73900,
-                    channel = "P",
-                    subchannel = "X",
-                    ALLOW_CHECKOUT = false
-                )
-            )
-        ), brandId = "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7"
-    )
-
-    val textPlacementRequestType2 = PlacementRequest(
-        placements = listOf(
-            PlacementRequestBody(
-                id = "8828d6d9-e993-41cc-8744-fa3857c12c4a", context = ContextRequestBody(
-                    SDK_TID = "6f42d67e-cff4-4575-802a-e90a838981bb",
-                    ENV = "STAGE",
-                    LOCATION = "Category",
-                    PRICE = 119900,
-                    channel = "A",
-                    subchannel = "X",
-                    ALLOW_CHECKOUT = false
-                )
-            )
-        ), brandId = "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7"
-    )
-
-    val textPlacementRequestType3 = PlacementRequest(
-        placements = listOf(
-            PlacementRequestBody(
-                id = "03d69ff1-f90c-41b2-8a27-836af7f1eb98", context = ContextRequestBody(
-                    SDK_TID = "6f42d67e-cff4-4575-802a-e90a838981ss",
-                    ENV = "STAGE",
-                    LOCATION = "Product",
-                    PRICE = 119900,
-                    channel = "A",
-                    subchannel = "X",
-                    ALLOW_CHECKOUT = false
-                )
-            )
-        ), brandId = "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7"
-    )
-
-    val textPlacementRequestType4 = PlacementRequest(
-        placements = listOf(
-            PlacementRequestBody(
-                id = "", context = ContextRequestBody(
-                    ENV = "STAGE",
-                    LOCATION = "RTPS-Approval",
-                    embeddedUrl = "https://acquire1uat.comenity.net/prescreen/offer?mockMO=success&mockPA=success&mockVL=success&embedded=true&clientKey=8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7&prescreenId=79233069&cardType=&urlPath=%2F&firstName=Carol&lastName=Jones&address1=3075%20Loyalty%20Cir&city=Columbus&state=OH&zip=43219&storeNumber=2009&location=checkout&channel=O"
-                )
-            )
-        ), brandId = "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7"
-    )
-
-    val dashboardWebViewURL =
-        "https://acquire1uat.comenity.net/unified/checkout-start?clientName=aspire&embedded=true&workflow=unifiedPrequalCheckout&mockPrequalApp=success&mockUD=success&mockBraintreeTokenize=success&mockVCI=successWithIssuedCard&mockBraintreeTokens=success&mockBuyer=success&mockUPC=successWithPrepareCheckout&mockVCIS=success&mockUO=success&epId=6f42d67e-cff4-4575-802a-e90a838981bb&location=Category&channel=C&subchannel=X"
-
-    val styleSet1 = StyleStruct(
-        parsedRedColor = Color.parseColor("#d50132"),
-        parsedGreyColor = Color.parseColor("#ececec"),
-        loaderColor = Color.parseColor("#0f2233"),
-        crossColor = Color.BLACK,
-        dividerColor = Color.parseColor("#ececec"),
-        borderColor = Color.parseColor("#ececec"),
-        headerBgColor = Color.parseColor("#ececec"),
-        actionButtonColor = Color.parseColor("#d50132"),
-
-        baseFontFamily = "Arial-BoldMT",
-        textSizeBold = 16.0f,
-        textSizeSemiBold = 14.0f,
-        textSizeRegular = 12.0f,
-        textSizeSmall = 10.0f,
-
-        normalTextColor = Color.BLACK,
-        clickableTextColor = Color.parseColor("#d50132"),
-        titleTextColor = Color.BLACK,
-        subTitleTextColor = Color.GRAY,
-        headerTextColor = Color.GRAY,
-        paragraphTextColor = Color.GRAY,
-        connectorTextColor = Color.BLACK,
-        disclosureTextColor = Color.GRAY,
-
-        popupHeaderFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-        popupTitleFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-        popupSubTitleFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-        popupParagraphFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-        popupConnectorFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-        popupDisclosureFont = Typeface.create("Arial-BoldMT", Typeface.BOLD)
-    )
-
-    val styleSet2 = StyleStruct(
-        parsedRedColor = Color.parseColor("#FF935F"),
-        parsedGreyColor = Color.parseColor("#ececec"),
-        loaderColor = Color.parseColor("#FF935F"),
-        crossColor = Color.parseColor("#FF935F"),
-        dividerColor = Color.parseColor("#FFBE9F"),
-        borderColor = Color.parseColor("#ececec"),
-        headerBgColor = Color.parseColor("#FFBE9F"),
-        actionButtonColor = Color.parseColor("#FF935F"),
-
-        baseFontFamily = "Arial-BoldMT",
-        textSizeBold = 17.0f,
-        textSizeSemiBold = 15.0f,
-        textSizeRegular = 13.0f,
-        textSizeSmall = 11.0f,
-
-        normalTextColor = Color.BLACK,
-        clickableTextColor = Color.parseColor("#FF935F"),
-        titleTextColor = Color.BLACK,
-        subTitleTextColor = Color.GRAY,
-        headerTextColor = Color.GRAY,
-        paragraphTextColor = Color.GRAY,
-        connectorTextColor = Color.BLACK,
-        disclosureTextColor = Color.GRAY,
-
-        popupHeaderFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-        popupTitleFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-        popupSubTitleFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-        popupParagraphFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-        popupConnectorFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-        popupDisclosureFont = Typeface.create("Arial-BoldMT", Typeface.BOLD)
-    )
-
-    val styleSet3 = StyleStruct(
-        parsedRedColor = Color.parseColor("#000000"),
-        parsedGreyColor = Color.parseColor("#ececec"),
-        loaderColor = Color.parseColor("#0f2233"),
-        crossColor = Color.parseColor("#000000"),
-        dividerColor = Color.parseColor("#ececec"),
-        borderColor = Color.parseColor("#ececec"),
-        headerBgColor = Color.parseColor("#ececec"),
-        actionButtonColor = Color.parseColor("#000000"),
-
-        baseFontFamily = "Arial-BoldMT",
-        textSizeBold = 17.0f,
-        textSizeSemiBold = 15.0f,
-        textSizeRegular = 13.0f,
-        textSizeSmall = 11.0f,
-
-        normalTextColor = Color.BLACK,
-        clickableTextColor = Color.parseColor("#000000"),
-        titleTextColor = Color.BLACK,
-        subTitleTextColor = Color.GRAY,
-        headerTextColor = Color.GRAY,
-        paragraphTextColor = Color.GRAY,
-        connectorTextColor = Color.BLACK,
-        disclosureTextColor = Color.GRAY,
-
-        popupHeaderFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-        popupTitleFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-        popupSubTitleFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-        popupParagraphFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-        popupConnectorFont = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-        popupDisclosureFont = Typeface.create("Arial-BoldMT", Typeface.BOLD)
-    )
-
-    val popUpStyling = PopUpStyling(
-        loaderColor = Color.parseColor("#0f2233"),
-        crossColor = Color.BLACK,
-        dividerColor = Color.parseColor("#ececec"),
-        borderColor = Color.parseColor("#ececec"),
-        titlePopupTextStyle = PopupTextStyle(
-            font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-            textColor = Color.BLACK,
-            textSize = 16.0f
-        ),
-        subTitlePopupTextStyle = PopupTextStyle(
-            font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-            textColor = Color.GRAY,
-            textSize = 12.0f
-        ),
-        headerPopupTextStyle = PopupTextStyle(
-            font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-            textColor = Color.GRAY,
-            textSize = 14.0f
-        ),
-        headerBgColor = Color.parseColor("#ececec"),
-        headingThreePopupTextStyle = PopupTextStyle(
-            font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-            textColor = Color.parseColor("#d50132"),
-            textSize = 14.0f
-        ),
-        paragraphPopupTextStyle = PopupTextStyle(
-            font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-            textColor = Color.GRAY,
-            textSize = 10.0f
-        ),
-        connectorPopupTextStyle = PopupTextStyle(
-            font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-            textColor = Color.BLACK,
-            textSize = 14.0f
-        ),
-        disclosurePopupTextStyle = PopupTextStyle(
-            font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-            textColor = Color.GRAY,
-            textSize = 10.0f
-        ),
-        actionButtonStyle = PopupActionButtonStyle(
-            font = Typeface.BOLD,
-            textColor = Color.WHITE,
-            frame = ViewFrame(width = 150, height = 50),
-            padding = Rect(16, 0, 16, 0),
-            backgroundColor = Color.BLUE,
-            cornerRadius = 12.0F
+    val styleStruct: Map<String, Map<String, Any>> = mapOf(
+        "red" to mapOf(
+            "primaryColor" to "#d50132",
+            "secondaryColor" to "#69727b",
+            "tertiaryColor" to "#ececec",
+            "fontFamily" to "josefinsans_bold",
+            "small" to 12,
+            "medium" to 15,
+            "large" to 18,
+            "xlarge" to 20
+        ), "orange" to mapOf(
+            "primaryColor" to "#FF935F",
+            "secondaryColor" to "#69727b",
+            "tertiaryColor" to "#ececec",
+            "fontFamily" to "lato_bold",
+            "small" to 12,
+            "medium" to 15,
+            "large" to 18,
+            "xlarge" to 20
+        ), "cadet" to mapOf(
+            "primaryColor" to "#13294b",
+            "secondaryColor" to "#69727b",
+            "tertiaryColor" to "#ececec",
+            "fontFamily" to "poppins_bold",
+            "small" to 12,
+            "medium" to 15,
+            "large" to 18,
+            "xlarge" to 20
         )
-    )
-
-    val actionButtonStyle = PopupActionButtonStyle(
-        font = Typeface.BOLD,
-        textColor = Color.WHITE,
-        frame = ViewFrame(width = 200, height = 50),
-        backgroundColor = Color.parseColor("#d50132"),
-        cornerRadius = 8.0F,
-        padding = Rect(16, 8, 16, 8)
-    )
-
-    val setupConfig1 = BreadPartnersSetupConfig(
-        buyer = BreadPartnersBuyer(
-            givenName = "Jack",
-            familyName = "Seamus",
-            additionalName = "C.",
-            birthDate = "1974-08-21",
-            email = "johncseamus@gmail.com",
-            phone = "+13235323423",
-            billingAddress = BreadPartnersAddress(
-                address1 = "323 something lane",
-                address2 = "apt. B",
-                country = "USA",
-                locality = "NYC",
-                region = "NY",
-                postalCode = "11222"
-            ),
-            shippingAddress = null
-        ),
-        loyaltyID = "xxxxxx",
-        storeNumber = "1234567",
-        env = "STAGE",
-        channel = "P",
-        subchannel = "X"
-    )
-
-    val placementConfig1 = BreadPartnersPlacementConfig(
-        financingType = FinancingType.INSTALLMENTS,
-        locationType = LocationType.CATEGORY,
-        placementId = "03d69ff1-f90c-41b2-8a27-836af7f1eb98",
-        domID = "123",
-        order = Order(
-            subTotal = CurrencyValue(currency = "USD", value = 50000.0),
-            totalDiscounts = CurrencyValue(currency = "USD", value = 50000.0),
-            totalPrice = CurrencyValue(currency = "USD", value = 73900.0),
-            totalShipping = CurrencyValue(currency = "USD", value = 50000.0),
-            totalTax = CurrencyValue(currency = "USD", value = 50000.0),
-            discountCode = "string",
-            pickupInformation = PickupInformation(
-                name = Name(
-                    givenName = "John", familyName = "Doe"
-                ), phone = "+14539842345", address = BreadPartnersAddress(
-                    address1 = "156 5th Avenue",
-                    locality = "New York",
-                    postalCode = "10019",
-                    region = "US-NY",
-                    country = "US"
-                ), email = "john.doe@gmail.com"
-            ),
-            fulfillmentType = "type",
-            items = emptyList()
-        )
-    )
-    val setupConfig2 = BreadPartnersSetupConfig(
-        buyer = BreadPartnersBuyer(
-            givenName = "Carol",
-            familyName = "Jones",
-            additionalName = "C.",
-            birthDate = "1974-08-21",
-            billingAddress = BreadPartnersAddress(
-                address1 = "3075 Loyalty Cir",
-                locality = "Columbus",
-                region = "OH",
-                postalCode = "43219"
-            )
-        ),
-        storeNumber = "2009"
-    )
-
-    val rtpsConfig1 = BreadPartnersRtpsConfig(
-        locationType = LocationType.CHECKOUT, mockResponse = BreadPartnersMockOptions.SUCCESS
     )
 }
+
 

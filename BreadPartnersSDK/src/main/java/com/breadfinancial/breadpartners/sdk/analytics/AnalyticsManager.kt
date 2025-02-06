@@ -9,7 +9,12 @@ import com.breadfinancial.breadpartners.sdk.networking.HTTPMethod
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementsResponse
 import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
 
-
+/**
+ * `AnalyticsManager` logs user interactions with placements in the app.
+ * It tracks two events:
+ * 1. **Click Placement**: When the user clicks on the placement.
+ * 2. **View Placement**: When the user sees or interacts with the placement without clicking.
+ */
 class AnalyticsManager(
     private val apiClient: APIClient, private val commonUtils: CommonUtils
 ) {
