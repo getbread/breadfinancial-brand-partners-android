@@ -1,8 +1,9 @@
 package com.breadfinancial.breadpartners.sdk.networking
 
+import com.breadfinancial.breadpartners.sdk.core.models.BreadSDKEnvironment
+
 // Enum to define different types of API URLs
 sealed class APIUrlType {
-    data object BASEURL : APIUrlType()
     data class RTPSWebURL(val type: String) : APIUrlType()
     data class BrandStyle(val brandId: String) : APIUrlType()
     data class BrandConfig(val brandId: String) : APIUrlType()
@@ -16,13 +17,35 @@ sealed class APIUrlType {
 // A centralized class for constructing and managing API URLs
 class APIUrl(private val urlType: APIUrlType) {
 
-    private val baseURL = "https://brands.kmsmep.com"
-    private val rtpsBaseURL = "https://acquire1uat.comenity.net"
+    companion object {
+        private var currentBreadSDKEnvironment: BreadSDKEnvironment = BreadSDKEnvironment.PROD
+
+        /// Set the environment globally
+        fun setEnvironment(breadSDKEnvironment: BreadSDKEnvironment) {
+            currentBreadSDKEnvironment = breadSDKEnvironment
+        }
+    }
+
+    private val baseURL: String
+    private val rtpsBaseURL: String
+
+    init {
+        when (currentBreadSDKEnvironment) {
+            BreadSDKEnvironment.STAGE -> {
+                baseURL = "https://brands.kmsmep.com"
+                rtpsBaseURL = "https://acquire1uat.comenity.net"
+            }
+
+            BreadSDKEnvironment.PROD -> {
+                baseURL = "https://brands.kmsmep.com"
+                rtpsBaseURL = "https://acquire1uat.comenity.net"
+            }
+        }
+    }
 
     // Generates the correct URL based on the URL type
     val url: String
         get() = when (urlType) {
-            is APIUrlType.BASEURL -> baseURL
             is APIUrlType.RTPSWebURL -> "$rtpsBaseURL/prescreen/${urlType.type}"
             is APIUrlType.BrandStyle -> "$baseURL/brands/${urlType.brandId}/style"
             is APIUrlType.BrandConfig -> "$baseURL/brands/${urlType.brandId}/config"

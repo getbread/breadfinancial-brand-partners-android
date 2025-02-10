@@ -12,6 +12,7 @@ import com.breadfinancial.breadpartners.sdk.core.extensions.fetchBrandConfig
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchPlacementData
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
+import com.breadfinancial.breadpartners.sdk.core.models.BreadSDKEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
 import com.breadfinancial.breadpartners.sdk.core.models.PopupActionButtonStyle
@@ -21,6 +22,7 @@ import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentParser
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentRenderer
 import com.breadfinancial.breadpartners.sdk.htmlhandling.JsoupHTMLParser
 import com.breadfinancial.breadpartners.sdk.networking.APIClient
+import com.breadfinancial.breadpartners.sdk.networking.APIUrl
 import com.breadfinancial.breadpartners.sdk.networking.models.BrandConfigResponse
 import com.breadfinancial.breadpartners.sdk.security.RecaptchaManager
 import com.breadfinancial.breadpartners.sdk.utilities.AlertHandler
@@ -178,7 +180,13 @@ class BreadPartnersSDK private constructor() {
      * @param applicationContent `Application` context for the entire app.
      *
      */
-    fun setup(integrationKey: String, enableLog: Boolean = false, applicationContent: Application) {
+    fun setup(
+        breadSDKEnvironment: BreadSDKEnvironment = BreadSDKEnvironment.PROD,
+        integrationKey: String,
+        enableLog: Boolean = false,
+        applicationContent: Application
+    ) {
+        APIUrl.setEnvironment(breadSDKEnvironment)
         this.integrationKey = integrationKey
         logger.loggingEnabled = enableLog
         this.application = applicationContent

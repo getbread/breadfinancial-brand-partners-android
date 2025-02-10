@@ -30,6 +30,7 @@ import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersPlacementCo
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersRtpsConfig
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
 import com.breadfinancial.breadpartners.sdk.core.models.CurrencyValue
+import com.breadfinancial.breadpartners.sdk.core.models.BreadSDKEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.FinancingType
 import com.breadfinancial.breadpartners.sdk.core.models.LocationType
 import com.breadfinancial.breadpartners.sdk.core.models.Name
@@ -104,6 +105,7 @@ class MainActivity : AppCompatActivity() {
          * @param integrationKey A unique key specific to the brand.
          */
         BreadPartnersSDK.getInstance().setup(
+            breadSDKEnvironment = BreadSDKEnvironment.STAGE,
             enableLog = true,
             integrationKey = brandId,
             applicationContent = application
