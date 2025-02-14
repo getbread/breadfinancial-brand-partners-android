@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 fun PopupDialog.fetchWebViewPlacement() {
 
     val builder = PlacementRequestBuilder(
-        integrationKey, setupConfig, placementsConfiguration?.placementConfig
+        integrationKey, merchantConfiguration, placementsConfiguration?.placementData
     )
     val placementRequest = builder.build()
 

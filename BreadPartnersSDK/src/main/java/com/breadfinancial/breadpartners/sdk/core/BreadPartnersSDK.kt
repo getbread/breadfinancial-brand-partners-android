@@ -11,7 +11,7 @@ import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchBrandConfig
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchPlacementData
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
+import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.BreadSDKEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
@@ -82,7 +82,7 @@ class BreadPartnersSDK private constructor() {
     internal lateinit var application: Application
     internal lateinit var thisContext: AppCompatActivity
 
-    internal var setupConfig: BreadPartnersSetupConfig? = null
+    internal var merchantConfiguration: MerchantConfiguration? = null
     internal var placementsConfiguration: PlacementsConfiguration? = null
     internal var brandConfiguration: BrandConfigResponse? = null
     internal var rtpsFlow: Boolean = false
@@ -165,7 +165,7 @@ class BreadPartnersSDK private constructor() {
             alertHandler = alertHandler,
             commonUtils = commonUtils,
             callback = callback,
-            setupConfig = setupConfig,
+            merchantConfiguration = merchantConfiguration,
             placementsConfiguration = placementsConfiguration,
             brandConfiguration = brandConfiguration,
             splitTextAndAction = splitTextAndAction
@@ -175,6 +175,7 @@ class BreadPartnersSDK private constructor() {
     /**
      * Call this function when the app launches.
      *
+     * @param breadSDKEnvironment Specifies the SDK environment, such as production (.prod) or development (stage).
      * @param integrationKey A unique key specific to the brand.
      * @param enableLog Set this to `true` if you want to see debug logs.
      * @param applicationContent `Application` context for the entire app.
@@ -197,20 +198,20 @@ class BreadPartnersSDK private constructor() {
     /**
      * Use this function to display text placements in your app's UI.
      *
-     * @param setupConfig Provide user account details in this configuration.
+     * @param merchantConfiguration Provide user account details in this configuration.
      * @param placementsConfiguration Specify the pre-defined placement details required for building the UI.
      * @param splitTextAndAction Set this to `true` if you want the placement to return either text with a link or a combination of text and button.
      * @param viewContext The current `AppCompatActivity` context where the view will be displayed.
      * @param callback A function that handles user interactions and ongoing events related to the placements.
      */
     fun registerPlacements(
-        setupConfig: BreadPartnersSetupConfig,
+        merchantConfiguration: MerchantConfiguration,
         placementsConfiguration: PlacementsConfiguration,
         viewContext: AppCompatActivity,
         splitTextAndAction: Boolean = false,
         callback: (BreadPartnerEvent) -> Unit
     ) {
-        this.setupConfig = setupConfig
+        this.merchantConfiguration = merchantConfiguration
         this.placementsConfiguration = placementsConfiguration
         this.splitTextAndAction = splitTextAndAction
         this.callback = callback
@@ -233,18 +234,18 @@ class BreadPartnersSDK private constructor() {
     /**
      * Call this function to check if the user qualifies for a pre-screen card application.
      *
-     * @param setupConfig Provide user account details in this configuration.
+     * @param merchantConfiguration Provide user account details in this configuration.
      * @param placementsConfiguration Specify the pre-defined placement details required for building the UI.
      * @param viewContext The current `AppCompatActivity` context where the view will be displayed.
      * @param callback A function that handles user interactions and ongoing events related to the placements.
      */
     fun submitRTPS(
-        setupConfig: BreadPartnersSetupConfig,
+        merchantConfiguration: MerchantConfiguration,
         placementsConfiguration: PlacementsConfiguration,
         viewContext: AppCompatActivity,
         callback: (BreadPartnerEvent) -> Unit
     ) {
-        this.setupConfig = setupConfig
+        this.merchantConfiguration = merchantConfiguration
         this.placementsConfiguration = placementsConfiguration
         this.callback = callback
         this.thisContext = viewContext

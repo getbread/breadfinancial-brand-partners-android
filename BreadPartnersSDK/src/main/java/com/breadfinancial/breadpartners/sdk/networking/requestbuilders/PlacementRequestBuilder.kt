@@ -1,36 +1,36 @@
 package com.breadfinancial.breadpartners.sdk.networking.requestbuilders
 
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersPlacementConfig
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
+import com.breadfinancial.breadpartners.sdk.core.models.PlacementData
+import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.networking.models.ContextRequestBody
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequest
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequestBody
 
 class PlacementRequestBuilder(
     integrationKey: String,
-    setupConfig: BreadPartnersSetupConfig?,
-    placementConfig: BreadPartnersPlacementConfig?
+    merchantConfiguration: MerchantConfiguration?,
+    placementData: PlacementData?
 ) {
     private var placements: MutableList<PlacementRequestBody> = mutableListOf()
     private var brandId: String = integrationKey
 
     init {
-        createPlacementRequestBody(setupConfig, placementConfig)
+        createPlacementRequestBody(merchantConfiguration, placementData)
     }
 
     private fun createPlacementRequestBody(
-        setupConfig: BreadPartnersSetupConfig?, placementConfig: BreadPartnersPlacementConfig?
+        merchantConfiguration: MerchantConfiguration?, placementData: PlacementData?
     ) {
         val context = ContextRequestBody(
-            ENV = setupConfig?.env,
-            PRICE = placementConfig?.order?.totalPrice?.value?.toLong(),
-            channel = setupConfig?.channel,
-            subchannel = setupConfig?.subchannel,
-            ALLOW_CHECKOUT = placementConfig?.allowCheckout ?: false
+            ENV = merchantConfiguration?.env,
+            PRICE = placementData?.order?.totalPrice?.value?.toLong(),
+            channel = merchantConfiguration?.channel,
+            subchannel = merchantConfiguration?.subchannel,
+            ALLOW_CHECKOUT = placementData?.allowCheckout ?: false
         )
 
         val placement = PlacementRequestBody(
-            id = placementConfig?.placementId, context = context
+            id = placementData?.placementId, context = context
         )
 
         placements.add(placement)

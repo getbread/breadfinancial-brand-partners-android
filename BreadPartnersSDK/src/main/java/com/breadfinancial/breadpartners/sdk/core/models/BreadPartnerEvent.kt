@@ -48,4 +48,9 @@ sealed class BreadPartnerEvent {
     /// Provides information about any SDK-related errors.
     /// - Parameter error: The error object detailing the issue.
     data class SdkError(val error: Throwable) : BreadPartnerEvent()
+
+    /// Provides information about any Card-related status.
+    /// - Parameter status: object detailing the status.
+    data class cardApplicationStatus(val status: Any) : BreadPartnerEvent()
+
 }

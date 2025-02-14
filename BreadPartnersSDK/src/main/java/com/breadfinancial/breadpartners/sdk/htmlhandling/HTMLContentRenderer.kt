@@ -3,9 +3,9 @@ package com.breadfinancial.breadpartners.sdk.htmlhandling
 import androidx.appcompat.app.AppCompatActivity
 import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
+import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
-import com.breadfinancial.breadpartners.sdk.htmlhandling.extensions.renderSingleTextView
+import com.breadfinancial.breadpartners.sdk.htmlhandling.extensions.renderTextViewWithLink
 import com.breadfinancial.breadpartners.sdk.htmlhandling.extensions.renderTextAndButton
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
@@ -27,7 +27,7 @@ class HTMLContentRenderer(
     val commonUtils: CommonUtils,
     val logger: Logger,
     val apiClient: APIClient,
-    var setupConfig: BreadPartnersSetupConfig?,
+    var merchantConfiguration: MerchantConfiguration?,
     var placementsConfiguration: PlacementsConfiguration?,
     var brandConfiguration: BrandConfigResponse?,
     var splitTextAndAction: Boolean = false,
@@ -55,7 +55,7 @@ class HTMLContentRenderer(
         if (splitTextAndAction) {
             renderTextAndButton()
         } else {
-            renderSingleTextView()
+            renderTextViewWithLink()
         }
 
     }
@@ -97,14 +97,14 @@ class HTMLContentRenderer(
             apiClient = apiClient,
             htmlContentParser = htmlContentParser,
             callback = callback,
-            setupConfig = setupConfig,
+            merchantConfiguration = merchantConfiguration,
             placementsConfiguration = placementsConfiguration,
             brandConfiguration = brandConfiguration
         )
         configurePopupPresentation(popupDialog)
     }
 
-    fun configurePopupPresentation(popupDialog: PopupDialog) {
+    private fun configurePopupPresentation(popupDialog: PopupDialog) {
         callback(BreadPartnerEvent.RenderPopupView(dialogFragment = popupDialog))
     }
 

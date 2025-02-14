@@ -15,7 +15,7 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.breadfinancial.breadpartners.sdk.R
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
+import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentParser
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.BreadFinancialWebViewInterstitial
@@ -39,7 +39,7 @@ class PopupDialog(
     internal val commonUtils: CommonUtils,
     internal val htmlContentParser: HTMLContentParser,
     internal val logger: Logger,
-    internal var setupConfig: BreadPartnersSetupConfig?,
+    internal var merchantConfiguration: MerchantConfiguration?,
     internal var placementsConfiguration: PlacementsConfiguration?,
     internal var brandConfiguration: BrandConfigResponse?,
     internal val callback: (BreadPartnerEvent) -> Unit?

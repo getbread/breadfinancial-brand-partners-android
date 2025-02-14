@@ -1,6 +1,6 @@
 package com.breadfinancial.breadpartners.sdk.core.models
 
-data class BreadPartnersPlacementConfig(
+data class PlacementData(
     var financingType: FinancingType? = null,
     var locationType: LocationType? = null,
     var placementId: String? = null,

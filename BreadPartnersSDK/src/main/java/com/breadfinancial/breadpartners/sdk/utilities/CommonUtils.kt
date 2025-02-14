@@ -3,7 +3,7 @@ package com.breadfinancial.breadpartners.sdk.utilities
 import android.graphics.Color
 import android.os.Handler
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersRtpsConfig
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
+import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.networking.APIUrl
 import com.breadfinancial.breadpartners.sdk.networking.APIUrlType
 import com.google.gson.Gson
@@ -58,7 +58,7 @@ class CommonUtils(
 
     fun buildRTPSWebURL(
         integrationKey: String,
-        setupConfig: BreadPartnersSetupConfig,
+        merchantConfiguration: MerchantConfiguration,
         rtpsConfig: BreadPartnersRtpsConfig
     ): URL? {
         val queryParams = mapOf(
@@ -70,13 +70,13 @@ class CommonUtils(
             "prescreenId" to rtpsConfig.prescreenId,
             "cardType" to rtpsConfig.cardType,
             "urlPath" to "screen name", // Replace with actual value if necessary
-            "firstName" to setupConfig.buyer?.givenName,
-            "lastName" to setupConfig.buyer?.familyName,
-            "address1" to setupConfig.buyer?.billingAddress?.address1,
-            "city" to setupConfig.buyer?.billingAddress?.locality,
-            "state" to setupConfig.buyer?.billingAddress?.region,
-            "zip" to setupConfig.buyer?.billingAddress?.postalCode,
-            "storeNumber" to setupConfig.storeNumber,
+            "firstName" to merchantConfiguration.buyer?.givenName,
+            "lastName" to merchantConfiguration.buyer?.familyName,
+            "address1" to merchantConfiguration.buyer?.billingAddress?.address1,
+            "city" to merchantConfiguration.buyer?.billingAddress?.locality,
+            "state" to merchantConfiguration.buyer?.billingAddress?.region,
+            "zip" to merchantConfiguration.buyer?.billingAddress?.postalCode,
+            "storeNumber" to merchantConfiguration.storeNumber,
             "location" to rtpsConfig.locationType?.name,
             "channel" to rtpsConfig.channel
         )

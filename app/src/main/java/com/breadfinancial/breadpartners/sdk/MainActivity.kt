@@ -26,9 +26,9 @@ import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersAddress
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersBuyer
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersMockOptions
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersPlacementConfig
+import com.breadfinancial.breadpartners.sdk.core.models.PlacementData
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersRtpsConfig
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersSetupConfig
+import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.CurrencyValue
 import com.breadfinancial.breadpartners.sdk.core.models.BreadSDKEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.FinancingType
@@ -91,8 +91,7 @@ class MainActivity : AppCompatActivity() {
         val xlargeTextSize = style["xlarge"] as Int
 
         val customFont = ResourcesCompat.getFont(
-            this,
-            this.resources.getIdentifier(fontFamily, "font", this.packageName)
+            this, this.resources.getIdentifier(fontFamily, "font", this.packageName)
         )
 
         binding.preScreenBtn.typeface = customFont
@@ -100,9 +99,12 @@ class MainActivity : AppCompatActivity() {
         binding.preScreenBtn.setTextColor(Color.parseColor(primaryColor))
 
         /**
-         * `setup` method must be placed at app launch.
+         * Call this function when the app launches.
          *
-         * @param integrationKey A unique key specific to the brand.
+         * @param breadSDKEnvironment Specifies the environment in which the SDK will operate (e.g., STAGE, PROD).
+         * @param enableLog Determines whether logging is enabled for debugging purposes.
+         * @param integrationKey A unique identifier for the brand.
+         * @param applicationContent The application context required for SDK initialization.
          */
         BreadPartnersSDK.getInstance().setup(
             breadSDKEnvironment = BreadSDKEnvironment.STAGE,
@@ -170,7 +172,7 @@ class MainActivity : AppCompatActivity() {
          *
          * Modify the Placement ID and total price to test different placements.
          */
-        val placement = BreadPartnersPlacementConfig(
+        val placementData = PlacementData(
             financingType = FinancingType.INSTALLMENTS,
             locationType = LocationType.CATEGORY,
             placementId = placementID,
@@ -198,43 +200,44 @@ class MainActivity : AppCompatActivity() {
             )
         )
 
-        /**
-         * Provides configurations for `registerPlacement` and `submitRTPS` methods.
-         */
         val placementsConfiguration = PlacementsConfiguration(
-            placementConfig = placement,
+            placementData = placementData,
             popUpStyling = popUpStyling
         )
 
-        BreadPartnersSDK.getInstance().registerPlacements(
-            setupConfig = BreadPartnersSetupConfig(
-                buyer = BreadPartnersBuyer(
-                    givenName = "Jack",
-                    familyName = "Seamus",
-                    additionalName = "C.",
-                    birthDate = "1974-08-21",
-                    email = "johncseamus@gmail.com",
-                    phone = "+13235323423",
-                    billingAddress = BreadPartnersAddress(
-                        address1 = "323 something lane",
-                        address2 = "apt. B",
-                        country = "USA",
-                        locality = "NYC",
-                        region = "NY",
-                        postalCode = "11222"
-                    ),
-                    shippingAddress = null
+        val merchantConfiguration = MerchantConfiguration(
+            buyer = BreadPartnersBuyer(
+                givenName = "Jack",
+                familyName = "Seamus",
+                additionalName = "C.",
+                birthDate = "1974-08-21",
+                email = "johncseamus@gmail.com",
+                phone = "+13235323423",
+                billingAddress = BreadPartnersAddress(
+                    address1 = "323 something lane",
+                    address2 = "apt. B",
+                    country = "USA",
+                    locality = "NYC",
+                    region = "NY",
+                    postalCode = "11222"
                 ),
-                loyaltyID = "xxxxxx",
-                storeNumber = "1234567",
-                env = "STAGE",
-                channel = "P",
-                subchannel = "X"
-            ), placementsConfiguration, this, splitTextAndAction = true
+                shippingAddress = null
+            ),
+            loyaltyID = "xxxxxx",
+            storeNumber = "1234567",
+            env = "STAGE",
+            channel = "P",
+            subchannel = "X"
+        )
+
+        BreadPartnersSDK.getInstance().registerPlacements(
+            merchantConfiguration = merchantConfiguration,
+            placementsConfiguration = placementsConfiguration,
+            viewContext = this,
+            splitTextAndAction = true
         ) { event ->
             when (event) {
                 is BreadPartnerEvent.RenderTextViewWithLink -> {
-                    Log.i("BreadPartnerSDK::", "Successfully rendered text with link.")
 
                     /**
                      * Handles rendering of a text view with a clickable link.
@@ -288,7 +291,6 @@ class MainActivity : AppCompatActivity() {
 
 
                 is BreadPartnerEvent.RenderSeparateTextAndButton -> {
-                    Log.i("BreadPartnerSDK::", "Successfully rendered text and button.")
 
                     /**
                      * Handles rendering of a popup view.
@@ -336,7 +338,6 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 is BreadPartnerEvent.RenderPopupView -> {
-                    Log.i("BreadPartnerSDK::", "Successfully rendered PopupView.")
 
                     /**
                      * Handles rendering of a popup view.
@@ -364,39 +365,44 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun preScreenCheck(view: View) {
-        val config2 = PlacementsConfiguration(
-            rtpsConfig = BreadPartnersRtpsConfig(
-                locationType = LocationType.CHECKOUT,
-                mockResponse = BreadPartnersMockOptions.SUCCESS
-            ),
+        val rtpsConfig = BreadPartnersRtpsConfig(
+            locationType = LocationType.CHECKOUT, mockResponse = BreadPartnersMockOptions.SUCCESS
+        )
+
+        val placementsConfiguration = PlacementsConfiguration(
+            rtpsConfig = rtpsConfig,
             popUpStyling = null,
         )
 
-        BreadPartnersSDK.getInstance().submitRTPS(
-            setupConfig = BreadPartnersSetupConfig(
-                buyer = BreadPartnersBuyer(
-                    givenName = "Jack",
-                    familyName = "Seamus",
-                    additionalName = "C.",
-                    birthDate = "1974-08-21",
-                    email = "johncseamus@gmail.com",
-                    phone = "+13235323423",
-                    billingAddress = BreadPartnersAddress(
-                        address1 = "323 something lane",
-                        address2 = "apt. B",
-                        country = "USA",
-                        locality = "NYC",
-                        region = "NY",
-                        postalCode = "11222"
-                    ),
-                    shippingAddress = null
+        val merchantConfiguration = MerchantConfiguration(
+            buyer = BreadPartnersBuyer(
+                givenName = "Jack",
+                familyName = "Seamus",
+                additionalName = "C.",
+                birthDate = "1974-08-21",
+                email = "johncseamus@gmail.com",
+                phone = "+13235323423",
+                billingAddress = BreadPartnersAddress(
+                    address1 = "323 something lane",
+                    address2 = "apt. B",
+                    country = "USA",
+                    locality = "NYC",
+                    region = "NY",
+                    postalCode = "11222"
                 ),
-                loyaltyID = "xxxxxx",
-                storeNumber = "1234567",
-                env = "STAGE",
-                channel = "P",
-                subchannel = "X"
-            ), config2, this
+                shippingAddress = null
+            ),
+            loyaltyID = "xxxxxx",
+            storeNumber = "1234567",
+            env = "STAGE",
+            channel = "P",
+            subchannel = "X"
+        )
+
+        BreadPartnersSDK.getInstance().submitRTPS(
+            merchantConfiguration = merchantConfiguration,
+            placementsConfiguration = placementsConfiguration,
+            viewContext = this
         ) { event ->
             when (event) {
                 is BreadPartnerEvent.RenderPopupView -> {
