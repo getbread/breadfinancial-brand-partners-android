@@ -2,6 +2,7 @@ package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import android.view.ViewGroup
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
@@ -14,14 +15,11 @@ internal class BreadFinancialWebViewInterstitial(private val context: Context) {
 
     @SuppressLint("SetJavaScriptEnabled")
     fun replaceViewWithWebView(
-        parent: ViewGroup,
-        url: String,
-        onUrlLoaded: (String) -> Unit
+        parent: ViewGroup, url: String, onUrlLoaded: (String) -> Unit
     ) {
         webView = WebView(context).apply {
             layoutParams = FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
+                FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
             )
             settings.apply {
                 javaScriptEnabled = true
@@ -33,8 +31,7 @@ internal class BreadFinancialWebViewInterstitial(private val context: Context) {
             webChromeClient = WebChromeClient()
             webViewClient = object : WebViewClient() {
                 override fun shouldOverrideUrlLoading(
-                    view: WebView?,
-                    request: WebResourceRequest?
+                    view: WebView?, request: WebResourceRequest?
                 ): Boolean {
                     return false
                 }
@@ -42,8 +39,13 @@ internal class BreadFinancialWebViewInterstitial(private val context: Context) {
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
                     url?.let { onUrlLoaded(it) }
+                    view?.evaluateJavascript(jsScript) {
+                        Log.i("BreadPartnerSDK::", "JSResult: $it")
+                    }
                 }
             }
+            addJavascriptInterface(WebMessageInterface(context), "AndroidInterface")
+
             loadUrl(url)
         }
 
@@ -57,3 +59,39 @@ internal class BreadFinancialWebViewInterstitial(private val context: Context) {
     }
 }
 
+
+val jsScript = """
+    setTimeout(function() {
+        try {
+            window.AndroidInterface.postMessage(JSON.stringify({
+                action: {
+                    type: "SAY_HELLO",
+                    payload: {
+                        name: "Sdk",
+                        ack: false
+                    }
+                },
+                fmcMessage: true
+            }));
+        } catch (err) {
+            console.error('Error sending initial message:', err);
+        }
+
+        window.addEventListener('message', (event) => {
+            try {
+                window.AndroidInterface.postMessage(JSON.stringify({
+                    action: {
+                        type: "message",
+                        payload: {
+                            name: event.data,
+                            ack: false
+                        }
+                    },
+                    fmcMessage: true
+                }));
+            } catch (err) {
+                console.error('Error sending HANDSHAKE message:', err);
+            }
+        });
+    }, 10000);
+""".trimIndent()
