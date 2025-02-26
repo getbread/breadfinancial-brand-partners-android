@@ -76,7 +76,8 @@ fun BreadPartnersSDK.executeSecurityCheck() {
         ) { result ->
             result.onSuccess {
                 commonUtils.executeAfterDelay(2000) {
-                    preScreenLookupCall(it.toString())
+//                    preScreenLookupCall(it.toString())
+                    fetchPlacementData()
                     alertHandler.hideAlert()
                 }
             }

@@ -8,11 +8,12 @@ import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
+import com.breadfinancial.breadpartners.sdk.core.extensions.executeSecurityCheck
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchBrandConfig
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchPlacementData
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
-import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.BreadSDKEnvironment
+import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
 import com.breadfinancial.breadpartners.sdk.core.models.PopupActionButtonStyle
@@ -261,9 +262,6 @@ class BreadPartnersSDK private constructor() {
             )
         }
 
-//                        executeSecurityCheck()
-//                        preScreenLookupCall(token= "")
-        fetchPlacementData()
-
+        executeSecurityCheck()
     }
 }
