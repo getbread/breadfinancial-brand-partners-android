@@ -76,8 +76,7 @@ fun BreadPartnersSDK.executeSecurityCheck() {
         ) { result ->
             result.onSuccess {
                 commonUtils.executeAfterDelay(2000) {
-//                    preScreenLookupCall(it.toString())
-                    fetchPlacementData()
+                    preScreenLookupCall(it.toString())
                     alertHandler.hideAlert()
                 }
             }
@@ -150,7 +149,7 @@ fun BreadPartnersSDK.fetchPlacementData() {
     val apiUrl = APIUrl(
         urlType = APIUrlType.GeneratePlacements
     ).url
-    var placementRequest: Any? = null
+    val placementRequest: Any?
     if (placementsConfiguration?.placementData != null) {
         val builder = PlacementRequestBuilder(
             integrationKey = integrationKey,

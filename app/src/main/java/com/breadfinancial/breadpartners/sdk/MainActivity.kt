@@ -366,7 +366,14 @@ class MainActivity : AppCompatActivity() {
 
     fun preScreenCheck(view: View) {
         val rtpsConfig = BreadPartnersRtpsConfig(
-            locationType = LocationType.CHECKOUT, mockResponse = BreadPartnersMockOptions.SUCCESS
+            locationType = LocationType.CHECKOUT,
+            order = Order(
+                totalPrice = CurrencyValue(
+                    currency = "USD",
+                    value = 5000.0
+                )
+            ),
+            mockResponse = BreadPartnersMockOptions.SUCCESS
         )
 
         val placementsConfiguration = PlacementsConfiguration(
@@ -399,7 +406,7 @@ class MainActivity : AppCompatActivity() {
             subchannel = "X"
         )
 
-        BreadPartnersSDK.getInstance().submitRTPS(
+        BreadPartnersSDK.getInstance().silentRTPSRequest(
             merchantConfiguration = merchantConfiguration,
             placementsConfiguration = placementsConfiguration,
             viewContext = this

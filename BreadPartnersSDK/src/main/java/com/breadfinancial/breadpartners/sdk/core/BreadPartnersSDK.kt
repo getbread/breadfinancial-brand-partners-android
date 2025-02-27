@@ -8,7 +8,6 @@ import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
-import com.breadfinancial.breadpartners.sdk.core.extensions.executeSecurityCheck
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchBrandConfig
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchPlacementData
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
@@ -234,13 +233,17 @@ class BreadPartnersSDK private constructor() {
 
     /**
      * Call this function to check if the user qualifies for a pre-screen card application.
+     * This call will be completely silent, with no impact on user behavior.
+     * Everything will be managed within the SDK, and the brand partner's app only needs to send data.
+     * If any step fails within the RTPS flow, the user will not experience any UI behavior changes.
+     * If RTPS succeeds, a popup should be displayed via the callback to show the "Approved" flow.
      *
      * @param merchantConfiguration Provide user account details in this configuration.
      * @param placementsConfiguration Specify the pre-defined placement details required for building the UI.
      * @param viewContext The current `AppCompatActivity` context where the view will be displayed.
      * @param callback A function that handles user interactions and ongoing events related to the placements.
      */
-    fun submitRTPS(
+    fun silentRTPSRequest(
         merchantConfiguration: MerchantConfiguration,
         placementsConfiguration: PlacementsConfiguration,
         viewContext: AppCompatActivity,
@@ -262,6 +265,7 @@ class BreadPartnersSDK private constructor() {
             )
         }
 
-        executeSecurityCheck()
+        //executeSecurityCheck()
+        fetchPlacementData()
     }
 }
