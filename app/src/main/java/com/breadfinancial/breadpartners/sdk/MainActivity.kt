@@ -202,7 +202,7 @@ class MainActivity : AppCompatActivity() {
 
         val placementsConfiguration = PlacementsConfiguration(
             placementData = placementData,
-            popUpStyling = popUpStyling
+            popUpStyling = null
         )
 
         val merchantConfiguration = MerchantConfiguration(
