@@ -1,12 +1,12 @@
 package com.breadfinancial.breadpartners.sdk.htmlhandling
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
-import com.breadfinancial.breadpartners.sdk.htmlhandling.extensions.renderTextViewWithLink
 import com.breadfinancial.breadpartners.sdk.htmlhandling.extensions.renderTextAndButton
+import com.breadfinancial.breadpartners.sdk.htmlhandling.extensions.renderTextViewWithLink
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.TextPlacementModel
@@ -36,11 +36,11 @@ class HTMLContentRenderer(
 
     var textPlacementModel: TextPlacementModel? = null
     var responseModel: PlacementsResponse? = null
-    var thisContext: AppCompatActivity? = null
+    var thisContext: Context? = null
 
     fun handleTextPlacement(
         responseModel: PlacementsResponse,
-        thisContext: AppCompatActivity
+        thisContext: Context
     ) {
         this.responseModel = responseModel
         this.thisContext = thisContext

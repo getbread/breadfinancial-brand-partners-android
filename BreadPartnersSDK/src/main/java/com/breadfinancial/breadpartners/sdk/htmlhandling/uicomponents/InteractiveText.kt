@@ -1,5 +1,6 @@
 package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Typeface
 import android.text.Spannable
@@ -10,12 +11,14 @@ import android.text.style.StyleSpan
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.TextPlacementModel
 
+@SuppressLint("AppCompatCustomView")
 class InteractiveText @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : AppCompatTextView(context, attrs, defStyleAttr) {
+) : TextView(context, attrs, defStyleAttr) {
 
     private var tapHandler: ((String) -> Unit)? = null
     private var normalText = ""
@@ -71,7 +74,7 @@ class InteractiveText @JvmOverloads constructor(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
                     tapHandler?.invoke(clickableText)
-                    (widget as AppCompatTextView).clearFocus()
+                    widget.clearFocus()
                     widget.invalidate()
                 }
             }, normalTextEndIndex, clickableTextEndIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE

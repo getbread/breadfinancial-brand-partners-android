@@ -74,7 +74,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     //    #Change-breadpartnersdk
-    implementation(libs.coordinatorlayout)
     implementation(libs.constraintlayout)
-//    implementation(libs.breadpartners)
 }

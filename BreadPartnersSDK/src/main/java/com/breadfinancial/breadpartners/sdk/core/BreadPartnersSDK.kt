@@ -1,12 +1,12 @@
 package com.breadfinancial.breadpartners.sdk.core
 
 import android.app.Application
+import android.content.Context
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
-import androidx.appcompat.app.AppCompatActivity
 import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchBrandConfig
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchPlacementData
@@ -80,7 +80,7 @@ class BreadPartnersSDK private constructor() {
 
     internal var htmlContentRenderer: HTMLContentRenderer? = null
     internal lateinit var application: Application
-    internal lateinit var thisContext: AppCompatActivity
+    internal lateinit var thisContext: Context
 
     internal var merchantConfiguration: MerchantConfiguration? = null
     internal var placementsConfiguration: PlacementsConfiguration? = null
@@ -154,7 +154,7 @@ class BreadPartnersSDK private constructor() {
         placementsConfiguration?.popUpStyling ?: run {
             placementsConfiguration?.popUpStyling?.actionButtonStyle = actionButtonStyle
         }
-        alertHandler.initialize(context = application)
+        alertHandler.initialize(context = thisContext)
 
         htmlContentRenderer = HTMLContentRenderer(
             integrationKey = integrationKey,
@@ -175,22 +175,22 @@ class BreadPartnersSDK private constructor() {
     /**
      * Call this function when the app launches.
      *
-     * @param breadSDKEnvironment Specifies the SDK environment, such as production (.prod) or development (stage).
+     * @param environment Specifies the SDK environment, such as production (.prod) or development (stage).
      * @param integrationKey A unique key specific to the brand.
      * @param enableLog Set this to `true` if you want to see debug logs.
-     * @param applicationContent `Application` context for the entire app.
+     * @param application `Application` context for the entire app.
      *
      */
     fun setup(
-        breadSDKEnvironment: BreadSDKEnvironment = BreadSDKEnvironment.PROD,
+        environment: BreadSDKEnvironment = BreadSDKEnvironment.PROD,
         integrationKey: String,
         enableLog: Boolean = false,
-        applicationContent: Application
+        application: Application
     ) {
-        APIUrl.setEnvironment(breadSDKEnvironment)
+        APIUrl.setEnvironment(environment)
         this.integrationKey = integrationKey
         logger.loggingEnabled = enableLog
-        this.application = applicationContent
+        this.application = application
 
         fetchBrandConfig()
     }
@@ -207,7 +207,7 @@ class BreadPartnersSDK private constructor() {
     fun registerPlacements(
         merchantConfiguration: MerchantConfiguration,
         placementsConfiguration: PlacementsConfiguration,
-        viewContext: AppCompatActivity,
+        viewContext: Context,
         splitTextAndAction: Boolean = false,
         callback: (BreadPartnerEvent) -> Unit
     ) {
@@ -246,7 +246,7 @@ class BreadPartnersSDK private constructor() {
     fun silentRTPSRequest(
         merchantConfiguration: MerchantConfiguration,
         placementsConfiguration: PlacementsConfiguration,
-        viewContext: AppCompatActivity,
+        viewContext: Context,
         callback: (BreadPartnerEvent) -> Unit
     ) {
         this.merchantConfiguration = merchantConfiguration

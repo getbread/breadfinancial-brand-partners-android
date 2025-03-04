@@ -101,16 +101,16 @@ class MainActivity : AppCompatActivity() {
         /**
          * Call this function when the app launches.
          *
-         * @param breadSDKEnvironment Specifies the environment in which the SDK will operate (e.g., STAGE, PROD).
+         * @param environment Specifies the environment in which the SDK will operate (e.g., STAGE, PROD).
          * @param enableLog Determines whether logging is enabled for debugging purposes.
          * @param integrationKey A unique identifier for the brand.
-         * @param applicationContent The application context required for SDK initialization.
+         * @param application The application context required for SDK initialization.
          */
         BreadPartnersSDK.getInstance().setup(
-            breadSDKEnvironment = BreadSDKEnvironment.STAGE,
+            environment = BreadSDKEnvironment.STAGE,
             enableLog = true,
             integrationKey = brandId,
-            applicationContent = application
+            application = application
         )
 
         /**
@@ -234,7 +234,7 @@ class MainActivity : AppCompatActivity() {
             merchantConfiguration = merchantConfiguration,
             placementsConfiguration = placementsConfiguration,
             viewContext = this,
-            splitTextAndAction = true
+            splitTextAndAction = false
         ) { event ->
             when (event) {
                 is BreadPartnerEvent.RenderTextViewWithLink -> {

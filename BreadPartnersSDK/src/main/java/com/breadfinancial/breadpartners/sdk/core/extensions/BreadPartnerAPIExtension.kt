@@ -160,7 +160,8 @@ fun BreadPartnersSDK.fetchPlacementData() {
     } else {
         val rtpsWebURL = commonUtils.buildRTPSWebURL(
             integrationKey = integrationKey,
-            merchantConfiguration = merchantConfiguration!!, rtpsConfig = placementsConfiguration?.rtpsConfig!!
+            merchantConfiguration = merchantConfiguration!!,
+            rtpsConfig = placementsConfiguration?.rtpsConfig!!
         )?.toString()
 
         val location = when (placementsConfiguration?.rtpsConfig?.locationType) {
