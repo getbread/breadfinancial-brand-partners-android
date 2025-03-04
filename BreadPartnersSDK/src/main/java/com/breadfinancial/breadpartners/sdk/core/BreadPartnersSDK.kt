@@ -154,7 +154,7 @@ class BreadPartnersSDK private constructor() {
         placementsConfiguration?.popUpStyling ?: run {
             placementsConfiguration?.popUpStyling?.actionButtonStyle = actionButtonStyle
         }
-        alertHandler.initialize(thisContext)
+        alertHandler.initialize(context = application)
 
         htmlContentRenderer = HTMLContentRenderer(
             integrationKey = integrationKey,

@@ -19,7 +19,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "BreadPartnersSDKAndroid"
+rootProject.name = "BreadPartnersSDK"
 include(":app")
 //    #Change-breadpartnersdk
 include(":BreadPartnersSDK")
