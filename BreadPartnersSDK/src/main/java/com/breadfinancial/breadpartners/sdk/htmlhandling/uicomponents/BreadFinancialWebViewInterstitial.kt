@@ -4,9 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.view.ViewGroup
+import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
+import android.webkit.WebView.setWebContentsDebuggingEnabled
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
 
@@ -28,23 +31,28 @@ internal class BreadFinancialWebViewInterstitial(private val context: Context) {
                 allowContentAccess = false
                 mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
             }
+            setWebContentsDebuggingEnabled(true)
             webChromeClient = WebChromeClient()
             webViewClient = object : WebViewClient() {
-                override fun shouldOverrideUrlLoading(
-                    view: WebView?, request: WebResourceRequest?
-                ): Boolean {
-                    return false
-                }
 
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
-                    url?.let { onUrlLoaded(it) }
-                    view?.evaluateJavascript(jsScript) {
-                        Log.i("BreadPartnerSDK::", "JSResult: $it")
+                    url?.let {
+                        onUrlLoaded(it)
+                    }
+                }
+
+                override fun onReceivedError(
+                    view: WebView?, request: WebResourceRequest?, error: WebResourceError?
+                ) {
+                    super.onReceivedError(view, request, error)
+                    error?.let {
+                        onUrlLoaded(it.toString())
                     }
                 }
             }
-            addJavascriptInterface(WebMessageInterface(context), "AndroidInterface")
+            webChromeClient = WebChromeClient()
+            addJavascriptInterface(MessageHandler(this), "MessageHandler")
 
             loadUrl(url)
         }
@@ -57,41 +65,11 @@ internal class BreadFinancialWebViewInterstitial(private val context: Context) {
             webView.destroy()
         }
     }
-}
 
-
-val jsScript = """
-    setTimeout(function() {
-        try {
-            window.AndroidInterface.postMessage(JSON.stringify({
-                action: {
-                    type: "SAY_HELLO",
-                    payload: {
-                        name: "Sdk",
-                        ack: false
-                    }
-                },
-                fmcMessage: true
-            }));
-        } catch (err) {
-            console.error('Error sending initial message:', err);
+    private inner class MessageHandler(webView: WebView) {
+        @JavascriptInterface
+        fun postMessage(message: String) {
+            Log.d("BreadPartnersSDK:", "WebViewMessage: $message")
         }
-
-        window.addEventListener('message', (event) => {
-            try {
-                window.AndroidInterface.postMessage(JSON.stringify({
-                    action: {
-                        type: "message",
-                        payload: {
-                            name: event.data,
-                            ack: false
-                        }
-                    },
-                    fmcMessage: true
-                }));
-            } catch (err) {
-                console.error('Error sending HANDSHAKE message:', err);
-            }
-        });
-    }, 10000);
-""".trimIndent()
+    }
+}
