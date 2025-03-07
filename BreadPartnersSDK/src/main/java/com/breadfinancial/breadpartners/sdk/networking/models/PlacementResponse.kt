@@ -1,3 +1,5 @@
+@file:Suppress("PropertyName", "SpellCheckingInspection")
+
 package com.breadfinancial.breadpartners.sdk.networking.models
 
 data class PlacementsResponse(

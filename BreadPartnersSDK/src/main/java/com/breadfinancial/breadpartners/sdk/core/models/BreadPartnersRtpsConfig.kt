@@ -6,7 +6,7 @@ data class BreadPartnersRtpsConfig(
     var locationType: LocationType? = null,
     var cardType: String? = null,
     var country: String? = null,
-    var prescreenId: String? = null,
+    var prescreenId: Int? = null,
     var correlationData: String? = null,
     var customerAcceptedOffer: Boolean? = null,
     var channel: String? = null,

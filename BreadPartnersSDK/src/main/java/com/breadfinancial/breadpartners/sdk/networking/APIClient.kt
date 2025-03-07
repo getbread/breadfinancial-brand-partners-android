@@ -19,7 +19,7 @@ sealed class Result<out T> {
 }
 
 enum class HTTPMethod(val value: String) {
-    GET("GET"), POST("POST"),
+    GET("GET"), POST("POST"),OPTIONS("OPTIONS")
 }
 
 /**
@@ -54,11 +54,11 @@ class APIClient(
                 val url = URL(urlString)
                 val connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = method.value
-                connection.setRequestProperty("Content-Type", "application/json")
 
                 val genericHeader = mapOf(
                     Constants.headerContentType to Constants.headerContentTypeValue,
-                    Constants.headerUserAgentKey to commonUtils.getUserAgent()
+                    Constants.headerUserAgentKey to commonUtils.getUserAgent(),
+                    Constants.headerOriginKey to Constants.headerOriginValue
                 )
                 val updatedHeaders = (headers ?: emptyMap()) + genericHeader
 

@@ -1,3 +1,5 @@
+@file:Suppress("ConstPropertyName")
+
 package com.breadfinancial.breadpartners.sdk.utilities
 
 object Constants {
@@ -9,6 +11,20 @@ object Constants {
     const val headerUserAgentKey = "User-Agent"
     const val headerContentType = "Content-Type"
     const val headerContentTypeValue = "application/json"
+    const val headerOriginKey = "Origin"
+    const val headerOriginValue = "https://aspire-ep-demo.myshopify.com"
+    const val headerAuthorityKey = "authority"
+    const val headerAuthorityValue = "metrics.kmsmep.com"
+    const val headerAcceptKey = "Accept"
+    const val headerAcceptValue = "*/*"
+    const val headerAcceptEncodingKey = "Accept-Encoding"
+    const val headerAcceptEncodingValue = "gzip, deflate, br, zstd"
+    const val headerAcceptLanguageKey = "Accept-Language"
+    const val headerAcceptLanguageValue = "en-GB,en-US;q=0.9,en;q=0.8"
+    const val headerAccessControlRequestHeadersKey = "Access-Control-Request-Headers"
+    const val headerAccessControlRequestHeadersValue = "content-type"
+    const val headerAccessControlRequestMethodKey = "Access-Control-Request-Method"
+    const val headerAccessControlRequestMethodValue = "POST"
 
     fun nativeSDKAlertTitle(): String {
         return "Bread Partner"

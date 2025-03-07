@@ -145,8 +145,9 @@
     <FrameLayout
         android:id="@+id/overlay_embedded_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/top_banner" />
 
     <LinearLayout

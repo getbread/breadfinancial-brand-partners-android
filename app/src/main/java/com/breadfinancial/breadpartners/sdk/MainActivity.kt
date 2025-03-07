@@ -351,13 +351,13 @@ class MainActivity : AppCompatActivity() {
                         if (userConfirmed) {
                             view.show(this.supportFragmentManager, "PopupDialog")
                         } else {
-                            println("User canceled No")
+                            print("User canceled No")
                         }
                     }
                 }
 
                 else -> {
-                    Log.i("BreadPartnerSDK::", "Event:${event}")
+                    Log.i("BreadPartnerSDK::", "Event:$event")
                 }
             }
         }
@@ -419,7 +419,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 else -> {
-                    Log.i("BreadPartnerSDK::", "Event:${event}")
+                    Log.i("BreadPartnerSDK::", "Event:$event")
                 }
             }
         }

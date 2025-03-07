@@ -1,6 +1,7 @@
 package com.breadfinancial.breadpartners.sdk.security
 
 import android.app.Application
+import com.breadfinancial.breadpartners.sdk.utilities.Logger
 import com.google.android.recaptcha.Recaptcha
 import com.google.android.recaptcha.RecaptchaAction
 import com.google.android.recaptcha.RecaptchaException
@@ -8,7 +9,7 @@ import com.google.android.recaptcha.RecaptchaException
 /**
  * `RecaptchaManager` handles the process of executing a reCAPTCHA for verifying user actions.
  */
-class RecaptchaManager {
+class RecaptchaManager(private val logger: Logger) {
 
     suspend fun executeReCaptcha(
         context: Application,
@@ -17,16 +18,17 @@ class RecaptchaManager {
         timeout: Long = 10000L,
         completion: (Result<Result<String>>) -> Unit
     ) {
+
         try {
             val client = Recaptcha.fetchClient(context, siteKey)
             val token = client.execute(action, timeout)
-            println("Recaptcha_Token: $token")
+            logger.printLog("Recaptcha_Token: $token")
             completion(Result.success(token))
         } catch (error: RecaptchaException) {
-            println("Recaptcha_Error: ${error.message}")
+            logger.printLog("Recaptcha_Error: ${error.message}")
             completion(Result.failure(error))
         } catch (exception: Exception) {
-            println("Recaptcha_Exception: ${exception.message}")
+            logger.printLog("Recaptcha_Exception: ${exception.message}")
             completion(Result.failure(exception))
         }
     }

@@ -60,7 +60,8 @@ class CommonUtils(
     fun buildRTPSWebURL(
         integrationKey: String,
         merchantConfiguration: MerchantConfiguration,
-        rtpsConfig: BreadPartnersRtpsConfig
+        rtpsConfig: BreadPartnersRtpsConfig,
+        prescreenId:Int
     ): URL? {
         val queryParams = mapOf(
             "mockMO" to rtpsConfig.mockResponse?.value,
@@ -68,7 +69,7 @@ class CommonUtils(
             "mockVL" to rtpsConfig.mockResponse?.value,
             "embedded" to "true",
             "clientKey" to integrationKey,
-            "prescreenId" to rtpsConfig.prescreenId,
+            "prescreenId" to prescreenId,
             "cardType" to rtpsConfig.cardType,
             "urlPath" to "screen name", // Replace with actual value if necessary
             "firstName" to merchantConfiguration.buyer?.givenName,
@@ -85,7 +86,7 @@ class CommonUtils(
         return try {
             val urlComponents = URL(APIUrl(urlType = APIUrlType.RTPSWebURL("offer")).url)
             val queryString =
-                queryParams.filterValues { !it.isNullOrEmpty() }.map { "${it.key}=${it.value}" }
+                queryParams.filterValues { it != null }.map { "${it.key}=${it.value}" }
                     .joinToString("&")
 
             URL("$urlComponents?$queryString")
@@ -102,7 +103,7 @@ class CommonUtils(
         return Color.rgb(r, g, b)
     }
 
-    fun getUserAgent():String{
+    fun getUserAgent(): String {
         val osVersion = "Android ${Build.VERSION.RELEASE}" // e.g., "Android 13"
         val deviceModel = Build.MODEL                    // e.g., "Pixel 7"
         val manufacturer = Build.MANUFACTURER           // e.g., "Google"

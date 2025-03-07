@@ -13,7 +13,9 @@ import com.breadfinancial.breadpartners.sdk.networking.models.ContextRequestBody
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequest
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequestBody
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementsResponse
+import com.breadfinancial.breadpartners.sdk.networking.models.PrescreenResult
 import com.breadfinancial.breadpartners.sdk.networking.models.RTPSResponse
+import com.breadfinancial.breadpartners.sdk.networking.models.getPrescreenResult
 import com.breadfinancial.breadpartners.sdk.networking.requestbuilders.PlacementRequestBuilder
 import com.breadfinancial.breadpartners.sdk.networking.requestbuilders.RTPSRequestBuilder
 import com.breadfinancial.breadpartners.sdk.utilities.Constants
@@ -98,7 +100,7 @@ fun BreadPartnersSDK.executeSecurityCheck() {
 fun BreadPartnersSDK.preScreenLookupCall(token: String) {
     coroutineScope.launch {
         val apiUrl = APIUrl(
-            urlType = if (prescreenId == null) APIUrlType.PreScreen else APIUrlType.VirtualLookup
+            urlType = if (placementsConfiguration?.rtpsConfig?.prescreenId == null) APIUrlType.PreScreen else APIUrlType.VirtualLookup
         ).url
         val rtpsRequestBuilder = RTPSRequestBuilder(
             merchantConfiguration!!, placementsConfiguration?.rtpsConfig!!
@@ -117,7 +119,20 @@ fun BreadPartnersSDK.preScreenLookupCall(token: String) {
                     commonUtils.decodeJSON(result.data.toString(),
                         RTPSResponse::class.java,
                         onSuccess = { response ->
-                            println("PreScreenID::${response.prescreenId}")
+                            val returnResultType = response.returnCode
+                            val prescreenResult = getPrescreenResult(returnResultType)
+                            logger.printLog("PreScreenID:Result: $prescreenResult")
+
+                            /**
+                             * This call runs in the background without user interaction.
+                             * If the result is not "approved", we simply return without taking any further action.
+                             */
+                            if (prescreenResult != PrescreenResult.APPROVED) {
+                                return@decodeJSON
+                            }
+
+                            prescreenId = response.prescreenId
+                            logger.printLog("PreScreenID::$prescreenId")
                             fetchPlacementData()
                         },
                         onError = { error ->
@@ -129,7 +144,6 @@ fun BreadPartnersSDK.preScreenLookupCall(token: String) {
                                 showOkButton = true
                             )
                         })
-                    executeSecurityCheck()
                 }
 
                 is Result.Failure -> {
@@ -164,7 +178,8 @@ fun BreadPartnersSDK.fetchPlacementData() {
         val rtpsWebURL = commonUtils.buildRTPSWebURL(
             integrationKey = integrationKey,
             merchantConfiguration = merchantConfiguration!!,
-            rtpsConfig = placementsConfiguration?.rtpsConfig!!
+            rtpsConfig = placementsConfiguration?.rtpsConfig!!,
+            prescreenId = prescreenId ?: 0
         )?.toString()
 
         val location = when (placementsConfiguration?.rtpsConfig?.locationType) {

@@ -23,7 +23,7 @@ data class Analytics(
     data class EventProperties(
         val placement: Placement?,
         val placementContent: PlacementContent?,
-        val metadata: Map<String, String>?,
+        val metadata: Map<String, String?>?,
         val actionTarget: String?
     )
 

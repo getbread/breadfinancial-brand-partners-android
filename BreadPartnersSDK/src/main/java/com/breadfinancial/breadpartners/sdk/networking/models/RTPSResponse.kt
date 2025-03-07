@@ -1,24 +1,26 @@
 package com.breadfinancial.breadpartners.sdk.networking.models
 
-data class RTPSResponse(
-    val returnCode: Int,
-    val errorMessage: String,
-    val errorCode: Int,
-    val address1: String? = null,
-    val address2: String? = null,
-    val city: String? = null,
-    val state: String? = null,
-    val zip: String? = null,
-    val firstName: String? = null,
-    val middleInitial: String? = null,
-    val lastName: String? = null,
-    val prescreenId: Int,
-    val isExpired: Boolean,
-    val cardType: String? = null,
-    val hasExistingAccount: Boolean? = null,
-    val debug: DebugInfo? = null
-) {
-    data class DebugInfo(
-        val requests: String? = null
-    )
+enum class PrescreenResult {
+    // Has been pre-approved
+    APPROVED,
+    NO_HIT,
+    // Not pre-approved but should/could apply
+    MAKE_OFFER,
+    ACKNOWLEDGE
 }
+
+val prescreenResultMap: Map<String, PrescreenResult> = mapOf(
+    "01" to PrescreenResult.APPROVED,
+    "10" to PrescreenResult.NO_HIT,
+    "11" to PrescreenResult.MAKE_OFFER,
+    "12" to PrescreenResult.ACKNOWLEDGE
+)
+
+fun getPrescreenResult(apiResponse: String): PrescreenResult {
+    return prescreenResultMap[apiResponse] ?: PrescreenResult.NO_HIT
+}
+
+data class RTPSResponse(
+    val returnCode: String,
+    val prescreenId: Int
+)

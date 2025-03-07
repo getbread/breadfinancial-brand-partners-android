@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.Typeface
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
@@ -49,7 +48,7 @@ class BreadPartnersSDK private constructor() {
     private var enableLog: Boolean = false
 
     private lateinit var callback: ((BreadPartnerEvent) -> Unit?)
-    private val logger: Logger by lazy {
+    val logger: Logger by lazy {
         Logger(
             outputStream = System.out, isLoggingEnabled = true
         )
@@ -67,7 +66,7 @@ class BreadPartnersSDK private constructor() {
             commonUtils = commonUtils
         )
     }
-    internal val recaptchaManager: RecaptchaManager by lazy { RecaptchaManager() }
+    internal val recaptchaManager: RecaptchaManager by lazy { RecaptchaManager(logger = logger) }
     private val analyticsManager: AnalyticsManager by lazy {
         AnalyticsManager(
             apiClient = apiClient, commonUtils = commonUtils
@@ -90,7 +89,7 @@ class BreadPartnersSDK private constructor() {
     internal var placementsConfiguration: PlacementsConfiguration? = null
     internal var brandConfiguration: BrandConfigResponse? = null
     internal var rtpsFlow: Boolean = false
-    internal var prescreenId: String? = null
+    internal var prescreenId: Int? = null
     private var splitTextAndAction: Boolean = false
 
     private fun setUpInjectables() {
@@ -159,6 +158,8 @@ class BreadPartnersSDK private constructor() {
             placementsConfiguration?.popUpStyling?.actionButtonStyle = actionButtonStyle
         }
         alertHandler.initialize(context = thisContext)
+
+        analyticsManager.setApiKey(integrationKey)
 
         htmlContentRenderer = HTMLContentRenderer(
             integrationKey = integrationKey,
@@ -269,7 +270,6 @@ class BreadPartnersSDK private constructor() {
             )
         }
 
-//        executeSecurityCheck()
-        fetchPlacementData()
+        executeSecurityCheck()
     }
 }

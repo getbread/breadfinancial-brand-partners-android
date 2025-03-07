@@ -8,6 +8,12 @@ import androidx.fragment.app.DialogFragment
 /// Enum representing different events supported by BreadPartnerSDK.
 sealed class BreadPartnerEvent {
 
+    override fun toString(): String {
+        return when (this) {
+            is SdkError -> "${this::class.simpleName}(error=${error.localizedMessage})"
+            else -> this::class.simpleName ?: "UnknownEvent"
+        }
+    }
     /// Renders a text view containing a clickable hyperlink.
     /// - Parameter spannableText: A Spannable object containing the text with a clickable link.
     data class RenderTextViewWithLink(val spannableText: Spannable) : BreadPartnerEvent()

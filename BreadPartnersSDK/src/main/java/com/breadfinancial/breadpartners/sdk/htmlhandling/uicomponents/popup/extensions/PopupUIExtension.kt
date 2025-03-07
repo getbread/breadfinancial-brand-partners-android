@@ -86,7 +86,12 @@ fun PopupDialog.setupUI() {
     }
 
     context?.let {
-        webViewManager = BreadFinancialWebViewInterstitial(it)
+        webViewManager = BreadFinancialWebViewInterstitial(it, logger) { event ->
+            when (event) {
+                is BreadPartnerEvent.PopupClosed -> closeButtonTapped()
+                else -> callback(event)
+            }
+        }
         addSectionsToLinearLayout(
             popupModel, contentStackView, it, popupStyle
         )

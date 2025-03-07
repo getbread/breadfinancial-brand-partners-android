@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED_PARAMETER")
+
 package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents
 
 import android.annotation.SuppressLint
@@ -12,13 +14,20 @@ import android.webkit.WebView
 import android.webkit.WebView.setWebContentsDebuggingEnabled
 import android.webkit.WebViewClient
 import android.widget.FrameLayout
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.utilities.Logger
+import org.json.JSONObject
 
-internal class BreadFinancialWebViewInterstitial(private val context: Context) {
+internal class BreadFinancialWebViewInterstitial(
+    private val context: Context,
+    private val logger: Logger,
+    private val callback: (BreadPartnerEvent) -> Unit?
+) {
     private lateinit var webView: WebView
 
     @SuppressLint("SetJavaScriptEnabled")
     fun replaceViewWithWebView(
-        parent: ViewGroup, url: String, onUrlLoaded: (String) -> Unit
+        parent: ViewGroup, url: String, onPageLoadCompleted: (String) -> Unit
     ) {
         webView = WebView(context).apply {
             layoutParams = FrameLayout.LayoutParams(
@@ -33,12 +42,14 @@ internal class BreadFinancialWebViewInterstitial(private val context: Context) {
             }
             setWebContentsDebuggingEnabled(true)
             webChromeClient = WebChromeClient()
+
+            logger.logLoadingURL(url = url)
             webViewClient = object : WebViewClient() {
 
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
                     url?.let {
-                        onUrlLoaded(it)
+                        onPageLoadCompleted(it)
                     }
                 }
 
@@ -47,7 +58,7 @@ internal class BreadFinancialWebViewInterstitial(private val context: Context) {
                 ) {
                     super.onReceivedError(view, request, error)
                     error?.let {
-                        onUrlLoaded(it.toString())
+                        onPageLoadCompleted(it.toString())
                     }
                 }
             }
@@ -70,6 +81,64 @@ internal class BreadFinancialWebViewInterstitial(private val context: Context) {
         @JavascriptInterface
         fun postMessage(message: String) {
             Log.d("BreadPartnersSDK:", "WebViewMessage: $message")
+
+            try {
+                val parsedData = JSONObject(message)
+                val action = parsedData.optJSONObject("action")
+                val type = action?.optString("type")
+
+                when (type) {
+                    "HEIGHT_CHANGED" -> {
+                        // Handle height change if needed
+                    }
+
+                    "LOAD_ADOBE_TRACKING_ID" -> {
+                        action.optJSONObject("payload")?.let { payload ->
+                            val adobeTrackingId = payload.optString("adobeTrackingId")
+                            logger.printLog("BreadPartnersSDK: AdobeTrackingID: $adobeTrackingId")
+                        }
+                    }
+
+                    "VIEW_PAGE" -> {
+                        action.optJSONObject("payload")?.let { payload ->
+                            val pageName = payload.optString("pageName")
+                            callback(BreadPartnerEvent.ScreenName(name = pageName))
+                        }
+                    }
+
+                    "CANCEL_APPLICATION" -> {
+                        callback(BreadPartnerEvent.PopupClosed)
+                    }
+
+                    "SUBMIT_APPLICATION" -> {
+                        callback(BreadPartnerEvent.ScreenName(name = "submit-application"))
+                    }
+
+                    "RECEIVE_APPLICATION_RESULT" -> {
+                        action.optJSONObject("payload")?.let { payload ->
+                            logger.logApplicationResultDetails(payload)
+                            callback(BreadPartnerEvent.WebViewSuccess(result = payload))
+                        }
+                    }
+
+                    "APPLICATION_COMPLETED" -> {
+                        callback(BreadPartnerEvent.ScreenName(name = "application-completed"))
+                    }
+
+                    "OFFER_RESPONSE" -> {
+                        val payload = action.optString("payload")
+                        if (payload == "NO" || payload == "NOT_ME") {
+                            callback(BreadPartnerEvent.PopupClosed)
+                        }
+                    }
+
+                    else -> {
+                        logger.printLog("BreadPartnersSDK: WebViewMessage: $message")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("BreadPartnersSDK", "Error parsing WebView message", e)
+            }
         }
     }
 }

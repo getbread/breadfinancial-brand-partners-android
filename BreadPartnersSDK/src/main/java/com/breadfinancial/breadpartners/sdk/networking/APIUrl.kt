@@ -33,7 +33,7 @@ class APIUrl(private val urlType: APIUrlType) {
         when (currentBreadSDKEnvironment) {
             BreadSDKEnvironment.STAGE -> {
                 baseURL = "https://brands.kmsmep.com"
-                rtpsBaseURL = "https://acquire1uat.comenity.net"
+                rtpsBaseURL = "https://acquire1sit.comenity.net"
             }
 
             BreadSDKEnvironment.PROD -> {
