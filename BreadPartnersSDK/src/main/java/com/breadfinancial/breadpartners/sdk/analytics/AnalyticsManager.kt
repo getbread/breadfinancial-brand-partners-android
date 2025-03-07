@@ -31,9 +31,6 @@ class AnalyticsManager(
         name: String, placementResponse: PlacementsResponse
     ): Analytics.Payload {
         val timestamp = commonUtils.getCurrentTimestamp()
-        val osVersion = "Android ${Build.VERSION.RELEASE}" // e.g., "Android 13"
-        val deviceModel = Build.MODEL                    // e.g., "Pixel 7"
-        val manufacturer = Build.MANUFACTURER           // e.g., "Google"
 
         return Analytics.Payload(
             name = name, props = Analytics.Props(
@@ -55,7 +52,7 @@ class AnalyticsManager(
                     library = Analytics.Library(
                         name = "bread-partners-sdk-android", version = "0.0.1"
                     ),
-                    userAgent = "$manufacturer $deviceModel; $osVersion", // Google Pixel 7; Android 13
+                    userAgent = commonUtils.getUserAgent(),
                     page = Analytics.Page(
                         path = "/collections/living-room/products/benchwright-square-coffee-table",
                         url = "https://aspire-ep-demo.myshopify.com/collections/living-room/products/benchwright-square-coffee-table"

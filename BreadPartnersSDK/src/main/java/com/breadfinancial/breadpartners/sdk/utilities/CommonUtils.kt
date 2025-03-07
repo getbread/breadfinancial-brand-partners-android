@@ -1,6 +1,7 @@
 package com.breadfinancial.breadpartners.sdk.utilities
 
 import android.graphics.Color
+import android.os.Build
 import android.os.Handler
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersRtpsConfig
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
@@ -99,5 +100,12 @@ class CommonUtils(
         val g = (Color.green(color) * factor).toInt()
         val b = (Color.blue(color) * factor).toInt()
         return Color.rgb(r, g, b)
+    }
+
+    fun getUserAgent():String{
+        val osVersion = "Android ${Build.VERSION.RELEASE}" // e.g., "Android 13"
+        val deviceModel = Build.MODEL                    // e.g., "Pixel 7"
+        val manufacturer = Build.MANUFACTURER           // e.g., "Google"
+        return "$manufacturer $deviceModel; $osVersion" // Google Pixel 7; Android 13
     }
 }

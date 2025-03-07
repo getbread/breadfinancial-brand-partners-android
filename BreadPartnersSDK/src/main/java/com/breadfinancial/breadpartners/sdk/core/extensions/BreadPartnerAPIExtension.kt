@@ -105,9 +105,12 @@ fun BreadPartnersSDK.preScreenLookupCall(token: String) {
         )
         val rtpsRequest = rtpsRequestBuilder.build()
         rtpsRequest.reCaptchaToken = token
-
+        val headers = mapOf(
+            Constants.headerClientKey to integrationKey,
+            Constants.headerRequestedWithKey to Constants.headerRequestedWithValue
+        )
         apiClient.request(
-            urlString = apiUrl, method = HTTPMethod.POST, body = rtpsRequest
+            urlString = apiUrl, method = HTTPMethod.POST, body = rtpsRequest, headers = headers
         ) { result ->
             when (result) {
                 is Result.Success -> {

@@ -1,6 +1,15 @@
 package com.breadfinancial.breadpartners.sdk.utilities
 
 object Constants {
+
+    // API constants
+    const val headerClientKey = "X-Client-Key"
+    const val headerRequestedWithKey = "X-Requested-With"
+    const val headerRequestedWithValue = "XMLHttpRequest"
+    const val headerUserAgentKey = "User-Agent"
+    const val headerContentType = "Content-Type"
+    const val headerContentTypeValue = "application/json"
+
     fun nativeSDKAlertTitle(): String {
         return "Bread Partner"
     }

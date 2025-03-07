@@ -5,9 +5,11 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.Typeface
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
+import com.breadfinancial.breadpartners.sdk.core.extensions.executeSecurityCheck
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchBrandConfig
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchPlacementData
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
@@ -60,7 +62,9 @@ class BreadPartnersSDK private constructor() {
     }
     internal val apiClient: APIClient by lazy {
         APIClient(
-            coroutineScope = CoroutineScope(Dispatchers.IO), logger = logger
+            coroutineScope = CoroutineScope(Dispatchers.IO),
+            logger = logger,
+            commonUtils = commonUtils
         )
     }
     internal val recaptchaManager: RecaptchaManager by lazy { RecaptchaManager() }
@@ -201,7 +205,7 @@ class BreadPartnersSDK private constructor() {
      * @param merchantConfiguration Provide user account details in this configuration.
      * @param placementsConfiguration Specify the pre-defined placement details required for building the UI.
      * @param splitTextAndAction Set this to `true` if you want the placement to return either text with a link or a combination of text and button.
-     * @param viewContext The current `AppCompatActivity` context where the view will be displayed.
+     * @param viewContext The current `Activity` context where the view will be displayed.
      * @param callback A function that handles user interactions and ongoing events related to the placements.
      */
     fun registerPlacements(
@@ -265,7 +269,7 @@ class BreadPartnersSDK private constructor() {
             )
         }
 
-        //executeSecurityCheck()
+//        executeSecurityCheck()
         fetchPlacementData()
     }
 }
