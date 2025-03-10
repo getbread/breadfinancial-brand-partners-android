@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents
 
 import android.annotation.SuppressLint
@@ -12,7 +14,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.res.ResourcesCompat
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.TextPlacementModel
 
 @SuppressLint("AppCompatCustomView")
@@ -83,4 +85,11 @@ class InteractiveText @JvmOverloads constructor(
         return spannableString
     }
 
+    fun setCustomFont(fontResId: Int) {
+        try {
+            typeface = ResourcesCompat.getFont(context, fontResId)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }
