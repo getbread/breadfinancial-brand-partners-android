@@ -38,7 +38,7 @@ class APIUrl(private val urlType: APIUrlType) {
 
             BreadSDKEnvironment.PROD -> {
                 baseURL = "https://brands.kmsmep.com"
-                rtpsBaseURL = "https://acquire1uat.comenity.net"
+                rtpsBaseURL = "https://acquire1.comenity.net"
             }
         }
     }

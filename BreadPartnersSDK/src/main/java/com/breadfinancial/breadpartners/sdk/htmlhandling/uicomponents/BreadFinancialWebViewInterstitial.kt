@@ -7,7 +7,6 @@ import android.content.Context
 import android.util.Log
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
-import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
@@ -36,12 +35,11 @@ internal class BreadFinancialWebViewInterstitial(
             settings.apply {
                 javaScriptEnabled = true
                 domStorageEnabled = true
-                allowFileAccess = false
-                allowContentAccess = false
-                mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
+                allowFileAccess = true
+                allowContentAccess = true
+                mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                setWebContentsDebuggingEnabled(true)
             }
-            setWebContentsDebuggingEnabled(true)
-            webChromeClient = WebChromeClient()
 
             logger.logLoadingURL(url = url)
             webViewClient = object : WebViewClient() {
@@ -62,8 +60,7 @@ internal class BreadFinancialWebViewInterstitial(
                     }
                 }
             }
-            webChromeClient = WebChromeClient()
-            addJavascriptInterface(MessageHandler(this), "MessageHandler")
+            addJavascriptInterface(WebAppInterface(this), "Android")
 
             loadUrl(url)
         }
@@ -77,12 +74,15 @@ internal class BreadFinancialWebViewInterstitial(
         }
     }
 
-    private inner class MessageHandler(webView: WebView) {
+    private inner class WebAppInterface(webView: WebView) {
         @JavascriptInterface
         fun postMessage(message: String) {
             Log.d("BreadPartnersSDK:", "WebViewMessage: $message")
 
             try {
+                if (message == "undefined") {
+                    return
+                }
                 val parsedData = JSONObject(message)
                 val action = parsedData.optJSONObject("action")
                 val type = action?.optString("type")
