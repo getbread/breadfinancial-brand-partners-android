@@ -16,14 +16,20 @@ class RecaptchaManager(private val logger: Logger) {
         siteKey: String,
         action: RecaptchaAction,
         timeout: Long = 10000L,
-        completion: (Result<Result<String>>) -> Unit
+        completion: (Result<String>) -> Unit
     ) {
 
         try {
             val client = Recaptcha.fetchClient(context, siteKey)
-            val token = client.execute(action, timeout)
-            logger.printLog("Recaptcha_Token: $token")
-            completion(Result.success(token))
+            val result = client.execute(action, timeout)
+            result.onSuccess { token ->
+                logger.printLog("Recaptcha_Token: $token")
+                completion(Result.success(token))
+            }.onFailure {
+                logger.printLog("Recaptcha_Error: $it")
+                completion(Result.failure(it))
+            }
+
         } catch (error: RecaptchaException) {
             logger.printLog("Recaptcha_Error: ${error.message}")
             completion(Result.failure(error))

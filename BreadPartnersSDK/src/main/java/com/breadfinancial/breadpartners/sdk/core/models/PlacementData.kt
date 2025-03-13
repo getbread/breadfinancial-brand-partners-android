@@ -1,8 +1,8 @@
 package com.breadfinancial.breadpartners.sdk.core.models
 
 data class PlacementData(
-    var financingType: FinancingType? = null,
-    var locationType: LocationType? = null,
+    var financingType: String? = null,
+    var locationType: String? = null,
     var placementId: String? = null,
     var domID: String? = null,
     var allowCheckout: Boolean? = null,

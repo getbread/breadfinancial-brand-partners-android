@@ -78,7 +78,7 @@ fun BreadPartnersSDK.executeSecurityCheck() {
         ) { result ->
             result.onSuccess {
                 commonUtils.executeAfterDelay(2000) {
-                    preScreenLookupCall(it.toString())
+                    preScreenLookupCall(token = it)
                     alertHandler.hideAlert()
                 }
             }
@@ -100,10 +100,10 @@ fun BreadPartnersSDK.executeSecurityCheck() {
 fun BreadPartnersSDK.preScreenLookupCall(token: String) {
     coroutineScope.launch {
         val apiUrl = APIUrl(
-            urlType = if (placementsConfiguration?.rtpsConfig?.prescreenId == null) APIUrlType.PreScreen else APIUrlType.VirtualLookup
+            urlType = if (placementsConfiguration?.rtpsData?.prescreenId == null) APIUrlType.PreScreen else APIUrlType.VirtualLookup
         ).url
         val rtpsRequestBuilder = RTPSRequestBuilder(
-            merchantConfiguration!!, placementsConfiguration?.rtpsConfig!!
+            merchantConfiguration!!, placementsConfiguration?.rtpsData!!
         )
         val rtpsRequest = rtpsRequestBuilder.build()
         rtpsRequest.reCaptchaToken = token
@@ -178,14 +178,16 @@ fun BreadPartnersSDK.fetchPlacementData() {
         val rtpsWebURL = commonUtils.buildRTPSWebURL(
             integrationKey = integrationKey,
             merchantConfiguration = merchantConfiguration!!,
-            rtpsConfig = placementsConfiguration?.rtpsConfig!!,
+            rtpsConfig = placementsConfiguration?.rtpsData!!,
             prescreenId = prescreenId ?: 0
         )?.toString()
 
-        val location = when (placementsConfiguration?.rtpsConfig?.locationType) {
-            LocationType.CHECKOUT -> "RTPS-Approval"
-            else -> ""
-        }
+        val location =
+            if (placementsConfiguration?.rtpsData?.locationType == LocationType.CHECKOUT.name) {
+                "RTPS-Approval"
+            } else {
+                ""
+            }
 
         placementRequest = PlacementRequest(
             placements = listOf(

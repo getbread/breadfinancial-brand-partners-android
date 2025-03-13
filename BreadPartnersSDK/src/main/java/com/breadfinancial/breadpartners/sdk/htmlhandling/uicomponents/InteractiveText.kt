@@ -15,6 +15,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
+import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementActionType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.TextPlacementModel
 
 @SuppressLint("AppCompatCustomView")
@@ -25,6 +26,7 @@ class InteractiveText @JvmOverloads constructor(
     private var tapHandler: ((String) -> Unit)? = null
     private var normalText = ""
     private var clickableText = ""
+    private var actionType = ""
 
     init {
         isClickable = true
@@ -36,9 +38,17 @@ class InteractiveText @JvmOverloads constructor(
         textPlacementModel: TextPlacementModel, link: ((String) -> Unit)? = null
     ): Spannable {
         this.tapHandler = link
+        actionType = textPlacementModel.actionType ?: ""
 
         normalText = textPlacementModel.contentText ?: ""
         clickableText = textPlacementModel.actionLink ?: ""
+
+        if (actionType == PlacementActionType.NO_ACTION.value) {
+            if (clickableText.isEmpty()) {
+                clickableText = normalText
+                normalText = ""
+            }
+        }
 
         val spannableContent = createSpannableText("$normalText ", clickableText)
 

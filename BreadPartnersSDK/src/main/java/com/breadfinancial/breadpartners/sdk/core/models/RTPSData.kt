@@ -1,9 +1,9 @@
 package com.breadfinancial.breadpartners.sdk.core.models
 
-data class BreadPartnersRtpsConfig(
-    var financingType: FinancingType? = null,
+data class RTPSData(
+    var financingType: String? = null,
     var order: Order? = null,
-    var locationType: LocationType? = null,
+    var locationType: String? = null,
     var cardType: String? = null,
     var country: String? = null,
     var prescreenId: Int? = null,

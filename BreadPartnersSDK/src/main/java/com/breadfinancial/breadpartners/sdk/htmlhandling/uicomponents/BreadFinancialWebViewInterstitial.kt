@@ -4,6 +4,8 @@ package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.ViewGroup
 import android.webkit.JavascriptInterface
@@ -22,7 +24,7 @@ internal class BreadFinancialWebViewInterstitial(
     private val logger: Logger,
     private val callback: (BreadPartnerEvent) -> Unit?
 ) {
-    private lateinit var webView: WebView
+    private var webView: WebView? = null
 
     @SuppressLint("SetJavaScriptEnabled")
     fun replaceViewWithWebView(
@@ -69,8 +71,11 @@ internal class BreadFinancialWebViewInterstitial(
     }
 
     fun destroyWebView() {
-        if (::webView.isInitialized) {
-            webView.destroy()
+        webView?.let {
+            Handler(Looper.getMainLooper()).post {
+                it.destroy()
+                webView = null
+            }
         }
     }
 
@@ -123,6 +128,7 @@ internal class BreadFinancialWebViewInterstitial(
 
                     "APPLICATION_COMPLETED" -> {
                         callback(BreadPartnerEvent.ScreenName(name = "application-completed"))
+                        callback(BreadPartnerEvent.PopupClosed)
                     }
 
                     "OFFER_RESPONSE" -> {
@@ -133,7 +139,7 @@ internal class BreadFinancialWebViewInterstitial(
                     }
 
                     else -> {
-                        logger.printLog("BreadPartnersSDK: WebViewMessage: $message")
+
                     }
                 }
             } catch (e: Exception) {

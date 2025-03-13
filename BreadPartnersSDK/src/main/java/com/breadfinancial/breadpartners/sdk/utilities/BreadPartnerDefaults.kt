@@ -14,15 +14,18 @@ class BreadPartnerDefaults private constructor() {
         "textPlacementRequestType1" to mapOf(
             "placementID" to "03d69ff1-f90c-41b2-8a27-836af7f1eb98",
             "sdkTid" to "69d7bfdd-a06c-4e16-adfb-58e03a3c7dbe",
+            "financingType" to "installments",
             "env" to "STAGE",
             "price" to 73900,
             "channel" to "P",
             "subchannel" to "X",
             "allowCheckout" to false,
             "brandId" to "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7"
-        ), "textPlacementRequestType2" to mapOf(
+        ),
+        "textPlacementRequestType2" to mapOf(
             "placementID" to "8828d6d9-e993-41cc-8744-fa3857c12c4a",
             "sdkTid" to "6f42d67e-cff4-4575-802a-e90a838981bb",
+            "financingType" to "installments",
             "env" to "STAGE",
             "location" to "Category",
             "price" to 119900,
@@ -30,9 +33,11 @@ class BreadPartnerDefaults private constructor() {
             "subchannel" to "X",
             "allowCheckout" to false,
             "brandId" to "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7"
-        ), "textPlacementRequestType3" to mapOf(
+        ),
+        "textPlacementRequestType3" to mapOf(
             "placementID" to "03d69ff1-f90c-41b2-8a27-836af7f1eb98",
             "sdkTid" to "6f42d67e-cff4-4575-802a-e90a838981ss",
+            "financingType" to "installments",
             "env" to "STAGE",
             "location" to "Product",
             "price" to 119900,
@@ -40,11 +45,23 @@ class BreadPartnerDefaults private constructor() {
             "subchannel" to "X",
             "allowCheckout" to false,
             "brandId" to "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7"
-        ), "textPlacementRequestType4" to mapOf(
+        ),
+        "textPlacementRequestType4" to mapOf(
             "brandId" to "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7",
             "location" to "RTPS-Approval",
             "embeddedUrl" to "https://acquire1uat.comenity.net/prescreen/offer?mockMO=success&mockPA=success&mockVL=success&embedded=true&clientKey=8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7&prescreenId=79233069&cardType=&urlPath=%2F&firstName=Carol&lastName=Jones&address1=3075%20Loyalty%20Cir&city=Columbus&state=OH&zip=43219&storeNumber=2009&location=checkout&channel=O"
-        )
+        ),
+        "textPlacementRequestType5" to mapOf(
+            "placementID" to "dadc4588-d67f-45f9-8096-81c1264fc2f3",
+            "sdkTid" to "6f42d67e-cff4-4575-802a-e90a838981ss",
+            "env" to "STAGE",
+            "location" to "\"footer\"",
+            "price" to 11000,
+            "channel" to "F",
+            "subchannel" to "X",
+            "allowCheckout" to false,
+            "brandId" to "b9464be2-3ea3-4018-80ed-e903f75acb18"
+        ),
     )
 
     val styleStruct: Map<String, Map<String, Any>> = mapOf(

@@ -26,20 +26,18 @@ import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersAddress
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersBuyer
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersMockOptions
-import com.breadfinancial.breadpartners.sdk.core.models.PlacementData
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersRtpsConfig
-import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
-import com.breadfinancial.breadpartners.sdk.core.models.CurrencyValue
 import com.breadfinancial.breadpartners.sdk.core.models.BreadSDKEnvironment
-import com.breadfinancial.breadpartners.sdk.core.models.FinancingType
-import com.breadfinancial.breadpartners.sdk.core.models.LocationType
+import com.breadfinancial.breadpartners.sdk.core.models.CurrencyValue
+import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.Name
 import com.breadfinancial.breadpartners.sdk.core.models.Order
 import com.breadfinancial.breadpartners.sdk.core.models.PickupInformation
+import com.breadfinancial.breadpartners.sdk.core.models.PlacementData
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
 import com.breadfinancial.breadpartners.sdk.core.models.PopupActionButtonStyle
 import com.breadfinancial.breadpartners.sdk.core.models.PopupTextStyle
+import com.breadfinancial.breadpartners.sdk.core.models.RTPSData
 import com.breadfinancial.breadpartners.sdk.core.models.ViewFrame
 import com.breadfinancial.breadpartners.sdk.databinding.ActivityMainBinding
 import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnerDefaults
@@ -71,9 +69,14 @@ class MainActivity : AppCompatActivity() {
         // based on the placement type key.
         val placementRequestType =
             BreadPartnerDefaults.shared.placementConfigurations["textPlacementRequestType1"]
-        val placementID = placementRequestType!!["placementID"] as String
-        val price = placementRequestType["price"] as Int
+        val placementID = placementRequestType!!["placementID"] as String?
+        val price = placementRequestType["price"] as? Int?
         val brandId = placementRequestType["brandId"] as String
+        val channel = placementRequestType["channel"] as? String?
+        val subChannel = placementRequestType["subchannel"] as? String?
+        val env = placementRequestType["env"] as? String?
+        val location = placementRequestType["location"] as? String?
+        val financingType = placementRequestType["financingType"] as? String?
 
         // MARK: For development purposes
         style = BreadPartnerDefaults.shared.styleStruct["cadet"]!!
@@ -173,14 +176,14 @@ class MainActivity : AppCompatActivity() {
          * Modify the Placement ID and total price to test different placements.
          */
         val placementData = PlacementData(
-            financingType = FinancingType.INSTALLMENTS,
-            locationType = LocationType.CATEGORY,
+            financingType = financingType,
+            locationType = location,
             placementId = placementID,
             domID = "123",
             order = Order(
                 subTotal = CurrencyValue(currency = "USD", value = 0.0),
                 totalDiscounts = CurrencyValue(currency = "USD", value = 0.0),
-                totalPrice = CurrencyValue(currency = "USD", value = price.toDouble()),
+                totalPrice = CurrencyValue(currency = "USD", value = price?.toDouble()),
                 totalShipping = CurrencyValue(currency = "USD", value = 0.0),
                 totalTax = CurrencyValue(currency = "USD", value = 0.0),
                 discountCode = "string",
@@ -201,8 +204,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         val placementsConfiguration = PlacementsConfiguration(
-            placementData = placementData,
-            popUpStyling = null
+            placementData = placementData, popUpStyling = null
         )
 
         val merchantConfiguration = MerchantConfiguration(
@@ -225,9 +227,9 @@ class MainActivity : AppCompatActivity() {
             ),
             loyaltyID = "xxxxxx",
             storeNumber = "1234567",
-            env = "STAGE",
-            channel = "P",
-            subchannel = "X"
+            env = env,
+            channel = channel,
+            subchannel = subChannel
         )
 
         BreadPartnersSDK.getInstance().registerPlacements(
@@ -365,19 +367,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun preScreenCheck(view: View) {
-        val rtpsConfig = BreadPartnersRtpsConfig(
-            locationType = LocationType.CHECKOUT,
-            order = Order(
+        val rtpsData = RTPSData(
+            locationType = "CHECKOUT", order = Order(
                 totalPrice = CurrencyValue(
-                    currency = "USD",
-                    value = 5000.0
+                    currency = "USD", value = 5000.0
                 )
-            ),
-            mockResponse = BreadPartnersMockOptions.SUCCESS
+            ), mockResponse = BreadPartnersMockOptions.SUCCESS
         )
 
         val placementsConfiguration = PlacementsConfiguration(
-            rtpsConfig = rtpsConfig,
+            rtpsData = rtpsData,
             popUpStyling = null,
         )
 

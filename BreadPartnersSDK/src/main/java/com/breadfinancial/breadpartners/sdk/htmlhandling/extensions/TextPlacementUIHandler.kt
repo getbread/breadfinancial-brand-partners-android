@@ -31,6 +31,8 @@ fun HTMLContentRenderer.handleLinkInteraction() {
     val actionType = textPlacementModel?.actionType?.let { htmlContentParser.handleActionType(it) }
     if (actionType == PlacementActionType.SHOW_OVERLAY) {
         handlePopupPlacement(textPlacementModel!!, responseModel!!)
+    } else if (actionType == PlacementActionType.NO_ACTION) {
+        callback(BreadPartnerEvent.TextClicked)
     } else {
         showAlert(Constants.nativeSDKAlertTitle(), Constants.missingTextPlacementError)
     }

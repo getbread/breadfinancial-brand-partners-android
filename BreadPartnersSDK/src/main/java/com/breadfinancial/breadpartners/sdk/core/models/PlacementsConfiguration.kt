@@ -8,12 +8,12 @@ import android.graphics.Typeface
  * Data class that provides configurations for the `registerPlacement` or `submitRTPS` methods.
  *
  * @property placementData Defines text placements on the brand partner screen for the `registerPlacementFlow`.
- * @property rtpsConfig Specifies the real-time pre-screen configuration for the prescreen flow.
+ * @property rtpsData Specifies the real-time pre-screen configuration for the prescreen flow.
  * @property popUpStyling Configures the popup styling for each element rendered within the popup.
  */
 data class PlacementsConfiguration(
     val placementData: PlacementData? = null,
-    val rtpsConfig: BreadPartnersRtpsConfig? = null,
+    val rtpsData: RTPSData? = null,
     var popUpStyling: PopUpStyling? = null,
 )
 
