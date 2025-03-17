@@ -8,7 +8,6 @@ import com.breadfinancial.breadpartners.sdk.networking.APIUrl
 import com.breadfinancial.breadpartners.sdk.networking.APIUrlType
 import com.breadfinancial.breadpartners.sdk.networking.HTTPMethod
 import com.breadfinancial.breadpartners.sdk.networking.Result
-import com.breadfinancial.breadpartners.sdk.networking.models.BrandConfigResponse
 import com.breadfinancial.breadpartners.sdk.networking.models.ContextRequestBody
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequest
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequestBody
@@ -16,52 +15,10 @@ import com.breadfinancial.breadpartners.sdk.networking.models.PlacementsResponse
 import com.breadfinancial.breadpartners.sdk.networking.models.PrescreenResult
 import com.breadfinancial.breadpartners.sdk.networking.models.RTPSResponse
 import com.breadfinancial.breadpartners.sdk.networking.models.getPrescreenResult
-import com.breadfinancial.breadpartners.sdk.networking.requestbuilders.PlacementRequestBuilder
 import com.breadfinancial.breadpartners.sdk.networking.requestbuilders.RTPSRequestBuilder
 import com.breadfinancial.breadpartners.sdk.utilities.Constants
 import com.google.android.recaptcha.RecaptchaAction
 import kotlinx.coroutines.launch
-
-/**
- * Retrieves brand-specific configurations, such as the Recaptcha key.
- */
-fun BreadPartnersSDK.fetchBrandConfig() {
-    coroutineScope.launch {
-        val apiUrl = APIUrl(
-            urlType = APIUrlType.BrandConfig(integrationKey)
-        ).url
-        apiClient.request(
-            urlString = apiUrl, method = HTTPMethod.GET, body = null
-        ) { result ->
-            when (result) {
-                is Result.Success -> {
-                    commonUtils.decodeJSON(result.data.toString(),
-                        BrandConfigResponse::class.java,
-                        onSuccess = { response ->
-                            brandConfiguration = response
-                        },
-                        onError = { error ->
-                            alertHandler.showAlert(
-                                title = Constants.nativeSDKAlertTitle(),
-                                message = Constants.catchError(
-                                    error.localizedMessage?.toString() ?: ""
-                                ),
-                                showOkButton = true
-                            )
-                        })
-                }
-
-                is Result.Failure -> {
-                    alertHandler.showAlert(
-                        title = Constants.nativeSDKAlertTitle(), message = Constants.catchError(
-                            result.error.localizedMessage ?: "Unknown error"
-                        ), showOkButton = true
-                    )
-                }
-            }
-        }
-    }
-}
 
 /**
  * Performs a bot behavior check using the Recaptcha v3 SDK
@@ -77,13 +34,10 @@ fun BreadPartnersSDK.executeSecurityCheck() {
             action = RecaptchaAction.custom(customAction = "checkout")
         ) { result ->
             result.onSuccess {
-                commonUtils.executeAfterDelay(2000) {
-                    preScreenLookupCall(token = it)
-                    alertHandler.hideAlert()
-                }
+                preScreenLookupCall(token = it)
             }
             result.onFailure { error ->
-                commonUtils.handleSecurityCheckFailure(error)
+                return@executeReCaptcha
             }
         }
     }
@@ -133,7 +87,7 @@ fun BreadPartnersSDK.preScreenLookupCall(token: String) {
 
                             prescreenId = response.prescreenId
                             logger.printLog("PreScreenID::$prescreenId")
-                            fetchPlacementData()
+                            fetchRTPSData()
                         },
                         onError = { error ->
                             alertHandler.showAlert(
@@ -162,43 +116,34 @@ fun BreadPartnersSDK.preScreenLookupCall(token: String) {
  * Fetches placement data to be displayed as a text view with a clickable button
  * in the brand partner's UI.
  */
-fun BreadPartnersSDK.fetchPlacementData() {
+fun BreadPartnersSDK.fetchRTPSData() {
     val apiUrl = APIUrl(
         urlType = APIUrlType.GeneratePlacements
     ).url
-    val placementRequest: Any?
-    if (placementsConfiguration?.placementData != null) {
-        val builder = PlacementRequestBuilder(
-            integrationKey = integrationKey,
-            merchantConfiguration,
-            placementsConfiguration?.placementData
-        )
-        placementRequest = builder.build()
-    } else {
-        val rtpsWebURL = commonUtils.buildRTPSWebURL(
-            integrationKey = integrationKey,
-            merchantConfiguration = merchantConfiguration!!,
-            rtpsConfig = placementsConfiguration?.rtpsData!!,
-            prescreenId = prescreenId ?: 0
-        )?.toString()
 
-        val location =
-            if (placementsConfiguration?.rtpsData?.locationType == LocationType.CHECKOUT.name) {
-                "RTPS-Approval"
-            } else {
-                ""
-            }
+    val rtpsWebURL = commonUtils.buildRTPSWebURL(
+        integrationKey = integrationKey,
+        merchantConfiguration = merchantConfiguration!!,
+        rtpsConfig = placementsConfiguration?.rtpsData!!,
+        prescreenId = prescreenId ?: 0
+    )?.toString()
 
-        placementRequest = PlacementRequest(
-            placements = listOf(
-                PlacementRequestBody(
-                    context = ContextRequestBody(
-                        ENV = "", LOCATION = location, embeddedUrl = rtpsWebURL
-                    )
+    val location =
+        if (placementsConfiguration?.rtpsData?.locationType == LocationType.CHECKOUT.name) {
+            "RTPS-Approval"
+        } else {
+            ""
+        }
+
+    val placementRequest = PlacementRequest(
+        placements = listOf(
+            PlacementRequestBody(
+                context = ContextRequestBody(
+                    ENV = "", LOCATION = location, embeddedUrl = rtpsWebURL
                 )
-            ), brandId = integrationKey
-        )
-    }
+            )
+        ), brandId = integrationKey
+    )
 
     coroutineScope.launch {
         apiClient.request(
@@ -207,7 +152,7 @@ fun BreadPartnersSDK.fetchPlacementData() {
             when (result) {
                 is Result.Success -> {
                     try {
-                        handlePlacementResponse(result.data)
+                        handleRTPSResponse(result.data)
                     } catch (error: Exception) {
                         alertHandler.showAlert(
                             title = Constants.nativeSDKAlertTitle(),
@@ -229,42 +174,36 @@ fun BreadPartnersSDK.fetchPlacementData() {
     }
 }
 
-fun BreadPartnersSDK.handlePlacementResponse(response: Any) {
+fun BreadPartnersSDK.handleRTPSResponse(response: Any) {
     commonUtils.decodeJSON(response.toString(),
         PlacementsResponse::class.java,
         onSuccess = { placementsResponse ->
-            if (rtpsFlow) {
-                val popupPlacementModel = PopupPlacementModel(
-                    overlayType = "EMBEDDED_OVERLAY",
-                    location = placementsResponse.placements?.first()?.renderContext?.LOCATION.toString(),
-                    brandLogoUrl = "",
-                    webViewUrl = placementsResponse.placements?.first()?.renderContext?.embeddedUrl
-                        ?: "",
-                    overlayTitle = "",
-                    overlaySubtitle = "",
-                    overlayContainerBarHeading = "",
-                    bodyHeader = "",
-                    dynamicBodyModel = PopupPlacementModel.DynamicBodyModel(
-                        bodyDiv = mapOf(
-                            "" to PopupPlacementModel.DynamicBodyContent(
-                                tagValuePairs = mapOf(
-                                    "" to ""
-                                )
+            val popupPlacementModel = PopupPlacementModel(
+                overlayType = "EMBEDDED_OVERLAY",
+                location = placementsResponse.placements?.first()?.renderContext?.LOCATION.toString(),
+                brandLogoUrl = "",
+                webViewUrl = placementsResponse.placements?.first()?.renderContext?.embeddedUrl
+                    ?: "",
+                overlayTitle = "",
+                overlaySubtitle = "",
+                overlayContainerBarHeading = "",
+                bodyHeader = "",
+                dynamicBodyModel = PopupPlacementModel.DynamicBodyModel(
+                    bodyDiv = mapOf(
+                        "" to PopupPlacementModel.DynamicBodyContent(
+                            tagValuePairs = mapOf(
+                                "" to ""
                             )
                         )
-                    ),
-                    disclosure = "",
-                    primaryActionButtonAttributes = null
-                )
-                htmlContentRenderer?.createPopupOverlay(
-                    popupPlacementModel = popupPlacementModel,
-                    overlayType = PlacementOverlayType.EMBEDDED_OVERLAY
-                )
-            } else {
-                htmlContentRenderer?.handleTextPlacement(
-                    placementsResponse, thisContext
-                )
-            }
+                    )
+                ),
+                disclosure = "",
+                primaryActionButtonAttributes = null
+            )
+            htmlContentRenderer?.createPopupOverlay(
+                popupPlacementModel = popupPlacementModel,
+                overlayType = PlacementOverlayType.EMBEDDED_OVERLAY
+            )
         },
         onError = { error ->
             alertHandler.showAlert(

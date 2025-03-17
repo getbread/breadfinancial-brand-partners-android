@@ -1,5 +1,6 @@
 package com.breadfinancial.breadpartners.sdk
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
@@ -25,7 +26,6 @@ import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersAddress
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersBuyer
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersMockOptions
 import com.breadfinancial.breadpartners.sdk.core.models.BreadSDKEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.CurrencyValue
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
@@ -37,7 +37,6 @@ import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
 import com.breadfinancial.breadpartners.sdk.core.models.PopupActionButtonStyle
 import com.breadfinancial.breadpartners.sdk.core.models.PopupTextStyle
-import com.breadfinancial.breadpartners.sdk.core.models.RTPSData
 import com.breadfinancial.breadpartners.sdk.core.models.ViewFrame
 import com.breadfinancial.breadpartners.sdk.databinding.ActivityMainBinding
 import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnerDefaults
@@ -58,6 +57,7 @@ class MainActivity : AppCompatActivity() {
         setupAndFetchPlacementUI()
     }
 
+    @SuppressLint("DiscouragedApi")
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setupAndFetchPlacementUI() {
 
@@ -101,14 +101,10 @@ class MainActivity : AppCompatActivity() {
         binding.preScreenBtn.textSize = largeTextSize.toFloat()
         binding.preScreenBtn.setTextColor(Color.parseColor(primaryColor))
 
-        /**
-         * Call this function when the app launches.
-         *
-         * @param environment Specifies the environment in which the SDK will operate (e.g., STAGE, PROD).
-         * @param enableLog Determines whether logging is enabled for debugging purposes.
-         * @param integrationKey A unique identifier for the brand.
-         * @param application The application context required for SDK initialization.
-         */
+        binding.openExperienceBtn.typeface = customFont
+        binding.openExperienceBtn.textSize = largeTextSize.toFloat()
+        binding.openExperienceBtn.setTextColor(Color.parseColor(primaryColor))
+
         BreadPartnersSDK.getInstance().setup(
             environment = BreadSDKEnvironment.STAGE,
             enableLog = true,
@@ -367,61 +363,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun preScreenCheck(view: View) {
-        val rtpsData = RTPSData(
-            locationType = "CHECKOUT", order = Order(
-                totalPrice = CurrencyValue(
-                    currency = "USD", value = 5000.0
-                )
-            ), mockResponse = BreadPartnersMockOptions.SUCCESS
-        )
-
-        val placementsConfiguration = PlacementsConfiguration(
-            rtpsData = rtpsData,
-            popUpStyling = null,
-        )
-
-        val merchantConfiguration = MerchantConfiguration(
-            buyer = BreadPartnersBuyer(
-                givenName = "Jack",
-                familyName = "Seamus",
-                additionalName = "C.",
-                birthDate = "1974-08-21",
-                email = "johncseamus@gmail.com",
-                phone = "+13235323423",
-                billingAddress = BreadPartnersAddress(
-                    address1 = "323 something lane",
-                    address2 = "apt. B",
-                    country = "USA",
-                    locality = "NYC",
-                    region = "NY",
-                    postalCode = "11222"
-                ),
-                shippingAddress = null
-            ),
-            loyaltyID = "xxxxxx",
-            storeNumber = "1234567",
-            env = "STAGE",
-            channel = "P",
-            subchannel = "X"
-        )
-
-        BreadPartnersSDK.getInstance().silentRTPSRequest(
-            merchantConfiguration = merchantConfiguration,
-            placementsConfiguration = placementsConfiguration,
-            viewContext = this
-        ) { event ->
-            when (event) {
-                is BreadPartnerEvent.RenderPopupView -> {
-                    val view = event.dialogFragment
-                    view.show(this.supportFragmentManager, "PopupDialog")
-                    Log.i("BreadPartnerSDK::", "Successfully rendered PopupView.")
-                }
-
-                else -> {
-                    Log.i("BreadPartnerSDK::", "Event:$event")
-                }
-            }
-        }
+        val bottomSheet = RTPSView()
+        bottomSheet.show(supportFragmentManager, "RTPSView")
     }
 
     private fun showYesNoAlert(context: Context, onResult: (Boolean) -> Unit) {
@@ -446,6 +389,11 @@ class MainActivity : AppCompatActivity() {
             ?.setTextColor(Color.parseColor(primaryColor))
         alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
             ?.setTextColor(Color.parseColor(primaryColor))
+    }
+
+    fun openExperience(view: View) {
+        val bottomSheet = OpenExperienceView()
+        bottomSheet.show(supportFragmentManager, "OpenExperienceView")
     }
 }
 

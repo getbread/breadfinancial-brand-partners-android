@@ -1,5 +1,6 @@
 package com.breadfinancial.breadpartners.sdk.core
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.graphics.Color
@@ -34,6 +35,7 @@ import kotlinx.coroutines.Dispatchers
 
 class BreadPartnersSDK private constructor() {
     companion object {
+        @SuppressLint("StaticFieldLeak")
         private var instance: BreadPartnersSDK? = null
 
         fun getInstance(): BreadPartnersSDK {
@@ -45,7 +47,6 @@ class BreadPartnersSDK private constructor() {
     }
 
     internal lateinit var integrationKey: String
-    private var enableLog: Boolean = false
 
     private lateinit var callback: ((BreadPartnerEvent) -> Unit?)
     val logger: Logger by lazy {
@@ -73,7 +74,7 @@ class BreadPartnersSDK private constructor() {
         )
     }
     private val jsoupHTMLParser: JsoupHTMLParser by lazy { JsoupHTMLParser() }
-    private val htmlContentParser: HTMLContentParser by lazy {
+    val htmlContentParser: HTMLContentParser by lazy {
         HTMLContentParser(
             alertHandler = alertHandler, htmlParser = jsoupHTMLParser
         )
@@ -88,11 +89,20 @@ class BreadPartnersSDK private constructor() {
     internal var merchantConfiguration: MerchantConfiguration? = null
     internal var placementsConfiguration: PlacementsConfiguration? = null
     internal var brandConfiguration: BrandConfigResponse? = null
+    internal var openPlacementExperience: Boolean = false
     internal var rtpsFlow: Boolean = false
     internal var prescreenId: Int? = null
     private var splitTextAndAction: Boolean = false
 
     private fun setUpInjectables() {
+
+        if (brandConfiguration == null) {
+            callback.invoke(
+                BreadPartnerEvent.SdkError(
+                    error = Exception("Brand configurations are missing or unavailable.")
+                )
+            )
+        }
 
         // region Default Popup action button Style
         val actionButtonStyle = PopupActionButtonStyle(
@@ -157,7 +167,7 @@ class BreadPartnersSDK private constructor() {
         placementsConfiguration?.popUpStyling ?: run {
             placementsConfiguration?.popUpStyling?.actionButtonStyle = actionButtonStyle
         }
-        alertHandler.initialize(context = thisContext)
+        alertHandler.initialize(context = thisContext, rtpsFlow = rtpsFlow, logger = logger)
 
         analyticsManager.setApiKey(integrationKey)
 
@@ -221,16 +231,10 @@ class BreadPartnersSDK private constructor() {
         this.splitTextAndAction = splitTextAndAction
         this.callback = callback
         this.thisContext = viewContext
+        this.rtpsFlow = false
+        this.openPlacementExperience = false
 
         setUpInjectables()
-
-        if (brandConfiguration == null) {
-            callback.invoke(
-                BreadPartnerEvent.SdkError(
-                    error = Exception("Brand configurations are missing or unavailable.")
-                )
-            )
-        }
 
         fetchPlacementData()
 
@@ -259,17 +263,37 @@ class BreadPartnersSDK private constructor() {
         this.callback = callback
         this.thisContext = viewContext
         this.rtpsFlow = true
+        this.openPlacementExperience = false
 
         setUpInjectables()
 
-        if (brandConfiguration == null) {
-            callback.invoke(
-                BreadPartnerEvent.SdkError(
-                    error = Exception("Brand configurations are missing or unavailable.")
-                )
-            )
-        }
-
         executeSecurityCheck()
+    }
+
+    /**
+     * Display an overlay to the customer without requiring them to click on a placement to trigger it.
+     *
+     * @param merchantConfiguration Provide user account details in this configuration.
+     * @param placementsConfiguration Specify the pre-defined placement details required for building the UI.
+     * @param viewContext The current `Activity` context where the view will be displayed.
+     * @param callback A function that handles user interactions and ongoing events related to the placements.
+     */
+    fun openExperienceForPlacement(
+        merchantConfiguration: MerchantConfiguration,
+        placementsConfiguration: PlacementsConfiguration,
+        viewContext: Context,
+        callback: (BreadPartnerEvent) -> Unit
+    ) {
+        this.merchantConfiguration = merchantConfiguration
+        this.placementsConfiguration = placementsConfiguration
+        this.callback = callback
+        this.thisContext = viewContext
+        this.rtpsFlow = false
+        this.openPlacementExperience = true
+
+        setUpInjectables()
+
+        fetchPlacementData()
+
     }
 }

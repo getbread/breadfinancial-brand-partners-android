@@ -29,11 +29,17 @@ fun HTMLContentRenderer.handleButtonTap(sender: Button) {
 
 fun HTMLContentRenderer.handleLinkInteraction() {
     val actionType = textPlacementModel?.actionType?.let { htmlContentParser.handleActionType(it) }
-    if (actionType == PlacementActionType.SHOW_OVERLAY) {
-        handlePopupPlacement(textPlacementModel!!, responseModel!!)
-    } else if (actionType == PlacementActionType.NO_ACTION) {
-        callback(BreadPartnerEvent.TextClicked)
-    } else {
-        showAlert(Constants.nativeSDKAlertTitle(), Constants.missingTextPlacementError)
+    when (actionType) {
+        PlacementActionType.SHOW_OVERLAY -> {
+            handlePopupPlacement(textPlacementModel!!, responseModel!!)
+        }
+
+        PlacementActionType.NO_ACTION -> {
+            callback(BreadPartnerEvent.TextClicked)
+        }
+
+        else -> {
+            showAlert(Constants.nativeSDKAlertTitle(), Constants.missingTextPlacementError)
+        }
     }
 }

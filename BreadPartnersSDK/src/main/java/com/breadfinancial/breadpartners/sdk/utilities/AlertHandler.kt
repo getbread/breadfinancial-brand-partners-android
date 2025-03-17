@@ -10,23 +10,27 @@ import android.view.Gravity
 import android.widget.TextView
 
 class AlertHandler(
-    private var contextRef: Context? = null // Now context is directly injected
+    private var contextRef: Context? = null,
+    private var rtpsFlow: Boolean = false,
+    private var logger: Logger? = null
 ) {
 
     private var alertDialog: AlertDialog? = null
 
-    // Initialize with a context, can be injected via constructor
-    fun initialize(context: Context) {
-        contextRef = context
+    fun initialize(context: Context, rtpsFlow: Boolean = false, logger: Logger) {
+        this.contextRef = context
+        this.rtpsFlow = rtpsFlow
+        this.logger = logger
     }
 
     fun showAlert(
-        title: String,
-        message: String,
-        showOkButton: Boolean = false
+        title: String, message: String, showOkButton: Boolean = false
     ) {
         val context = contextRef
-
+        if (rtpsFlow) {
+            logger?.printLog("Error: $message")
+            return
+        }
         // Ensure context is not null and is a valid Activity
         if (context !is Activity || context.isFinishing || context.isDestroyed) {
             throw IllegalStateException("Invalid or inactive context. Ensure the Activity is running.")
@@ -38,16 +42,11 @@ class AlertHandler(
     }
 
     private fun presentAlert(
-        context: Context,
-        title: String,
-        message: String,
-        showOkButton: Boolean
+        context: Context, title: String, message: String, showOkButton: Boolean
     ) {
         val builder = AlertDialog.Builder(context)
 
-        builder.setTitle(title)
-            .setMessage(message)
-            .setCancelable(true)
+        builder.setTitle(title).setMessage(message).setCancelable(true)
 
         if (showOkButton) {
             builder.setPositiveButton("OK") { _, _ -> }

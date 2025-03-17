@@ -69,7 +69,8 @@ class HTMLContentParser(
                     .orEmpty()
             val brandLogoUrl = document.select(".brand.logo img").first()?.attr("src").orEmpty()
             val tmpWebViewUrl = document.select("iframe").first()?.attr("src").orEmpty()
-            val webViewUrl = document.select("iframe").first()?.attr("src").orEmpty().replace("uat","sit")
+            val webViewUrl =
+                document.select("iframe").first()?.attr("src").orEmpty().replace("uat", "sit")
             val overlayTitle =
                 document.select(".epjs-css-overlay-title").first()?.text().orEmpty()
             val overlaySubtitle =
