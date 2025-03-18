@@ -1,7 +1,8 @@
 package com.breadfinancial.breadpartners.sdk.core.extensions
 
 import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
-import com.breadfinancial.breadpartners.sdk.core.models.LocationType
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersLocationType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
 import com.breadfinancial.breadpartners.sdk.networking.APIUrl
@@ -82,6 +83,13 @@ fun BreadPartnersSDK.preScreenLookupCall(token: String) {
                              * If the result is not "approved", we simply return without taking any further action.
                              */
                             if (prescreenResult != PrescreenResult.APPROVED) {
+                                callback(
+                                    BreadPartnerEvent.SdkError(
+                                        error = Exception(
+                                            "Error: PreScreen Result $prescreenResult"
+                                        )
+                                    )
+                                )
                                 return@decodeJSON
                             }
 
@@ -129,7 +137,7 @@ fun BreadPartnersSDK.fetchRTPSData() {
     )?.toString()
 
     val location =
-        if (placementsConfiguration?.rtpsData?.locationType == LocationType.CHECKOUT.name) {
+        if (placementsConfiguration?.rtpsData?.locationType == BreadPartnersLocationType.CHECKOUT) {
             "RTPS-Approval"
         } else {
             ""

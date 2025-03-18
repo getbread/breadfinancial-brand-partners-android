@@ -7,7 +7,7 @@ data class MerchantConfiguration(
     var departmentId: String? = null,
     var existingCardHolder: Boolean? = null,
     var cardholderTier: String? = null,
-    var env: String? = null,
+    var env: BreadPartnersEnvironment? = null,
     var cardEnv: String? = null,
     var channel: String? = null,
     var subchannel: String? = null,

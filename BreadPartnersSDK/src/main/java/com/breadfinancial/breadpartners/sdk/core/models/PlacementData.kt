@@ -1,8 +1,8 @@
 package com.breadfinancial.breadpartners.sdk.core.models
 
 data class PlacementData(
-    var financingType: String? = null,
-    var locationType: String? = null,
+    var financingType: BreadPartnersFinancingType? = null,
+    var locationType: BreadPartnersLocationType? = null,
     var placementId: String? = null,
     var domID: String? = null,
     var allowCheckout: Boolean? = null,
@@ -11,13 +11,27 @@ data class PlacementData(
     var selectedCardKey: String? = null
 )
 
-enum class LocationType {
-    BAG, BANNER, CART, CATEGORY, CHECKOUT, DASHBOARD, FOOTER, HOMEPAGE,
-    LANDING, LOYALTY, MOBILE, PRODUCT, HEADER, SEARCH
+enum class BreadPartnersLocationType(val value: String) {
+    BAG("bag"),
+    BANNER("banner"),
+    CART("cart"),
+    CATEGORY("category"),
+    CHECKOUT("checkout"),
+    DASHBOARD("dashboard"),
+    FOOTER("footer"),
+    HOMEPAGE("homepage"),
+    LANDING("landing"),
+    LOYALTY("loyalty"),
+    MOBILE("mobile"),
+    PRODUCT("product"),
+    HEADER("header"),
+    SEARCH("search")
 }
 
-enum class FinancingType {
-    CARD, INSTALLMENTS, VERSATILE
+enum class BreadPartnersFinancingType(val value: String) {
+    CARD("card"),
+    INSTALLMENTS("installments"),
+    VERSATILE("versatile")
 }
 
 data class Order(

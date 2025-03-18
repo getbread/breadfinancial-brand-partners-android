@@ -13,7 +13,7 @@ import com.breadfinancial.breadpartners.sdk.core.extensions.executeSecurityCheck
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchBrandConfig
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchPlacementData
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
-import com.breadfinancial.breadpartners.sdk.core.models.BreadSDKEnvironment
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
@@ -48,7 +48,7 @@ class BreadPartnersSDK private constructor() {
 
     internal lateinit var integrationKey: String
 
-    private lateinit var callback: ((BreadPartnerEvent) -> Unit?)
+    lateinit var callback: ((BreadPartnerEvent) -> Unit?)
     val logger: Logger by lazy {
         Logger(
             outputStream = System.out, isLoggingEnabled = true
@@ -167,7 +167,9 @@ class BreadPartnersSDK private constructor() {
         placementsConfiguration?.popUpStyling ?: run {
             placementsConfiguration?.popUpStyling?.actionButtonStyle = actionButtonStyle
         }
-        alertHandler.initialize(context = thisContext, rtpsFlow = rtpsFlow, logger = logger)
+        alertHandler.initialize(
+            context = thisContext, rtpsFlow = rtpsFlow, logger = logger, callback = callback
+        )
 
         analyticsManager.setApiKey(integrationKey)
 
@@ -197,7 +199,7 @@ class BreadPartnersSDK private constructor() {
      *
      */
     fun setup(
-        environment: BreadSDKEnvironment = BreadSDKEnvironment.PROD,
+        environment: BreadPartnersEnvironment = BreadPartnersEnvironment.PROD,
         integrationKey: String,
         enableLog: Boolean = false,
         application: Application

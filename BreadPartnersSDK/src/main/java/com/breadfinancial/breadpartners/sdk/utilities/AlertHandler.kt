@@ -8,24 +8,33 @@ import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RoundRectShape
 import android.view.Gravity
 import android.widget.TextView
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 
 class AlertHandler(
     private var contextRef: Context? = null,
     private var rtpsFlow: Boolean = false,
-    private var logger: Logger? = null
+    private var logger: Logger? = null,
+    private var callback: (BreadPartnerEvent) -> Unit? = { },
 ) {
 
     private var alertDialog: AlertDialog? = null
 
-    fun initialize(context: Context, rtpsFlow: Boolean = false, logger: Logger) {
+    fun initialize(
+        context: Context,
+        rtpsFlow: Boolean = false,
+        logger: Logger,
+        callback: (BreadPartnerEvent) -> Unit?
+    ) {
         this.contextRef = context
         this.rtpsFlow = rtpsFlow
         this.logger = logger
+        this.callback = callback
     }
 
     fun showAlert(
         title: String, message: String, showOkButton: Boolean = false
     ) {
+        callback(BreadPartnerEvent.SdkError(error = Exception("Error: $message")))
         val context = contextRef
         if (rtpsFlow) {
             logger?.printLog("Error: $message")

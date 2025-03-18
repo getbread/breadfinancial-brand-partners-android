@@ -26,8 +26,10 @@ import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersAddress
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersBuyer
-import com.breadfinancial.breadpartners.sdk.core.models.BreadSDKEnvironment
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.CurrencyValue
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersFinancingType
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersLocationType
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.Name
 import com.breadfinancial.breadpartners.sdk.core.models.Order
@@ -74,9 +76,9 @@ class MainActivity : AppCompatActivity() {
         val brandId = placementRequestType["brandId"] as String
         val channel = placementRequestType["channel"] as? String?
         val subChannel = placementRequestType["subchannel"] as? String?
-        val env = placementRequestType["env"] as? String?
-        val location = placementRequestType["location"] as? String?
-        val financingType = placementRequestType["financingType"] as? String?
+        val env = placementRequestType["env"] as? BreadPartnersEnvironment?
+        val location = placementRequestType["location"] as? BreadPartnersLocationType?
+        val breadPartnersFinancingType = placementRequestType["financingType"] as? BreadPartnersFinancingType?
 
         // MARK: For development purposes
         style = BreadPartnerDefaults.shared.styleStruct["cadet"]!!
@@ -106,7 +108,7 @@ class MainActivity : AppCompatActivity() {
         binding.openExperienceBtn.setTextColor(Color.parseColor(primaryColor))
 
         BreadPartnersSDK.getInstance().setup(
-            environment = BreadSDKEnvironment.STAGE,
+            environment = env ?: BreadPartnersEnvironment.STAGE,
             enableLog = true,
             integrationKey = brandId,
             application = application
@@ -172,7 +174,7 @@ class MainActivity : AppCompatActivity() {
          * Modify the Placement ID and total price to test different placements.
          */
         val placementData = PlacementData(
-            financingType = financingType,
+            financingType = breadPartnersFinancingType,
             locationType = location,
             placementId = placementID,
             domID = "123",
@@ -223,7 +225,7 @@ class MainActivity : AppCompatActivity() {
             ),
             loyaltyID = "xxxxxx",
             storeNumber = "1234567",
-            env = env,
+            env = env ?: BreadPartnersEnvironment.STAGE,
             channel = channel,
             subchannel = subChannel
         )

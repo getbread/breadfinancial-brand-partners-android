@@ -9,7 +9,10 @@ import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersAddress
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersBuyer
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.CurrencyValue
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersFinancingType
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersLocationType
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.Name
 import com.breadfinancial.breadpartners.sdk.core.models.Order
@@ -63,9 +66,9 @@ class OpenExperienceView : BottomSheetDialogFragment() {
         val brandId = placementRequestType["brandId"] as String
         val channel = placementRequestType["channel"] as? String?
         val subChannel = placementRequestType["subchannel"] as? String?
-        val env = placementRequestType["env"] as? String?
-        val location = placementRequestType["location"] as? String?
-        val financingType = placementRequestType["financingType"] as? String?
+        val env = placementRequestType["env"] as? BreadPartnersEnvironment?
+        val location = placementRequestType["location"] as? BreadPartnersLocationType?
+        val breadPartnersFinancingType = placementRequestType["financingType"] as? BreadPartnersFinancingType?
 
         /**
          * Configuration for defining placement options in BreadPartners.
@@ -73,7 +76,7 @@ class OpenExperienceView : BottomSheetDialogFragment() {
          * Modify the Placement ID and total price to test different placements.
          */
         val placementData = PlacementData(
-            financingType = financingType,
+            financingType = breadPartnersFinancingType,
             locationType = location,
             placementId = placementID,
             domID = "123",

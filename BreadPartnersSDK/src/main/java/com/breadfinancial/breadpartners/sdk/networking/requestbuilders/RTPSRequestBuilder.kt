@@ -21,11 +21,11 @@ class RTPSRequestBuilder(
             state = buyer?.billingAddress?.locality,
             zip = buyer?.billingAddress?.postalCode,
             storeNumber = merchantConfiguration.storeNumber,
-            location = rtpsConfig.locationType,
+            location = rtpsConfig.locationType?.value,
             channel = merchantConfiguration.channel,
             subchannel = merchantConfiguration.subchannel,
             reCaptchaToken = null,
-            mockResponse = rtpsConfig.mockResponse?.name,
+            mockResponse = rtpsConfig.mockResponse?.value,
             overrideConfig = RTPSRequest.OverrideConfig(enhancedPresentment = true)
         )
     }

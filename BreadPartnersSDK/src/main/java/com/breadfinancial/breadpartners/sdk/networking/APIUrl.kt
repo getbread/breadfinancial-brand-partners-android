@@ -1,6 +1,6 @@
 package com.breadfinancial.breadpartners.sdk.networking
 
-import com.breadfinancial.breadpartners.sdk.core.models.BreadSDKEnvironment
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersEnvironment
 
 // Enum to define different types of API URLs
 sealed class APIUrlType {
@@ -18,11 +18,11 @@ sealed class APIUrlType {
 class APIUrl(private val urlType: APIUrlType) {
 
     companion object {
-        private var currentBreadSDKEnvironment: BreadSDKEnvironment = BreadSDKEnvironment.PROD
+        private var currentBreadPartnersEnvironment: BreadPartnersEnvironment = BreadPartnersEnvironment.PROD
 
         /// Set the environment globally
-        fun setEnvironment(breadSDKEnvironment: BreadSDKEnvironment) {
-            currentBreadSDKEnvironment = breadSDKEnvironment
+        fun setEnvironment(breadPartnersEnvironment: BreadPartnersEnvironment) {
+            currentBreadPartnersEnvironment = breadPartnersEnvironment
         }
     }
 
@@ -30,13 +30,13 @@ class APIUrl(private val urlType: APIUrlType) {
     private val rtpsBaseURL: String
 
     init {
-        when (currentBreadSDKEnvironment) {
-            BreadSDKEnvironment.STAGE -> {
+        when (currentBreadPartnersEnvironment) {
+            BreadPartnersEnvironment.STAGE -> {
                 baseURL = "https://brands.kmsmep.com"
                 rtpsBaseURL = "https://acquire1sit.comenity.net"
             }
 
-            BreadSDKEnvironment.PROD -> {
+            BreadPartnersEnvironment.PROD -> {
                 baseURL = "https://brands.kmsmep.com"
                 rtpsBaseURL = "https://acquire1.comenity.net"
             }

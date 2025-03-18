@@ -22,7 +22,7 @@ class PlacementRequestBuilder(
         merchantConfiguration: MerchantConfiguration?, placementData: PlacementData?
     ) {
         val context = ContextRequestBody(
-            ENV = merchantConfiguration?.env,
+            ENV = merchantConfiguration?.env?.value,
             PRICE = placementData?.order?.totalPrice?.value?.toLong(),
             channel = merchantConfiguration?.channel,
             subchannel = merchantConfiguration?.subchannel,

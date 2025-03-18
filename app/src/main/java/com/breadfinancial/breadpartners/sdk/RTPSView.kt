@@ -10,7 +10,9 @@ import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersAddress
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersBuyer
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersMockOptions
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.CurrencyValue
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersLocationType
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.Order
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
@@ -48,11 +50,11 @@ class RTPSView : BottomSheetDialogFragment() {
 
     fun rtpsFlow() {
         val rtpsData = RTPSData(
-            locationType = "CHECKOUT", order = Order(
+            locationType = BreadPartnersLocationType.CHECKOUT, order = Order(
                 totalPrice = CurrencyValue(
                     currency = "USD", value = 5000.0
                 )
-            ), mockResponse = BreadPartnersMockOptions.SUCCESS
+            ), mockResponse = BreadPartnersMockOptions.NO_HIT
         )
 
         val placementsConfiguration = PlacementsConfiguration(
@@ -80,7 +82,7 @@ class RTPSView : BottomSheetDialogFragment() {
             ),
             loyaltyID = "xxxxxx",
             storeNumber = "1234567",
-            env = "STAGE",
+            env = BreadPartnersEnvironment.STAGE,
             channel = "P",
             subchannel = "X"
         )

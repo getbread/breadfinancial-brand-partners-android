@@ -3,7 +3,7 @@ package com.breadfinancial.breadpartners.sdk.core.models
 data class RTPSData(
     var financingType: String? = null,
     var order: Order? = null,
-    var locationType: String? = null,
+    var locationType: BreadPartnersLocationType? = null,
     var cardType: String? = null,
     var country: String? = null,
     var prescreenId: Int? = null,
