@@ -54,7 +54,7 @@ class RTPSView : BottomSheetDialogFragment() {
                 totalPrice = CurrencyValue(
                     currency = "USD", value = 5000.0
                 )
-            ), mockResponse = BreadPartnersMockOptions.NO_HIT
+            ), mockResponse = BreadPartnersMockOptions.SUCCESS
         )
 
         val placementsConfiguration = PlacementsConfiguration(

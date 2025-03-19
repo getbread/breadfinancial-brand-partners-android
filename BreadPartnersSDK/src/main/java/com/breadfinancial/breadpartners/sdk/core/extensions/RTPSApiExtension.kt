@@ -27,11 +27,10 @@ import kotlinx.coroutines.launch
  */
 fun BreadPartnersSDK.executeSecurityCheck() {
     coroutineScope.launch {
-//        val siteKey = brandConfiguration?.config?.recaptchaSiteKeyQA
-        val siteKey = "6Ldai6wqAAAAAAaYMIgzUKlNAO3zTLHnOL7Fce0w"
+        val siteKey = brandConfiguration?.config?.recaptchaSiteKeyQA
         recaptchaManager.executeReCaptcha(
             context = application,
-            siteKey = siteKey,
+            siteKey = siteKey ?: "",
             action = RecaptchaAction.custom(customAction = "checkout")
         ) { result ->
             result.onSuccess {

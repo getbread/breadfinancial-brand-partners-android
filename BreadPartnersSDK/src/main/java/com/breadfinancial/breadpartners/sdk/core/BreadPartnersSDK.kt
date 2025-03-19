@@ -12,6 +12,7 @@ import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
 import com.breadfinancial.breadpartners.sdk.core.extensions.executeSecurityCheck
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchBrandConfig
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchPlacementData
+import com.breadfinancial.breadpartners.sdk.core.extensions.preScreenLookupCall
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
@@ -32,6 +33,7 @@ import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
 import com.breadfinancial.breadpartners.sdk.utilities.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import java.util.UUID
 
 class BreadPartnersSDK private constructor() {
     companion object {
@@ -269,7 +271,8 @@ class BreadPartnersSDK private constructor() {
 
         setUpInjectables()
 
-        executeSecurityCheck()
+//        executeSecurityCheck()
+        preScreenLookupCall(token = UUID.randomUUID().toString())
     }
 
     /**
