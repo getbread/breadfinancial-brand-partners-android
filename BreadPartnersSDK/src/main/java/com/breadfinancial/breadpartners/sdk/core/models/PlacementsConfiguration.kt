@@ -65,10 +65,8 @@ data class PopupActionButtonStyle(
     val font: Int = Typeface.NORMAL,
     val textColor: Int = Color.WHITE,
     val textSize: Float = 12F,
-    val frame: ViewFrame = ViewFrame(width = 100, height = 50),
-    val padding: Rect = Rect(0, 0, 0, 0),
     val backgroundColor: Int = Color.BLACK,
-    val cornerRadius: Float = 8.0F
+    val cornerRadius: Float = 60.0F
 )
 
 data class ViewFrame(

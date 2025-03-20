@@ -161,8 +161,6 @@ class MainActivity : AppCompatActivity() {
             actionButtonStyle = PopupActionButtonStyle(
                 font = Typeface.BOLD,
                 textColor = Color.WHITE,
-                frame = ViewFrame(width = 100, height = 50),
-                padding = Rect(2, 2, 2, 2),
                 backgroundColor = Color.parseColor(primaryColor),
                 cornerRadius = 60.0F
             )
@@ -347,13 +345,7 @@ class MainActivity : AppCompatActivity() {
                      * (e.g., checking if the customer is authenticated).
                      */
                     val view = event.dialogFragment
-                    showYesNoAlert(this) { userConfirmed ->
-                        if (userConfirmed) {
-                            view.show(this.supportFragmentManager, "PopupDialog")
-                        } else {
-                            print("User canceled No")
-                        }
-                    }
+                    view.show(this.supportFragmentManager, "PopupDialog")
                 }
 
                 else -> {

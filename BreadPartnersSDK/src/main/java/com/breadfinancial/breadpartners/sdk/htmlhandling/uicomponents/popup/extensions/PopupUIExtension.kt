@@ -54,8 +54,12 @@ fun PopupDialog.setupUI() {
     subtitleLabel.applyTextStyle(popupStyle.subTitlePopupTextStyle)
     disclosureLabel.text = popupModel.disclosure
     disclosureLabel.applyTextStyle(popupStyle.disclosurePopupTextStyle)
-    headerLabel.text = popupModel.overlayContainerBarHeading
-    headerLabel.applyTextStyle(popupStyle.headerPopupTextStyle)
+    if (popupModel.overlayContainerBarHeading.isEmpty()) {
+        headerView.visibility = View.GONE
+    } else {
+        headerLabel.text = popupModel.overlayContainerBarHeading
+        headerLabel.applyTextStyle(popupStyle.headerPopupTextStyle)
+    }
 
     actionButton.text = popupModel.primaryActionButtonAttributes?.buttonText ?: "Action"
 
@@ -150,6 +154,12 @@ fun PopupDialog.addSectionsToLinearLayout(
                 }
             }
         }
+    }
+
+    if (bodyDivModel.isEmpty()) {
+        container.visibility = View.GONE
+    } else {
+        container.visibility = View.VISIBLE
     }
 }
 

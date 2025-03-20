@@ -110,10 +110,8 @@ class BreadPartnersSDK private constructor() {
         val actionButtonStyle = PopupActionButtonStyle(
             font = Typeface.BOLD,
             textColor = Color.WHITE,
-            frame = ViewFrame(width = 200, height = 50),
             backgroundColor = Color.parseColor("#d50132"),
-            cornerRadius = 8.0F,
-            padding = Rect(16, 8, 16, 8)
+            cornerRadius = 60.0F,
         )
         // endregion
 

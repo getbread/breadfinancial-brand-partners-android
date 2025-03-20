@@ -77,6 +77,17 @@ class BreadPartnerDefaults private constructor() {
             "allowCheckout" to false,
             "brandId" to "217a0943-8031-457d-b9e3-7375c8af3a22"
         ),
+        // TIna provided data
+        "textPlacementRequestType7" to mapOf(
+            "placementID" to "25a8a961-d226-4ee7-b80e-8f41b2d8ee94",
+            "sdkTid" to "",
+            "env" to BreadPartnersEnvironment.STAGE,
+            "price" to 150000,
+            "channel" to "X",
+            "subchannel" to "X",
+            "allowCheckout" to false,
+            "brandId" to "217a0943-8031-457d-b9e3-7375c8af3a22"
+        ),
     )
 
     val styleStruct: Map<String, Map<String, Any>> = mapOf(
