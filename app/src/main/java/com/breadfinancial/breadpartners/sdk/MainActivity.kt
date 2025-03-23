@@ -115,58 +115,6 @@ class MainActivity : AppCompatActivity() {
         )
 
         /**
-         * Prepares a popup styling configuration object for each style element.
-         */
-        val popUpStyling = PopUpStyling(
-            loaderColor = Color.parseColor(primaryColor),
-            crossColor = Color.parseColor(primaryColor),
-            dividerColor = Color.parseColor(tertiaryColor),
-            borderColor = Color.parseColor(tertiaryColor),
-            titlePopupTextStyle = PopupTextStyle(
-                font = Typeface.create(
-                    fontFamily, Typeface.BOLD
-                ), textColor = Color.parseColor(blackColor), textSize = xlargeTextSize.toFloat()
-            ),
-            subTitlePopupTextStyle = PopupTextStyle(
-                font = Typeface.create(
-                    fontFamily, Typeface.NORMAL
-                ), textColor = Color.parseColor(blackColor), textSize = mediumTextSize.toFloat()
-            ),
-            headerPopupTextStyle = PopupTextStyle(
-                font = Typeface.create(
-                    fontFamily, Typeface.BOLD
-                ), textColor = Color.parseColor(blackColor), textSize = mediumTextSize.toFloat()
-            ),
-            headerBgColor = Color.parseColor(tertiaryColor),
-            headingThreePopupTextStyle = PopupTextStyle(
-                font = Typeface.create(
-                    fontFamily, Typeface.BOLD
-                ), textColor = Color.parseColor(primaryColor), textSize = largeTextSize.toFloat()
-            ),
-            paragraphPopupTextStyle = PopupTextStyle(
-                font = Typeface.create(
-                    fontFamily, Typeface.BOLD
-                ), textColor = Color.parseColor(secondaryColor), textSize = smallTextSize.toFloat()
-            ),
-            connectorPopupTextStyle = PopupTextStyle(
-                font = Typeface.create(
-                    fontFamily, Typeface.BOLD
-                ), textColor = Color.parseColor(primaryColor), textSize = smallTextSize.toFloat()
-            ),
-            disclosurePopupTextStyle = PopupTextStyle(
-                font = Typeface.create(
-                    fontFamily, Typeface.BOLD
-                ), textColor = Color.parseColor(secondaryColor), textSize = smallTextSize.toFloat()
-            ),
-            actionButtonStyle = PopupActionButtonStyle(
-                font = Typeface.BOLD,
-                textColor = Color.WHITE,
-                backgroundColor = Color.parseColor(primaryColor),
-                cornerRadius = 60.0F
-            )
-        )
-
-        /**
          * Configuration for defining placement options in BreadPartners.
          *
          * Modify the Placement ID and total price to test different placements.
@@ -200,7 +148,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         val placementsConfiguration = PlacementsConfiguration(
-            placementData = placementData, popUpStyling = null
+            placementData = placementData
         )
 
         val merchantConfiguration = MerchantConfiguration(

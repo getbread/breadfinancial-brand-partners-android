@@ -18,6 +18,7 @@ class AlertHandler(
 ) {
 
     private var alertDialog: AlertDialog? = null
+    private var shouldShowAlert: Boolean = false
 
     fun initialize(
         context: Context,
@@ -35,11 +36,12 @@ class AlertHandler(
         title: String, message: String, showOkButton: Boolean = false
     ) {
         callback(BreadPartnerEvent.SdkError(error = Exception("Error: $message")))
-        val context = contextRef
-        if (rtpsFlow) {
-            logger?.printLog("Error: $message")
+        if (!shouldShowAlert) {
             return
         }
+
+        val context = contextRef
+
         // Ensure context is not null and is a valid Activity
         if (context !is Activity || context.isFinishing || context.isDestroyed) {
             throw IllegalStateException("Invalid or inactive context. Ensure the Activity is running.")

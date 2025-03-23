@@ -9,10 +9,10 @@ import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersAddress
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersBuyer
-import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersMockOptions
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersEnvironment
-import com.breadfinancial.breadpartners.sdk.core.models.CurrencyValue
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersLocationType
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersMockOptions
+import com.breadfinancial.breadpartners.sdk.core.models.CurrencyValue
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.Order
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
@@ -58,8 +58,7 @@ class RTPSView : BottomSheetDialogFragment() {
         )
 
         val placementsConfiguration = PlacementsConfiguration(
-            rtpsData = rtpsData,
-            popUpStyling = null,
+            rtpsData = rtpsData
         )
 
         val merchantConfiguration = MerchantConfiguration(

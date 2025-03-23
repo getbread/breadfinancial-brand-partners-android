@@ -65,6 +65,8 @@ object Constants {
     const val popupPlacementParsingError = "$error Unable to parse popup placement."
     const val missingPopupPlacementError = "Unhandled popup placement type."
 
+    const val somethingWentWrong = "Something went wrong. Please try again later."
+
     fun unableToLoadWebURL(message: String): String {
         return "$error Web Url Loading Issue: $message"
     }

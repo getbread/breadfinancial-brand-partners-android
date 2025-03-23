@@ -43,11 +43,9 @@ class InteractiveText @JvmOverloads constructor(
         normalText = textPlacementModel.contentText ?: ""
         clickableText = textPlacementModel.actionLink ?: ""
 
-        if (actionType == PlacementActionType.NO_ACTION.value) {
-            if (clickableText.isEmpty()) {
-                clickableText = normalText
-                normalText = ""
-            }
+        if (clickableText.isEmpty()) {
+            clickableText = normalText
+            normalText = ""
         }
 
         val spannableContent = createSpannableText("$normalText ", clickableText)

@@ -104,7 +104,7 @@ class OpenExperienceView : BottomSheetDialogFragment() {
         )
 
         val placementsConfiguration = PlacementsConfiguration(
-            placementData = placementData, popUpStyling = null
+            placementData = placementData
         )
 
         val merchantConfiguration = MerchantConfiguration(

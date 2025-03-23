@@ -7,7 +7,6 @@ import android.graphics.drawable.StateListDrawable
 import android.view.View
 import android.widget.LinearLayout
 import com.breadfinancial.breadpartners.sdk.R
-import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.BreadFinancialWebViewInterstitial
@@ -16,13 +15,13 @@ import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.Pop
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupDialog
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupElements
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.applyTextStyle
+import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnerDefaults
 import com.bumptech.glide.Glide
 
 fun PopupDialog.setupUI() {
 
-    val configModel = BreadPartnersSDK.getInstance().placementsConfiguration
-    val popupStyle = configModel!!.popUpStyling
-    val buttonStyle = popupStyle?.actionButtonStyle
+    val popupStyle = BreadPartnerDefaults.shared.popUpStyling
+    val buttonStyle = popupStyle.actionButtonStyle
 
     closeButton = popupView.findViewById(R.id.close_button)
     brandLogo = popupView.findViewById(R.id.brand_logo)
@@ -44,7 +43,7 @@ fun PopupDialog.setupUI() {
     closeButton.setOnClickListener {
         closeButtonTapped()
     }
-    closeButton.setColorFilter(popupStyle!!.crossColor)
+    closeButton.setColorFilter(popupStyle.crossColor)
 
     Glide.with(this).load(popupModel.brandLogoUrl).into(brandLogo)
 

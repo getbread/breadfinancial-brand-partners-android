@@ -61,7 +61,7 @@ class CommonUtils(
         integrationKey: String,
         merchantConfiguration: MerchantConfiguration,
         rtpsConfig: RTPSData,
-        prescreenId:Int
+        prescreenId:Long
     ): URL? {
         val queryParams = mapOf(
             "mockMO" to rtpsConfig.mockResponse?.value,

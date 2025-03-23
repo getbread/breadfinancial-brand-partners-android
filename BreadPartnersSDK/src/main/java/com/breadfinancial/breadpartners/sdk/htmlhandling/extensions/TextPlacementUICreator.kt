@@ -24,11 +24,10 @@ fun HTMLContentRenderer.createActionButton(): Button {
     val normalText = textPlacementModel?.contentText ?: ""
     var clickableText = textPlacementModel?.actionLink ?: ""
 
-    if (actionType == PlacementActionType.NO_ACTION.value) {
-        if (clickableText.isEmpty()) {
-            clickableText = normalText
-        }
+    if (clickableText.isEmpty()) {
+        clickableText = normalText
     }
+
     val button = Button(thisContext).apply {
         text = clickableText ?: ""
         contentDescription = clickableText ?: ""

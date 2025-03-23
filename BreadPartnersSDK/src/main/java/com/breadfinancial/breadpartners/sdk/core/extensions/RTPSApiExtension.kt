@@ -57,10 +57,9 @@ fun BreadPartnersSDK.preScreenLookupCall(token: String) {
             urlType = if (placementsConfiguration?.rtpsData?.prescreenId == null) APIUrlType.PreScreen else APIUrlType.VirtualLookup
         ).url
         val rtpsRequestBuilder = RTPSRequestBuilder(
-            merchantConfiguration!!, placementsConfiguration?.rtpsData!!
+            merchantConfiguration!!, placementsConfiguration?.rtpsData!!, reCaptchaToken = token
         )
         val rtpsRequest = rtpsRequestBuilder.build()
-        rtpsRequest.reCaptchaToken = token
         val headers = mapOf(
             Constants.headerClientKey to integrationKey,
             Constants.headerRequestedWithKey to Constants.headerRequestedWithValue

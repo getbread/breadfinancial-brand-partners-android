@@ -3,13 +3,9 @@ package com.breadfinancial.breadpartners.sdk.core
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
-import android.graphics.Color
-import android.graphics.Rect
-import android.graphics.Typeface
 import android.os.Handler
 import android.os.Looper
 import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
-import com.breadfinancial.breadpartners.sdk.core.extensions.executeSecurityCheck
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchBrandConfig
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchPlacementData
 import com.breadfinancial.breadpartners.sdk.core.extensions.preScreenLookupCall
@@ -17,10 +13,6 @@ import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
-import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
-import com.breadfinancial.breadpartners.sdk.core.models.PopupActionButtonStyle
-import com.breadfinancial.breadpartners.sdk.core.models.PopupTextStyle
-import com.breadfinancial.breadpartners.sdk.core.models.ViewFrame
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentParser
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentRenderer
 import com.breadfinancial.breadpartners.sdk.htmlhandling.JsoupHTMLParser
@@ -93,7 +85,7 @@ class BreadPartnersSDK private constructor() {
     internal var brandConfiguration: BrandConfigResponse? = null
     internal var openPlacementExperience: Boolean = false
     internal var rtpsFlow: Boolean = false
-    internal var prescreenId: Int? = null
+    internal var prescreenId: Long? = null
     private var splitTextAndAction: Boolean = false
 
     private fun setUpInjectables() {
@@ -106,67 +98,6 @@ class BreadPartnersSDK private constructor() {
             )
         }
 
-        // region Default Popup action button Style
-        val actionButtonStyle = PopupActionButtonStyle(
-            font = Typeface.BOLD,
-            textColor = Color.WHITE,
-            backgroundColor = Color.parseColor("#d50132"),
-            cornerRadius = 60.0F,
-        )
-        // endregion
-
-        // region Default Popup Style
-        val popUpStyling = PopUpStyling(
-            loaderColor = Color.parseColor("#0f2233"),
-            crossColor = Color.BLACK,
-            dividerColor = Color.parseColor("#ececec"),
-            borderColor = Color.parseColor("#ececec"),
-            titlePopupTextStyle = PopupTextStyle(
-                font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-                textColor = Color.BLACK,
-                textSize = 16.0f
-            ),
-            subTitlePopupTextStyle = PopupTextStyle(
-                font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-                textColor = Color.GRAY,
-                textSize = 12.0f
-            ),
-            headerPopupTextStyle = PopupTextStyle(
-                font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-                textColor = Color.GRAY,
-                textSize = 14.0f
-            ),
-            headerBgColor = Color.parseColor("#ececec"),
-            headingThreePopupTextStyle = PopupTextStyle(
-                font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-                textColor = Color.parseColor("#d50132"),
-                textSize = 14.0f
-            ),
-            paragraphPopupTextStyle = PopupTextStyle(
-                font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-                textColor = Color.GRAY,
-                textSize = 10.0f
-            ),
-            connectorPopupTextStyle = PopupTextStyle(
-                font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-                textColor = Color.BLACK,
-                textSize = 14.0f
-            ),
-            disclosurePopupTextStyle = PopupTextStyle(
-                font = Typeface.create("Arial-BoldMT", Typeface.BOLD),
-                textColor = Color.GRAY,
-                textSize = 10.0f
-            ),
-            actionButtonStyle = actionButtonStyle
-        )
-        //endregion
-
-        placementsConfiguration?.popUpStyling ?: run {
-            placementsConfiguration?.popUpStyling = popUpStyling
-        }
-        placementsConfiguration?.popUpStyling ?: run {
-            placementsConfiguration?.popUpStyling?.actionButtonStyle = actionButtonStyle
-        }
         alertHandler.initialize(
             context = thisContext, rtpsFlow = rtpsFlow, logger = logger, callback = callback
         )

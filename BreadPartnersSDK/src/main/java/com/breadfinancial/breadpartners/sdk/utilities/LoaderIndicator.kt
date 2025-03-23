@@ -3,7 +3,6 @@ package com.breadfinancial.breadpartners.sdk.utilities
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
@@ -40,7 +39,7 @@ class LoaderIndicator @JvmOverloads constructor(
     }
 
     private fun createBallPaints(): List<Paint> {
-        val loaderColor = sdkConfiguration?.popUpStyling?.loaderColor ?: Color.BLACK
+        val loaderColor = BreadPartnerDefaults.shared.popUpStyling.loaderColor
         return List(8) {
             Paint().apply {
                 color = loaderColor
