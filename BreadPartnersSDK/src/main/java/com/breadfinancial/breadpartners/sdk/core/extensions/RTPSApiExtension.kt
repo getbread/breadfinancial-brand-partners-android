@@ -1,5 +1,7 @@
 package com.breadfinancial.breadpartners.sdk.core.extensions
 
+import android.text.Spanned
+import android.text.SpannedString
 import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersLocationType
@@ -190,20 +192,20 @@ fun BreadPartnersSDK.handleRTPSResponse(response: Any) {
                 brandLogoUrl = "",
                 webViewUrl = placementsResponse.placements?.first()?.renderContext?.embeddedUrl
                     ?: "",
-                overlayTitle = "",
-                overlaySubtitle = "",
-                overlayContainerBarHeading = "",
-                bodyHeader = "",
+                overlayTitle = SpannedString(""),
+                overlaySubtitle = SpannedString(""),
+                overlayContainerBarHeading = SpannedString(""),
+                bodyHeader = SpannedString(""),
                 dynamicBodyModel = PopupPlacementModel.DynamicBodyModel(
                     bodyDiv = mapOf(
                         "" to PopupPlacementModel.DynamicBodyContent(
                             tagValuePairs = mapOf(
-                                "" to ""
+                                "" to SpannedString("")
                             )
                         )
                     )
                 ),
-                disclosure = "",
+                disclosure = SpannedString(""),
                 primaryActionButtonAttributes = null
             )
             htmlContentRenderer?.createPopupOverlay(

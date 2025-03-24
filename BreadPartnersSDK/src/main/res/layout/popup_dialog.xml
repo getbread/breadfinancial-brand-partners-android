@@ -84,6 +84,7 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="10dp"
                     android:text="Title"
+                    android:textAlignment="center"
                     android:textColor="#000000"
                     android:textSize="18sp" />
 
@@ -94,6 +95,7 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="5dp"
                     android:text="Subtitle"
+                    android:textAlignment="center"
                     android:textColor="#555555"
                     android:textSize="14sp" />
             </LinearLayout>

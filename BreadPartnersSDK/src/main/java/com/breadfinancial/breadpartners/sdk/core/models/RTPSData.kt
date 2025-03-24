@@ -15,6 +15,7 @@ data class RTPSData(
 )
 
 enum class BreadPartnersMockOptions(val value: String) {
+    NO_MOCK(""),
     SUCCESS("success"),
     NO_HIT("noHit"),
     MAKE_OFFER("makeOffer"),

@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.StateListDrawable
+import android.text.Spanned
 import android.view.View
 import android.widget.LinearLayout
 import com.breadfinancial.breadpartners.sdk.R
@@ -163,7 +164,7 @@ fun PopupDialog.addSectionsToLinearLayout(
 }
 
 @Suppress("SameParameterValue")
-fun PopupDialog.findTagValue(popupModel: PopupPlacementModel, searchTag: String): String? {
+fun PopupDialog.findTagValue(popupModel: PopupPlacementModel, searchTag: String): Spanned? {
     for (bodyDiv in popupModel.dynamicBodyModel.bodyDiv) {
         for ((key, tagValuePair) in bodyDiv.value.tagValuePairs) {
             if (key == searchTag) {

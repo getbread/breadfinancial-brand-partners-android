@@ -3,6 +3,7 @@ package com.breadfinancial.breadpartners.sdk.core.models
 data class MerchantConfiguration(
     var buyer: BreadPartnersBuyer? = null,
     var loyaltyID: String? = null,
+    var campaignID: String? = null,
     var storeNumber: String? = null,
     var departmentId: String? = null,
     var existingCardHolder: Boolean? = null,

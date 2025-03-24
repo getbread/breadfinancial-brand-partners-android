@@ -3,6 +3,7 @@ package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.text.Spanned
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -61,7 +62,7 @@ class PopupElements private constructor() {
     fun createLabelForTag(
         popupModel: PopUpStyling,
         tag: String,
-        value: String,
+        value: Spanned,
         context: Context,
         gravity: Int = Gravity.CENTER
     ): TextView? {
