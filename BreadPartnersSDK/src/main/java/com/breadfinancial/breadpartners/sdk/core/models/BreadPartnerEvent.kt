@@ -57,6 +57,9 @@ sealed class BreadPartnerEvent {
 
     /// Provides information about any Card-related status.
     /// - Parameter status: object detailing the status.
-    data class cardApplicationStatus(val status: Any) : BreadPartnerEvent()
+    data class CardApplicationStatus(val status: Any) : BreadPartnerEvent()
+
+    /// Logs requests, responses, errors, and successes.
+    data class OnSDKEventLog(val log: Any) : BreadPartnerEvent()
 
 }

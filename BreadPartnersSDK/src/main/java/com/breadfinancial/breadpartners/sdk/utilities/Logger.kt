@@ -1,5 +1,6 @@
 package com.breadfinancial.breadpartners.sdk.utilities
 
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.TextPlacementModel
 import org.json.JSONObject
@@ -19,6 +20,11 @@ class Logger(
             isLoggingEnabled = value
         }
 
+    var callback: ((BreadPartnerEvent) -> Unit?)? = null
+        set(value) {
+            field = value
+        }
+
 
     private fun generateDashLine(length: Int): String {
         return "-".repeat(length)
@@ -26,6 +32,7 @@ class Logger(
 
     internal fun printLog(message: String) {
         if (!isLoggingEnabled) return
+        callback?.invoke(BreadPartnerEvent.OnSDKEventLog(message))
         outputStream.write(message.toByteArray())
         outputStream.write("\n".toByteArray())  // Adding a newline after the log
     }

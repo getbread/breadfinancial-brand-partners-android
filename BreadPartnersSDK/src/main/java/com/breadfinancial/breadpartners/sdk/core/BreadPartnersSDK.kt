@@ -43,6 +43,7 @@ class BreadPartnersSDK private constructor() {
     internal lateinit var integrationKey: String
 
     lateinit var callback: ((BreadPartnerEvent) -> Unit?)
+
     val logger: Logger by lazy {
         Logger(
             outputStream = System.out, isLoggingEnabled = true
@@ -89,6 +90,8 @@ class BreadPartnersSDK private constructor() {
     private var splitTextAndAction: Boolean = false
 
     private fun setUpInjectables() {
+
+        logger.callback = callback
 
         if (brandConfiguration == null) {
             callback.invoke(
