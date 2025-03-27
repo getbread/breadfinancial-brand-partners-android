@@ -1,3 +1,15 @@
+//------------------------------------------------------------------------------
+//  File:          AnalyticsModels.kt
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for Android,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 package com.breadfinancial.breadpartners.sdk.analytics.models
 
 import com.breadfinancial.breadpartners.sdk.networking.models.MetadataModel
