@@ -83,6 +83,11 @@ class PopupElements private constructor() {
                 textView.applyTextStyle(popupModel.connectorPopupTextStyle)
             }
 
+            "footer" -> {
+                textView.text = value
+                textView.applyTextStyle(popupModel.paragraphPopupTextStyle)
+            }
+
             else -> return null
         }
         textView.gravity = gravity

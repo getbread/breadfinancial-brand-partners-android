@@ -102,25 +102,35 @@ class HTMLContentParser(
     }
 
     private fun processDynamicBodyModel(document: Document): PopupPlacementModel.DynamicBodyModel {
-        val bodyContainer = document.select(".epjs-css-overlay-body-content").first()
+        val bodyContainer = document.select(".epjs-css-overlay-body-content")
         val mutableBodyDiv = mutableMapOf<String, PopupPlacementModel.DynamicBodyContent>()
+        var sequenceCounter = 0
+        bodyContainer.forEachIndexed { _, mainParent ->
+            mainParent.children().forEach { child ->
+                when (child.className()) {
+                    "epjs-css-overlay-value-prop" -> {
+                        val bodyContent = PopupPlacementModel.DynamicBodyContent(
+                            child.children().associate { it.tagName() to it.getHtmlAsSpanned() })
+                        mutableBodyDiv["div${sequenceCounter++}"] = bodyContent
+                    }
 
-        bodyContainer?.let {
-            val valueProps = it.select(".epjs-css-overlay-value-prop")
-            val connectors = it.select(".epjs-css-overlay-value-prop-connector")
-            var sequenceCounter = 1
+                    "epjs-css-overlay-value-prop-connector" -> {
+                        val bodyContent = PopupPlacementModel.DynamicBodyContent(
+                            mapOf("connector" to child.getHtmlAsSpanned())
+                        )
+                        mutableBodyDiv["div${sequenceCounter++}"] = bodyContent
+                    }
 
-            valueProps.forEach { valueProp ->
-                val bodyContent = PopupPlacementModel.DynamicBodyContent(valueProp.children()
-                    .associate { child -> child.tagName() to child.getHtmlAsSpanned() })
-                mutableBodyDiv["div${sequenceCounter++}"] = bodyContent
-            }
+                    "epjs-css-overlay-body-footer" -> {
+                        val bodyContent = PopupPlacementModel.DynamicBodyContent(
+                            child.children().associate { it.tagName() to it.getHtmlAsSpanned() })
 
-            connectors.forEach { connector ->
-                val connectorBodyContent = PopupPlacementModel.DynamicBodyContent(
-                    mapOf("connector" to connector.getHtmlAsSpanned())
-                )
-                mutableBodyDiv["div${sequenceCounter++}"] = connectorBodyContent
+                        mutableBodyDiv["footer${sequenceCounter++}"] = bodyContent
+                    }
+                    else -> {
+
+                    }
+                }
             }
         }
 

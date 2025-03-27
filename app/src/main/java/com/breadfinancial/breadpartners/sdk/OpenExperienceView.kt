@@ -63,12 +63,14 @@ class OpenExperienceView : BottomSheetDialogFragment() {
             BreadPartnerDefaults.shared.placementConfigurations["textPlacementRequestType6"]
         val placementID = placementRequestType!!["placementID"] as String?
         val price = placementRequestType["price"] as? Int?
+        val loyaltyId = placementRequestType["loyaltyId"] as? String?
         val brandId = placementRequestType["brandId"] as String
         val channel = placementRequestType["channel"] as? String?
         val subChannel = placementRequestType["subchannel"] as? String?
         val env = placementRequestType["env"] as? BreadPartnersEnvironment?
         val location = placementRequestType["location"] as? BreadPartnersLocationType?
-        val breadPartnersFinancingType = placementRequestType["financingType"] as? BreadPartnersFinancingType?
+        val breadPartnersFinancingType =
+            placementRequestType["financingType"] as? BreadPartnersFinancingType?
 
         /**
          * Configuration for defining placement options in BreadPartners.
@@ -125,7 +127,7 @@ class OpenExperienceView : BottomSheetDialogFragment() {
                 ),
                 shippingAddress = null
             ),
-            loyaltyID = "xxxxxx",
+            loyaltyID = loyaltyId,
             storeNumber = "1234567",
             env = env,
             channel = channel,
@@ -142,6 +144,8 @@ class OpenExperienceView : BottomSheetDialogFragment() {
                     val view = event.dialogFragment
                     view.show(parentFragmentManager, "PopupDialog")
                 }
+
+                is BreadPartnerEvent.OnSDKEventLog -> {}
 
                 else -> {
                     Log.i("BreadPartnerSDK::", "Event:$event")

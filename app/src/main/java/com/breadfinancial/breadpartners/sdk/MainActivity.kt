@@ -73,12 +73,14 @@ class MainActivity : AppCompatActivity() {
             BreadPartnerDefaults.shared.placementConfigurations["textPlacementRequestType1"]
         val placementID = placementRequestType!!["placementID"] as String?
         val price = placementRequestType["price"] as? Int?
+        val loyaltyId = placementRequestType["loyaltyId"] as? String?
         val brandId = placementRequestType["brandId"] as String
         val channel = placementRequestType["channel"] as? String?
         val subChannel = placementRequestType["subchannel"] as? String?
         val env = placementRequestType["env"] as? BreadPartnersEnvironment?
         val location = placementRequestType["location"] as? BreadPartnersLocationType?
-        val breadPartnersFinancingType = placementRequestType["financingType"] as? BreadPartnersFinancingType?
+        val breadPartnersFinancingType =
+            placementRequestType["financingType"] as? BreadPartnersFinancingType?
 
         // MARK: For development purposes
         style = BreadPartnerDefaults.shared.styleStruct["cadet"]!!
@@ -169,7 +171,7 @@ class MainActivity : AppCompatActivity() {
                 ),
                 shippingAddress = null
             ),
-            loyaltyID = "xxxxxx",
+            loyaltyID = loyaltyId,
             storeNumber = "1234567",
             env = env ?: BreadPartnersEnvironment.STAGE,
             channel = channel,
@@ -295,6 +297,8 @@ class MainActivity : AppCompatActivity() {
                     val view = event.dialogFragment
                     view.show(this.supportFragmentManager, "PopupDialog")
                 }
+
+                is BreadPartnerEvent.OnSDKEventLog -> {}
 
                 else -> {
                     Log.i("BreadPartnerSDK::", "Event:$event")

@@ -107,6 +107,19 @@ class BreadPartnerDefaults private constructor() {
             "allowCheckout" to false,
             "brandId" to "217a0943-8031-457d-b9e3-7375c8af3a22"
         ),
+        // Antaylore post SignIn use case
+        "textPlacementRequestType9" to mapOf(
+            "placementID" to "dadc4588-d67f-45f9-8096-81c1264fc2f3",
+            "sdkTid" to "",
+            "env" to BreadPartnersEnvironment.STAGE,
+            "location" to BreadPartnersLocationType.FOOTER,
+            "price" to 11000,
+            "channel" to "F",
+            "loyaltyId" to "true",
+            "subchannel" to "X",
+            "allowCheckout" to false,
+            "brandId" to "b9464be2-3ea3-4018-80ed-e903f75acb18"
+        ),
     )
 
     val styleStruct: Map<String, Map<String, Any>> = mapOf(

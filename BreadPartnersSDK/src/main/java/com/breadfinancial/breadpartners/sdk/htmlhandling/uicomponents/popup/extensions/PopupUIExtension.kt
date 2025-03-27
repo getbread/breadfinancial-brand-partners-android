@@ -131,48 +131,49 @@ fun PopupDialog.addSectionsToLinearLayout(
 ) {
     val bodyDivModel = popupModel.dynamicBodyModel.bodyDiv
     val tagPriorityList = listOf("h3", "p", "connector")
-    val tagConnector = "connector"
-
-    bodyDivModel.entries.forEachIndexed { index, (_, value) ->
-        // Handle connectors on odd indexes
-        if (index % 2 != 0) {
-            findTagValue(popupModel, tagConnector)?.let { content ->
-                PopupElements.shared.createLabelForTag(
-                    popupStyle, tagConnector, content, context
-                )?.let {
-                    container.addView(it)
-                }
-            }
-        }
-
-        // Handle other tags (h3, p)
+    val sortedDictList = bodyDivModel.entries.sortedBy { entry ->
+        entry.key.replace("div", "").toIntOrNull() ?: 0
+    }
+    sortedDictList.forEachIndexed { index, (_, value) ->
         val tagValuePairs = value.tagValuePairs
-        tagPriorityList.filterNot { it == tagConnector }.forEach { tag ->
-            tagValuePairs[tag]?.let { content ->
-                PopupElements.shared.createLabelForTag(popupStyle, tag, content, context)?.let {
-                    container.addView(it)
+        tagPriorityList.forEach { tag ->
+            val content = tagValuePairs[tag]
+            content?.let {
+                PopupElements.shared.createLabelForTag(
+                    popupModel = popupStyle, tag = tag, value = it, context
+                )?.let { label ->
+                    container.addView(label)
                 }
             }
         }
     }
+    val containerFooter = bodyDivModel.entries.firstOrNull { it.key.contains("footer") }
 
+    containerFooter.let { footerEntry ->
+        val labelValue = footerEntry?.value?.tagValuePairs
+        val valueFooter: Spanned? = labelValue?.get("footer")
+        if (valueFooter != null) {
+            PopupElements.shared.createLabelForTag(
+                popupModel = popupStyle, tag = "footer", value = valueFooter, context
+            )?.let { label ->
+                container.addView(label)
+            }
+        } else {
+            val firstValue = labelValue?.values?.firstOrNull()
+            firstValue?.let { spannedValue ->
+                PopupElements.shared.createLabelForTag(
+                    popupStyle, tag = "footer", value = spannedValue, context
+                )?.let { label ->
+                    container.addView(label)
+                }
+            }
+        }
+    }
     if (bodyDivModel.isEmpty()) {
         container.visibility = View.GONE
     } else {
         container.visibility = View.VISIBLE
     }
-}
-
-@Suppress("SameParameterValue")
-fun PopupDialog.findTagValue(popupModel: PopupPlacementModel, searchTag: String): Spanned? {
-    for (bodyDiv in popupModel.dynamicBodyModel.bodyDiv) {
-        for ((key, tagValuePair) in bodyDiv.value.tagValuePairs) {
-            if (key == searchTag) {
-                return tagValuePair
-            }
-        }
-    }
-    return null
 }
 
 fun PopupDialog.displayProductOverlay() {
