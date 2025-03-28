@@ -1,1 +1,3 @@
-/build
+# Inside exampleapp/.gitignore
+/build/
+*.apk
