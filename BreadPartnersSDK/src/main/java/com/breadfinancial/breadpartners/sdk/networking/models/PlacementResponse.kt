@@ -14,21 +14,33 @@
 
 package com.breadfinancial.breadpartners.sdk.networking.models
 
+/**
+ * Represents the response model containing all placement-related data.
+ */
 data class PlacementsResponse(
     val placements: List<PlacementsModel>? = null,
     val placementContent: List<PlacementContentModel>? = null
 )
 
+/**
+ * Represents an individual placement for rendering.
+ */
 data class PlacementsModel(
     val id: String? = null,
     val content: PlacementContentReferenceModel? = null,
     val renderContext: RenderContextModel? = null
 )
 
+/**
+ * Represents a reference to placement content via ID.
+ */
 data class PlacementContentReferenceModel(
     val contentId: String? = null
 )
 
+/**
+ * Contains contextual information for rendering a placement.
+ */
 data class RenderContextModel(
     val LOCATION: String? = null,
     val subchannel: String? = null,
@@ -45,6 +57,9 @@ data class RenderContextModel(
     val embeddedUrl: String? = null
 )
 
+/**
+ * Represents the content model for a placement.
+ */
 data class PlacementContentModel(
     val id: String? = null,
     val contentType: String? = null,
@@ -52,10 +67,16 @@ data class PlacementContentModel(
     val metadata: MetadataModel? = null
 )
 
+/**
+ * Contains the HTML content used to render the placement.
+ */
 data class ContentDataModel(
     val htmlContent: String? = null
 )
 
+/**
+ * Represents additional metadata about a placement.
+ */
 data class MetadataModel(
     val placementId: String? = null,
     val productType: String? = null,

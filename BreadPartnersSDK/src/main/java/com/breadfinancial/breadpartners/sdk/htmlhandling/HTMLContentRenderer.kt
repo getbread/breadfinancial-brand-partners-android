@@ -31,6 +31,9 @@ import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
 import com.breadfinancial.breadpartners.sdk.utilities.Constants
 import com.breadfinancial.breadpartners.sdk.utilities.Logger
 
+/**
+ * Responsible for parsing HTML content and rendering corresponding native UI elements.
+ */
 class HTMLContentRenderer(
     val integrationKey: String,
     val htmlContentParser: HTMLContentParser,
@@ -50,6 +53,9 @@ class HTMLContentRenderer(
     var responseModel: PlacementsResponse? = null
     var thisContext: Context? = null
 
+    /**
+     * Handles rendering of text-based placement using the provided response model.
+     */
     fun handleTextPlacement(
         responseModel: PlacementsResponse,
         thisContext: Context
@@ -72,6 +78,10 @@ class HTMLContentRenderer(
 
     }
 
+    /**
+     * Renders a popup overlay based on the given overlay placement model and response data.
+     * Sets up and displays the popup UI with dynamic content and configuration.
+     */
     fun handlePopupPlacement(
         textPlacementModel: TextPlacementModel, responseModel: PlacementsResponse
     ) {
@@ -96,6 +106,9 @@ class HTMLContentRenderer(
         createPopupOverlay(popupPlacementModel, overlayType)
     }
 
+    /**
+     * Initializes and displays a popup overlay based on the provided model and type.
+     */
     fun createPopupOverlay(
         popupPlacementModel: PopupPlacementModel, overlayType: PlacementOverlayType
     ) {
@@ -116,10 +129,16 @@ class HTMLContentRenderer(
         configurePopupPresentation(popupDialog)
     }
 
+    /**
+     * Triggers the display of the popup dialog by invoking the render callback.
+     */
     private fun configurePopupPresentation(popupDialog: PopupDialog) {
         callback(BreadPartnerEvent.RenderPopupView(dialogFragment = popupDialog))
     }
 
+    /**
+     * Displays a simple alert dialog with a title, message, and a default OK button.
+     */
     fun showAlert(title: String, message: String) {
         alertHandler.showAlert(title = title, message = message, showOkButton = true)
     }

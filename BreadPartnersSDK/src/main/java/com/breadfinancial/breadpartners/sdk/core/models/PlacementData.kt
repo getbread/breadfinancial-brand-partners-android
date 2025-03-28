@@ -12,6 +12,9 @@
 
 package com.breadfinancial.breadpartners.sdk.core.models
 
+/**
+ * Data model representing placement-related configuration
+ */
 data class PlacementData(
     var financingType: BreadPartnersFinancingType? = null,
     var locationType: BreadPartnersLocationType? = null,
@@ -23,29 +26,30 @@ data class PlacementData(
     var selectedCardKey: String? = null
 )
 
+/**
+ * Enum representing different placement location types used for configuring
+ * where Bread Partners UI elements appear within the host app.
+ */
 enum class BreadPartnersLocationType(val value: String) {
-    BAG("bag"),
-    BANNER("banner"),
-    CART("cart"),
-    CATEGORY("category"),
-    CHECKOUT("checkout"),
-    DASHBOARD("dashboard"),
-    FOOTER("footer"),
-    HOMEPAGE("homepage"),
-    LANDING("landing"),
-    LOYALTY("loyalty"),
-    MOBILE("mobile"),
-    PRODUCT("product"),
-    HEADER("header"),
-    SEARCH("search")
+    BAG("bag"), BANNER("banner"), CART("cart"), CATEGORY("category"), CHECKOUT("checkout"), DASHBOARD(
+        "dashboard"
+    ),
+    FOOTER("footer"), HOMEPAGE("homepage"), LANDING("landing"), LOYALTY("loyalty"), MOBILE("mobile"), PRODUCT(
+        "product"
+    ),
+    HEADER("header"), SEARCH("search")
 }
 
+/**
+ * Enum representing different financial types used for placement configurations.
+ */
 enum class BreadPartnersFinancingType(val value: String) {
-    CARD("card"),
-    INSTALLMENTS("installments"),
-    VERSATILE("versatile")
+    CARD("card"), INSTALLMENTS("installments"), VERSATILE("versatile")
 }
 
+/**
+ * Data model representing order information.
+ */
 data class Order(
     var subTotal: CurrencyValue? = null,
     var totalDiscounts: CurrencyValue? = null,
@@ -58,11 +62,16 @@ data class Order(
     var items: List<Item>? = null
 )
 
+/**
+ * Data model representing currency value information.
+ */
 data class CurrencyValue(
-    var currency: String? = null,
-    var value: Double? = null
+    var currency: String? = null, var value: Double? = null
 )
 
+/**
+ * Data model representing pickup information.
+ */
 data class PickupInformation(
     var name: Name? = null,
     var phone: String? = null,
@@ -70,12 +79,19 @@ data class PickupInformation(
     var email: String? = null
 )
 
+
+/**
+ * Data model representing pickup information.
+ */
 data class Name(
     var givenName: String? = null,
     var familyName: String? = null,
     var additionalName: String? = null
 )
 
+/**
+ * Data model representing cart item information.
+ */
 data class Item(
     var name: String? = null,
     var category: String? = null,

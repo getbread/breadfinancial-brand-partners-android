@@ -14,6 +14,10 @@ package com.breadfinancial.breadpartners.sdk.analytics.models
 
 import com.breadfinancial.breadpartners.sdk.networking.models.MetadataModel
 
+/**
+ * Data model representing analytics-related information for tracking events
+ * within the SDK.
+ */
 data class Analytics(
     val placementContent: PlacementContent?,
     val placement: Placement?,

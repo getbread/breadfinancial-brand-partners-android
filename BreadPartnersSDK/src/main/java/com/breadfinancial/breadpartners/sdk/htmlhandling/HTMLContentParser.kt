@@ -23,20 +23,32 @@ import com.breadfinancial.breadpartners.sdk.utilities.Constants
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
+/**
+ * Interface for parsing HTML content into a Document.
+ */
 interface HTMLParser {
     fun parse(htmlContent: String): Document
 }
 
+/**
+ * HTML parser implementation using Jsoup library.
+ */
 class JsoupHTMLParser : HTMLParser {
     override fun parse(htmlContent: String): Document {
         return Jsoup.parse(htmlContent)
     }
 }
 
+/**
+ * Parses and processes HTML content for rendering and interaction handling.
+ */
 class HTMLContentParser(
     private val alertHandler: AlertHandler, private val htmlParser: HTMLParser
 ) {
 
+    /**
+     * Extracts a TextPlacementModel from the given HTML content.
+     */
     fun extractTextPlacementModel(htmlContent: String): TextPlacementModel {
         val document = htmlParser.parse(htmlContent)
 
@@ -70,6 +82,9 @@ class HTMLContentParser(
         )
     }
 
+    /**
+     * Parses HTML content to extract a PopupPlacementModel.
+     */
     fun extractPopupPlacementModel(htmlContent: String): PopupPlacementModel? {
         return try {
             val document = htmlParser.parse(htmlContent)
@@ -113,6 +128,9 @@ class HTMLContentParser(
         }
     }
 
+    /**
+     * Processes the HTML document to generate a DynamicBodyModel for the popup.
+     */
     private fun processDynamicBodyModel(document: Document): PopupPlacementModel.DynamicBodyModel {
         val bodyContainer = document.select(".epjs-css-overlay-body-content")
         val mutableBodyDiv = mutableMapOf<String, PopupPlacementModel.DynamicBodyContent>()
@@ -139,6 +157,7 @@ class HTMLContentParser(
 
                         mutableBodyDiv["footer${sequenceCounter++}"] = bodyContent
                     }
+
                     else -> {
 
                     }
@@ -149,6 +168,9 @@ class HTMLContentParser(
         return PopupPlacementModel.DynamicBodyModel(mutableBodyDiv.toMap())
     }
 
+    /**
+     * Extracts attributes for the primary CTA button from the HTML document.
+     */
     private fun extractPrimaryCTAButtonAttributes(
         document: Document, selector: String
     ): PrimaryActionButtonModel? {
@@ -164,6 +186,9 @@ class HTMLContentParser(
             buttonText = button.select("span").text().takeIf { it.isNotEmpty() })
     }
 
+    /**
+     * Parses the given response string to a PlacementActionType.
+     */
     fun handleActionType(response: String): PlacementActionType? {
         return try {
             PlacementActionType.valueOf(response)
@@ -177,6 +202,9 @@ class HTMLContentParser(
         }
     }
 
+    /**
+     * Safely parses the given response string to a PlacementOverlayType.
+     */
     fun handleOverlayType(response: String): PlacementOverlayType? {
         return try {
             PlacementOverlayType.valueOf(response)

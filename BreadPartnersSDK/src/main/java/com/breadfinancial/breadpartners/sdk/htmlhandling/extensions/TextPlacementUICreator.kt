@@ -17,8 +17,10 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentRenderer
-import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementActionType
 
+/**
+ * Creates a plain TextView from the given HTMLContentRenderer
+ */
 fun HTMLContentRenderer.createPlainTextView(): TextView {
     val textView = TextView(thisContext).apply {
         layoutParams = LinearLayout.LayoutParams(
@@ -30,8 +32,10 @@ fun HTMLContentRenderer.createPlainTextView(): TextView {
     return textView
 }
 
+/**
+ * Creates a Button from the given HTMLContentRenderer
+ */
 fun HTMLContentRenderer.createActionButton(): Button {
-    val actionType = textPlacementModel?.actionType ?: ""
 
     val normalText = textPlacementModel?.contentText ?: ""
     var clickableText = textPlacementModel?.actionLink ?: ""
@@ -41,8 +45,8 @@ fun HTMLContentRenderer.createActionButton(): Button {
     }
 
     val button = Button(thisContext).apply {
-        text = clickableText ?: ""
-        contentDescription = clickableText ?: ""
+        text = clickableText
+        contentDescription = clickableText
         setOnClickListener { handleButtonTap(this) }
     }
 

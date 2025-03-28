@@ -22,6 +22,9 @@ import android.widget.TextView
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
 import com.breadfinancial.breadpartners.sdk.core.models.PopupTextStyle
 
+/**
+ * Applies the given text style to the TextView.
+ */
 fun TextView.applyTextStyle(style: PopupTextStyle) {
     style.font?.let {
         this.typeface = it
@@ -36,12 +39,18 @@ fun TextView.applyTextStyle(style: PopupTextStyle) {
     }
 }
 
+/**
+ * Utility class for creating and managing popup UI elements.
+ */
 class PopupElements private constructor() {
 
     companion object {
         val shared: PopupElements by lazy { PopupElements() }
     }
 
+    /**
+     * Applies background color, border, and corner radius styling to a LinearLayout.
+     */
     fun decorateLinearLayout(
         linearLayout: LinearLayout,
         borderColor: Int = Color.parseColor("#FF5733"),
@@ -71,6 +80,9 @@ class PopupElements private constructor() {
         linearLayout.background = borderDrawable
     }
 
+    /**
+     * Creates a TextView label from an HTML tag and its content.
+     */
     fun createLabelForTag(
         popupModel: PopUpStyling,
         tag: String,

@@ -31,6 +31,9 @@ import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.utilities.Logger
 import org.json.JSONObject
 
+/**
+ * Manages WebView interactions and events within the SDK.
+ */
 internal class BreadFinancialWebViewInterstitial(
     private val context: Context,
     private val logger: Logger,
@@ -38,6 +41,9 @@ internal class BreadFinancialWebViewInterstitial(
 ) {
     private var webView: WebView? = null
 
+    /**
+     * Replaces the given parent view with a WebView and loads the specified URL.
+     */
     @SuppressLint("SetJavaScriptEnabled")
     fun replaceViewWithWebView(
         parent: ViewGroup, url: String, onPageLoadCompleted: (String) -> Unit
@@ -91,6 +97,9 @@ internal class BreadFinancialWebViewInterstitial(
         }
     }
 
+    /**
+     * Interface to handle messages sent from JavaScript running in the WebView.
+     */
     private inner class WebAppInterface(webView: WebView) {
         @JavascriptInterface
         fun postMessage(message: String) {
@@ -151,11 +160,11 @@ internal class BreadFinancialWebViewInterstitial(
                     }
 
                     else -> {
-
+                        callback(BreadPartnerEvent.OnSDKEventLog(message))
                     }
                 }
             } catch (e: Exception) {
-                Log.e("BreadPartnersSDK", "Error parsing WebView message", e)
+                callback(BreadPartnerEvent.SdkError(error = e))
             }
         }
     }

@@ -22,6 +22,13 @@ import android.view.Gravity
 import android.widget.TextView
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 
+/**
+ * Class is responsible for displaying alerts triggered by errors or events.
+ *
+ * It provides options to:
+ * - Completely suppress all alerts
+ * - Suppress only alerts triggered during RTPS flow
+ */
 class AlertHandler(
     private var contextRef: Context? = null,
     private var rtpsFlow: Boolean = false,

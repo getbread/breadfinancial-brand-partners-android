@@ -12,6 +12,9 @@
 
 package com.breadfinancial.breadpartners.sdk.networking.models
 
+/**
+ * Represents the request model for an RTPS call.
+ */
 data class RTPSRequest(
     val urlPath: String? = null,
     val firstName: String? = null,

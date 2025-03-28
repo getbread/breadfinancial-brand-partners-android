@@ -16,6 +16,9 @@ import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupDialog
 import com.breadfinancial.breadpartners.sdk.utilities.Constants
 
+/**
+ * Handles the close button tap action.
+ */
 fun PopupDialog.closeButtonTapped() {
     callback(BreadPartnerEvent.PopupClosed)
     dismiss()
@@ -23,6 +26,9 @@ fun PopupDialog.closeButtonTapped() {
     return
 }
 
+/**
+ * Handles the action button tap inside the popup.
+ */
 fun PopupDialog.onActionButtonTapped() {
     callback(BreadPartnerEvent.ActionButtonTapped)
     if (isWebViewPlacementModelInitialized()) {

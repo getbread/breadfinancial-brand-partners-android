@@ -12,17 +12,25 @@
 
 package com.breadfinancial.breadpartners.sdk.networking.models
 
+/**
+ * Enum representing the results from a RTPS check.
+ */
 enum class PrescreenResult {
     // Account found from virtual lookup
     ACCOUNT_FOUND,
+
     // Has been pre-approved
     APPROVED,
     NO_HIT,
+
     // Not pre-approved but should/could apply
     MAKE_OFFER,
     ACKNOWLEDGE
 }
 
+/**
+ * Mapping of return codes from the API to corresponding PrescreenResult.
+ */
 val prescreenResultMap: Map<String, PrescreenResult> = mapOf(
     "0" to PrescreenResult.ACCOUNT_FOUND,
     "01" to PrescreenResult.APPROVED,
@@ -31,10 +39,16 @@ val prescreenResultMap: Map<String, PrescreenResult> = mapOf(
     "12" to PrescreenResult.ACKNOWLEDGE
 )
 
+/**
+ * Returns the PrescreenResult associated with given code.
+ */
 fun getPrescreenResult(apiResponse: String): PrescreenResult {
     return prescreenResultMap[apiResponse] ?: PrescreenResult.NO_HIT
 }
 
+/**
+ * Data class representing the response from an RTPS call.
+ */
 data class RTPSResponse(
     val returnCode: String,
     val prescreenId: Long

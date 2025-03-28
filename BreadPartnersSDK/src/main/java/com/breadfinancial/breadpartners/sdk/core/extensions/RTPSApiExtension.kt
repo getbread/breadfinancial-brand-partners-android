@@ -194,6 +194,10 @@ fun BreadPartnersSDK.fetchRTPSData() {
     }
 }
 
+/**
+ * Handle RTPS data to be displayed as a Popup view
+ * in the brand partner's UI.
+ */
 fun BreadPartnersSDK.handleRTPSResponse(response: Any) {
     commonUtils.decodeJSON(response.toString(),
         PlacementsResponse::class.java,

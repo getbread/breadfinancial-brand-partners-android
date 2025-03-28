@@ -39,6 +39,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import java.util.UUID
 
+/**
+ * Primary interface class for interacting with the Bread Partners SDK.
+ * Provides entry points for initialization, configuration, and SDK-level actions.
+ */
 class BreadPartnersSDK private constructor() {
     companion object {
         @SuppressLint("StaticFieldLeak")

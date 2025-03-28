@@ -18,6 +18,9 @@ import com.breadfinancial.breadpartners.sdk.networking.models.ContextRequestBody
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequest
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequestBody
 
+/**
+ * Builder class to create a PlacementRequest for fetching placements.
+ */
 class PlacementRequestBuilder(
     integrationKey: String,
     merchantConfiguration: MerchantConfiguration?,

@@ -12,6 +12,9 @@
 
 package com.breadfinancial.breadpartners.sdk.core.models
 
+/**
+ * Data class that provides configurations for the `silentRTPSRequest` method.
+ */
 data class RTPSData(
     var financingType: String? = null,
     var order: Order? = null,
@@ -26,6 +29,10 @@ data class RTPSData(
     var mockResponse: BreadPartnersMockOptions? = null
 )
 
+/**
+ * Enum representing mock options used to simulate RTPs call behavior
+ * for testing and development purposes within the SDK.
+ */
 enum class BreadPartnersMockOptions(val value: String) {
     NO_MOCK(""),
     SUCCESS("success"),

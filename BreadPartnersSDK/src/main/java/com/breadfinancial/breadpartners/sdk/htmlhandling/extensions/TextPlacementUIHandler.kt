@@ -19,6 +19,9 @@ import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.Interactiv
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementActionType
 import com.breadfinancial.breadpartners.sdk.utilities.Constants
 
+/**
+ * Renders both text and a button from the HTMLContent
+ */
 fun HTMLContentRenderer.renderTextAndButton() {
     val plainTextView = createPlainTextView()
     val actionButton = createActionButton()
@@ -26,6 +29,9 @@ fun HTMLContentRenderer.renderTextAndButton() {
     callback(BreadPartnerEvent.RenderSeparateTextAndButton(plainTextView, actionButton))
 }
 
+/**
+ * Renders a TextView from the HTMLContent with clickable link.
+ */
 fun HTMLContentRenderer.renderTextViewWithLink() {
     val interactiveText = InteractiveText(thisContext!!)
     val spannable = interactiveText.configure(textPlacementModel!!) {
@@ -34,11 +40,17 @@ fun HTMLContentRenderer.renderTextViewWithLink() {
     callback(BreadPartnerEvent.RenderTextViewWithLink(spannableText = spannable))
 }
 
+/**
+ * Handles tap events on buttons rendered.
+ */
 fun HTMLContentRenderer.handleButtonTap(sender: Button) {
     sender.contentDescription ?: return
     handleLinkInteraction()
 }
 
+/**
+ * Handles user interactions with links rendered.
+ */
 fun HTMLContentRenderer.handleLinkInteraction() {
     val actionType = textPlacementModel?.actionType?.let { htmlContentParser.handleActionType(it) }
     when (actionType) {

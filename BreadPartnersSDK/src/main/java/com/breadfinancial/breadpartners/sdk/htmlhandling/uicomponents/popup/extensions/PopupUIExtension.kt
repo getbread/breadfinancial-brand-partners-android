@@ -31,6 +31,10 @@ import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.appl
 import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnerDefaults
 import com.bumptech.glide.Glide
 
+/**
+ * Initializes and sets up the UI components of the popup,
+ * including layout, styling, and content binding.
+ */
 fun PopupDialog.setupUI() {
 
     val popupStyle = BreadPartnerDefaults.shared.popUpStyling
@@ -135,6 +139,10 @@ fun PopupDialog.setupUI() {
     }
 }
 
+/**
+ * Dynamically adds header and paragraph sections to the popup's
+ * sub-container based on the provided placement configuration.
+ */
 fun PopupDialog.addSectionsToLinearLayout(
     popupModel: PopupPlacementModel,
     container: LinearLayout,
@@ -188,6 +196,9 @@ fun PopupDialog.addSectionsToLinearLayout(
     }
 }
 
+/**
+ * Displays the product overlay view in the popup.
+ */
 fun PopupDialog.displayProductOverlay() {
     loader.visibility = View.GONE
     overlayEmbeddedView.visibility = View.GONE

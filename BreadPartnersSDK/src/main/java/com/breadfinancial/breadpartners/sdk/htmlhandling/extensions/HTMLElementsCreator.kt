@@ -17,9 +17,16 @@ import android.text.Spanned
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 
-
+/**
+ * Extension functions for converting HTML content from Jsoup Elements
+ * into Android Spanned text using legacy HTML mode.
+ */
 fun Elements.getHtmlAsSpanned(): Spanned =
     Html.fromHtml(first()?.html().orEmpty().trimIndent(), Html.FROM_HTML_MODE_LEGACY)
 
+/**
+ * Extension functions for converting HTML content from Jsoup Element
+ * into Android Spanned text using legacy HTML mode.
+ */
 fun Element.getHtmlAsSpanned(): Spanned = Html.fromHtml(this.html().trimIndent(), Html.FROM_HTML_MODE_LEGACY)
 

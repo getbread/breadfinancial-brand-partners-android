@@ -14,6 +14,9 @@
 
 package com.breadfinancial.breadpartners.sdk.utilities
 
+/**
+ * Object containing constant values used throughout the SDK.
+ */
 object Constants {
 
     // API constants

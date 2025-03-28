@@ -14,6 +14,10 @@ package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models
 
 import android.text.Spanned
 
+/**
+ * Data model representing the content and configuration required
+ * to render a popup within the SDK.
+ */
 data class PopupPlacementModel(
     val overlayType: String,
     val location: String,
@@ -36,6 +40,10 @@ data class PopupPlacementModel(
     )
 }
 
+/**
+ * Data model representing the primary action button
+ * displayed inside a popup.
+ */
 data class PrimaryActionButtonModel(
     val dataOverlayType: String? = null,
     val dataContentFetch: String? = null,
@@ -46,6 +54,9 @@ data class PrimaryActionButtonModel(
     val buttonText: String? = null
 )
 
+/**
+ * Enum representing different types of popup overlays.
+ */
 enum class PlacementOverlayType(val value: String) {
     EMBEDDED_OVERLAY("EMBEDDED_OVERLAY"),
     SINGLE_PRODUCT_OVERLAY("SINGLE_PRODUCT_OVERLAY");

@@ -13,3 +13,4 @@
 .externalNativeBuild
 .cxx
 local.properties
+BreadPartnersSDK/src/main/java/com/breadfinancial/breadpartners/sdk/utilities/BreadPartnerDefaults.kt

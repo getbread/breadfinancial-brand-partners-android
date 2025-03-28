@@ -10,12 +10,20 @@
 //  © 2025 Bread Financial
 //------------------------------------------------------------------------------
 
+@file:Suppress("PropertyName")
+
 package com.breadfinancial.breadpartners.sdk.networking.models
 
+/**
+ * Data model represents brand-specific configuration response.
+ */
 data class BrandConfigResponse(
     val config: Config
 )
 
+/**
+ * Holds various configuration values used for brand customization and environment handling.
+ */
 data class Config(
     val AEMContent: String = "",
     val OVERRIDE_KEY: String = "",

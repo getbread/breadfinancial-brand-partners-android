@@ -10,17 +10,28 @@
 //  © 2025 Bread Financial
 //------------------------------------------------------------------------------
 
+@file:Suppress("PropertyName", "SpellCheckingInspection")
+
 package com.breadfinancial.breadpartners.sdk.networking.models
 
 
+/**
+ * Represents a request for fetching placement data based on brand and placement details.
+ */
 data class PlacementRequest(
     val placements: List<PlacementRequestBody>? = null, val brandId: String? = null
 )
 
+/**
+ * Represents an individual placement request with an ID and context.
+ */
 data class PlacementRequestBody(
     val id: String? = null, val context: ContextRequestBody? = null
 )
 
+/**
+ * Holds additional context information for a placement request.
+ */
 data class ContextRequestBody(
     val SDK_TID: String? = null,
     val ENV: String? = null,

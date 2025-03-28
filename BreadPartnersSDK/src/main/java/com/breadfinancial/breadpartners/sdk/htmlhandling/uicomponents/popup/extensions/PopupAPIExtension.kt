@@ -26,6 +26,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+/**
+ * Fetches placement data after the popup is displayed.
+ */
 fun PopupDialog.fetchWebViewPlacement() {
 
     val builder = PlacementRequestBuilder(
@@ -45,6 +48,9 @@ fun PopupDialog.fetchWebViewPlacement() {
     fetchData(request)
 }
 
+/**
+ * Fetches placement data based on the provided request body.
+ */
 fun PopupDialog.fetchData(requestBody: PlacementRequest) {
     val apiUrl = APIUrl(
         urlType = APIUrlType.GeneratePlacements

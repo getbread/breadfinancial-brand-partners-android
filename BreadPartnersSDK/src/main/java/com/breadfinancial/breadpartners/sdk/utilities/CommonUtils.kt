@@ -22,6 +22,9 @@ import com.breadfinancial.breadpartners.sdk.networking.APIUrlType
 import com.google.gson.Gson
 import java.net.URL
 
+/**
+ * Utility class for handling common operations across the SDK.
+ */
 class CommonUtils(
     private val handler: Handler, private val alertHandler: AlertHandler
 ) {
@@ -48,6 +51,9 @@ class CommonUtils(
         }
     }
 
+    /**
+     * Returns the current timestamp.
+     */
     fun getCurrentTimestamp(): String {
         val dateFormatter = java.text.SimpleDateFormat(
             "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.getDefault()
@@ -57,6 +63,9 @@ class CommonUtils(
         return dateFormatter.format(currentDate)
     }
 
+    /**
+     * Safely decodes a JSON string into the specified model class.
+     */
     fun <T> decodeJSON(
         jsonString: String, clazz: Class<T>, onSuccess: (T) -> Unit, onError: (Exception) -> Unit
     ) {
@@ -69,11 +78,14 @@ class CommonUtils(
         }
     }
 
+    /**
+     * Constructs the full RTPS Web URL with required query parameters.
+     */
     fun buildRTPSWebURL(
         integrationKey: String,
         merchantConfiguration: MerchantConfiguration,
         rtpsConfig: RTPSData,
-        prescreenId:Long
+        prescreenId: Long
     ): URL? {
         val queryParams = mapOf(
             "mockMO" to rtpsConfig.mockResponse?.value,
@@ -107,6 +119,9 @@ class CommonUtils(
         }
     }
 
+    /**
+     * Returns a darker shade of the given color.
+     */
     fun darkerColor(color: Int): Int {
         val factor = 0.8f
         val r = (Color.red(color) * factor).toInt()
@@ -115,6 +130,9 @@ class CommonUtils(
         return Color.rgb(r, g, b)
     }
 
+    /**
+     * Generates a simplified User-Agent string based on the device's manufacturer, model, and OS version.
+     */
     fun getUserAgent(): String {
         val osVersion = "Android ${Build.VERSION.RELEASE}" // e.g., "Android 13"
         val deviceModel = Build.MODEL                    // e.g., "Pixel 7"

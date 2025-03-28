@@ -42,6 +42,10 @@ import com.breadfinancial.breadpartners.sdk.utilities.LoaderIndicator
 import com.breadfinancial.breadpartners.sdk.utilities.Logger
 import com.bumptech.glide.Glide
 
+/**
+ * DialogFragment that renders a dynamic popup based on placement data,
+ * handling UI rendering, user interactions, and event callbacks.
+ */
 class PopupDialog(
     internal val integrationKey: String,
     internal val popupModel: PopupPlacementModel,
@@ -112,6 +116,9 @@ class PopupDialog(
         }
     }
 
+    /**
+     * Displays the embedded overlay UI using the provided placement model.
+     */
     internal fun displayEmbeddedOverlay(popupPlacementModel: PopupPlacementModel) {
         bottomBanner.visibility = View.GONE
         overlayProductView.visibility = View.GONE

@@ -16,6 +16,9 @@ import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.RTPSData
 import com.breadfinancial.breadpartners.sdk.networking.models.RTPSRequest
 
+/**
+ * Builder class to create a RTPSRequest for RTPS flow.
+ */
 class RTPSRequestBuilder(
     private val merchantConfiguration: MerchantConfiguration,
     private val rtpsData: RTPSData,

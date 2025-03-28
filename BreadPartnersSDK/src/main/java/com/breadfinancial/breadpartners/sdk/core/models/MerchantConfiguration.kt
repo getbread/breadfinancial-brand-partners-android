@@ -12,6 +12,9 @@
 
 package com.breadfinancial.breadpartners.sdk.core.models
 
+/**
+ * Data model representing merchant-related configuration
+ */
 data class MerchantConfiguration(
     var buyer: BreadPartnersBuyer? = null,
     var loyaltyID: String? = null,

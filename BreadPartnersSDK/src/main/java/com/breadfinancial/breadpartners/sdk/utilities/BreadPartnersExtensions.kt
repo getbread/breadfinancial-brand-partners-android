@@ -20,7 +20,16 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 
+/**
+ * Object provides reusable extension methods that can be used across apps,
+ * integrating the Bread Partners SDK.
+ */
 object BreadPartnersExtensions {
+
+    /**
+     * Replaces an existing TextView within a ViewGroup
+     * with a new TextView, maintaining its layout position.
+     */
     fun ViewGroup.replaceTextView(
         oldTextView: TextView?, newTextView: TextView
     ) {
@@ -64,6 +73,10 @@ object BreadPartnersExtensions {
         }
     }
 
+    /**
+     * Replaces an existing Button within a ViewGroup
+     * with a new Button, preserving layout position.
+     */
     fun ViewGroup.replaceButton(oldButton: Button?, newButton: Button) {
         val index = this.indexOfChild(oldButton)
         if (index != -1 && oldButton != null) {
