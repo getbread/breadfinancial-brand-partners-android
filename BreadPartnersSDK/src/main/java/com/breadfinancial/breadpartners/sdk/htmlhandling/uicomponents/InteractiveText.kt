@@ -1,6 +1,22 @@
+//------------------------------------------------------------------------------
+//  File:          InteractiveText.kt
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for Android,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
+@file:Suppress("unused")
+
 package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Typeface
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.method.LinkMovementMethod
@@ -9,15 +25,20 @@ import android.text.style.StyleSpan
 import android.util.AttributeSet
 import android.view.View
 import android.widget.LinearLayout
-import androidx.appcompat.widget.AppCompatTextView
-import com.breadfinancial.breadpartners.sdk.core.models.TextPlacementStyling
+import android.widget.TextView
+import androidx.core.content.res.ResourcesCompat
+import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementActionType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.TextPlacementModel
 
+@SuppressLint("AppCompatCustomView")
 class InteractiveText @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : AppCompatTextView(context, attrs, defStyleAttr) {
+) : TextView(context, attrs, defStyleAttr) {
 
     private var tapHandler: ((String) -> Unit)? = null
+    private var normalText = ""
+    private var clickableText = ""
+    private var actionType = ""
 
     init {
         isClickable = true
@@ -26,49 +47,47 @@ class InteractiveText @JvmOverloads constructor(
     }
 
     fun configure(
-        textPlacementModel: TextPlacementModel,
-        textPlacementStyling: TextPlacementStyling,
-        link: ((String) -> Unit)? = null
-    ) {
+        textPlacementModel: TextPlacementModel, link: ((String) -> Unit)? = null
+    ): Spannable {
         this.tapHandler = link
+        actionType = textPlacementModel.actionType ?: ""
 
-        val normalText = textPlacementModel.contentText ?: ""
-        val clickableText = textPlacementModel.actionLink ?: ""
+        normalText = textPlacementModel.contentText ?: ""
+        clickableText = textPlacementModel.actionLink ?: ""
 
-        val spannableContent = createSpannableText(normalText, clickableText, textPlacementStyling)
+        if (clickableText.isEmpty()) {
+            clickableText = normalText
+            normalText = ""
+        }
+
+        val spannableContent = createSpannableText("$normalText ", clickableText)
 
         text = spannableContent
+        return spannableContent
     }
 
     private fun createSpannableText(
-        normalText: String, clickableText: String, textPlacementStyling: TextPlacementStyling
+        normalText: String, clickableText: String
     ): Spannable {
 
         textSize = 16.0F
 
-        setTextColor(textPlacementStyling.normalTextColor)
-
         val layoutParams = LinearLayout.LayoutParams(
-            (textPlacementStyling.textViewFrame.width), (textPlacementStyling.textViewFrame.height)
+            LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT
         )
         this.layoutParams = layoutParams
-
-        setLinkTextColor(textPlacementStyling.clickableTextColor)
 
         val spannableString = SpannableString(normalText + clickableText)
 
         val normalTextEndIndex = normalText.length
         spannableString.setSpan(
-            StyleSpan(textPlacementStyling.normalFont),
-            0,
-            normalTextEndIndex,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            StyleSpan(Typeface.NORMAL), 0, normalTextEndIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
 
         val clickableTextEndIndex = normalTextEndIndex + clickableText.length
 
         spannableString.setSpan(
-            StyleSpan(textPlacementStyling.clickableFont),
+            StyleSpan(Typeface.BOLD),
             normalTextEndIndex,
             clickableTextEndIndex,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -77,7 +96,7 @@ class InteractiveText @JvmOverloads constructor(
             object : ClickableSpan() {
                 override fun onClick(widget: View) {
                     tapHandler?.invoke(clickableText)
-                    (widget as AppCompatTextView).clearFocus()
+                    widget.clearFocus()
                     widget.invalidate()
                 }
             }, normalTextEndIndex, clickableTextEndIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -86,4 +105,11 @@ class InteractiveText @JvmOverloads constructor(
         return spannableString
     }
 
+    fun setCustomFont(fontResId: Int) {
+        try {
+            typeface = ResourcesCompat.getFont(context, fontResId)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }

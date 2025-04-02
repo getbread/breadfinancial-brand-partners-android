@@ -1,5 +1,19 @@
+//------------------------------------------------------------------------------
+//  File:          APIClient.kt
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for Android,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 package com.breadfinancial.breadpartners.sdk.networking
 
+import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
+import com.breadfinancial.breadpartners.sdk.utilities.Constants
 import com.breadfinancial.breadpartners.sdk.utilities.Logger
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
@@ -17,28 +31,33 @@ sealed class Result<out T> {
 }
 
 enum class HTTPMethod(val value: String) {
-    GET("GET"),
-    POST("POST"),
+    GET("GET"), POST("POST"),OPTIONS("OPTIONS")
 }
 
-interface APIClientProtocol {
+/**
+ * A utility class for making HTTP API requests.
+ */
+class APIClient(
+    private val coroutineScope: CoroutineScope,
+    private val logger: Logger,
+    private val commonUtils: CommonUtils
+) {
+
+    /**
+     * Generic API call function.
+     *
+     * - Parameters:
+     *   - urlString: The URL endpoint as a string.
+     *   - method: HTTP method (e.g., "GET", "POST").
+     *   - body: Optional request body, can be a map (`Map<String, Any>`) or a model that implements `Serializable`.
+     *   - headers: Optional headers body, can be a map (`Map<String, Any>`) or null.
+     *   - completion: A lambda to handle the result, returning success with response or failure with error.
+     */
     fun request(
         urlString: String,
         method: HTTPMethod,
         body: Any?,
-        completion: (Result<Any>) -> Unit
-    )
-}
-
-class APIClient(
-    private val coroutineScope: CoroutineScope,
-    private val logger: Logger
-) : APIClientProtocol {
-
-    override fun request(
-        urlString: String,
-        method: HTTPMethod,
-        body: Any?,
+        headers: Map<String, String>? = null,
         completion: (Result<Any>) -> Unit
     ) {
         coroutineScope.launch {
@@ -47,29 +66,39 @@ class APIClient(
                 val url = URL(urlString)
                 val connection = url.openConnection() as HttpURLConnection
                 connection.requestMethod = method.value
-                connection.setRequestProperty("Content-Type", "application/json")
 
-                val headers = mapOf("content-type" to "application/json")
-                headers.forEach { (key, value) ->
+                val genericHeader = mapOf(
+                    Constants.headerContentType to Constants.headerContentTypeValue,
+                    Constants.headerUserAgentKey to commonUtils.getUserAgent(),
+                    Constants.headerOriginKey to Constants.headerOriginValue
+                )
+                val updatedHeaders = (headers ?: emptyMap()) + genericHeader
+
+                updatedHeaders.forEach { (key, value) ->
                     connection.setRequestProperty(key, value)
                 }
 
-                logger.logRequestDetails(
-                    urlString,
+                logger.logRequestDetails(urlString,
                     method.value,
-                    headers,
+                    updatedHeaders,
                     body?.let { Gson().toJson(it).toByteArray() })
 
                 body?.let {
                     connection.doOutput = true
                     val requestBody = Gson().toJson(it)
-                    OutputStreamWriter(connection.outputStream).use { writer ->
+                    val outputStream = connection.outputStream
+                    OutputStreamWriter(outputStream).use { writer ->
                         writer.write(requestBody)
                     }
                 }
 
                 val responseCode = connection.responseCode
-                val responseMessage = connection.inputStream.bufferedReader().use { it.readText() }
+
+                val responseMessage = if (responseCode in 200..299) {
+                    connection.inputStream.bufferedReader().use { it.readText() }
+                } else {
+                    connection.errorStream?.bufferedReader()?.use { it.readText() } ?: "Unknown error"
+                }
 
                 logger.logResponseDetails(
                     urlString,

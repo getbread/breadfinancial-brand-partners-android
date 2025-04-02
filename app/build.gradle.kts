@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.breadfinancial.breadpartners.sdk"
+    namespace = "com.breadfinancial.breadpartnersexample.sdk"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.breadfinancial.breadpartners.sdk"
+        applicationId = "com.breadfinancial.breadpartnersexample.sdk"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.appcompat)
     implementation(project(":BreadPartnersSDK"))
+    implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -74,7 +75,5 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     //    #Change-breadpartnersdk
-    implementation(libs.coordinatorlayout)
     implementation(libs.constraintlayout)
-//    implementation(libs.breadpartners)
 }

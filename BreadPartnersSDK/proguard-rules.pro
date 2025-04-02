@@ -1,21 +1,45 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# kotlinx.serialization.json
+-keep class kotlinx.serialization.** { *; }
+-keepclassmembers class kotlinx.serialization.** { *; }
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# jsoup
+-keep class org.jsoup.** { *; }
+-dontwarn org.jsoup.**
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# gson
+-keep class com.google.gson.** { *; }
+-dontwarn com.google.gson.**
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Glide
+-keep class com.bumptech.glide.** { *; }
+-keep class com.bumptech.glide.load.model.stream.** { *; }
+-keep class com.bumptech.glide.load.resource.bitmap.** { *; }
+-keep class com.bumptech.glide.load.resource.drawable.** { *; }
+-keep class com.bumptech.glide.load.resource.gif.** { *; }
+-keep class com.bumptech.glide.manager.** { *; }
+-keep class com.bumptech.glide.request.** { *; }
+-keep class com.bumptech.glide.util.** { *; }
+
+# Glide Annotation Processor
+-keep class com.bumptech.glide.compiler.** { *; }
+
+# reCAPTCHA
+-keep class com.google.android.gms.recaptcha.** { *; }
+
+# CoordinatorLayout
+-keep class android.support.design.widget.CoordinatorLayout$** { *; }
+-keep class androidx.coordinatorlayout.widget.CoordinatorLayout$** { *; }
+
+# ConstraintLayout
+-keep class androidx.constraintlayout.widget.** { *; }
+
+# This will keep any required resources used by Glide or any other image loading functionality
+-keep class android.graphics.drawable.** { *; }
+-dontwarn android.graphics.drawable.**
+
+# Or keep all classes in a package public
+-keep public class com.breadfinancial.breadpartners.sdk.core.** { *; }
+
+-keep class androidx.multidex.** { *; }
+
+-dontwarn javax.annotation.**

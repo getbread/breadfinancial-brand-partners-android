@@ -1,14 +1,30 @@
+//------------------------------------------------------------------------------
+//  File:          PopupElements.kt
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for Android,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup
 
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.text.Spanned
 import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
 import com.breadfinancial.breadpartners.sdk.core.models.PopupTextStyle
 
+/**
+ * Applies the given text style to the TextView.
+ */
 fun TextView.applyTextStyle(style: PopupTextStyle) {
     style.font?.let {
         this.typeface = it
@@ -23,12 +39,18 @@ fun TextView.applyTextStyle(style: PopupTextStyle) {
     }
 }
 
+/**
+ * Utility class for creating and managing popup UI elements.
+ */
 class PopupElements private constructor() {
 
     companion object {
         val shared: PopupElements by lazy { PopupElements() }
     }
 
+    /**
+     * Applies background color, border, and corner radius styling to a LinearLayout.
+     */
     fun decorateLinearLayout(
         linearLayout: LinearLayout,
         borderColor: Int = Color.parseColor("#FF5733"),
@@ -58,10 +80,13 @@ class PopupElements private constructor() {
         linearLayout.background = borderDrawable
     }
 
+    /**
+     * Creates a TextView label from an HTML tag and its content.
+     */
     fun createLabelForTag(
         popupModel: PopUpStyling,
         tag: String,
-        value: String,
+        value: Spanned,
         context: Context,
         gravity: Int = Gravity.CENTER
     ): TextView? {
@@ -80,6 +105,11 @@ class PopupElements private constructor() {
             "connector" -> {
                 textView.text = value
                 textView.applyTextStyle(popupModel.connectorPopupTextStyle)
+            }
+
+            "footer" -> {
+                textView.text = value
+                textView.applyTextStyle(popupModel.paragraphPopupTextStyle)
             }
 
             else -> return null

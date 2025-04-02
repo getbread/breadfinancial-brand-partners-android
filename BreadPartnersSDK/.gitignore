@@ -1,1 +1,4 @@
-/build
+# Inside sdk/.gitignore
+/build/
+*.jks
+*.keystore

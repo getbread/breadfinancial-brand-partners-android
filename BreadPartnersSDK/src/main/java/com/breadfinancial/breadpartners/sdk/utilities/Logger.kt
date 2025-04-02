@@ -1,14 +1,29 @@
+//------------------------------------------------------------------------------
+//  File:          Logger.kt
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for Android,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 package com.breadfinancial.breadpartners.sdk.utilities
 
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.TextPlacementModel
 import org.json.JSONObject
 import java.io.OutputStream
 import java.nio.charset.StandardCharsets
 
+/**
+ * Class responsible for logging information for debugging and tracking purposes.
+ */
 class Logger(
-    private val outputStream: OutputStream,
-    private var isLoggingEnabled: Boolean
+    private val outputStream: OutputStream, private var isLoggingEnabled: Boolean
 ) {
 
     var loggingEnabled: Boolean
@@ -17,12 +32,19 @@ class Logger(
             isLoggingEnabled = value
         }
 
+    var callback: ((BreadPartnerEvent) -> Unit?)? = null
+        set(value) {
+            field = value
+        }
+
 
     private fun generateDashLine(length: Int): String {
         return "-".repeat(length)
     }
 
-    private fun printLog(message: String) {
+    internal fun printLog(message: String) {
+        if (!isLoggingEnabled) return
+        callback?.invoke(BreadPartnerEvent.OnSDKEventLog(message))
         outputStream.write(message.toByteArray())
         outputStream.write("\n".toByteArray())  // Adding a newline after the log
     }
@@ -117,14 +139,13 @@ class Logger(
         }
 
         if (model.dynamicBodyModel.bodyDiv.isNotEmpty()) {
-            val logOutput =
-                StringBuilder(
-                    "\n${generateDashLine(20)} Dynamic Body Model Details ${
-                        generateDashLine(
-                            20
-                        )
-                    }\n"
-                )
+            val logOutput = StringBuilder(
+                "\n${generateDashLine(20)} Dynamic Body Model Details ${
+                    generateDashLine(
+                        20
+                    )
+                }\n"
+            )
             model.dynamicBodyModel.bodyDiv.forEach { (key, bodyContent) ->
                 logOutput.append("  Body Div Key [$key]:\n")
                 bodyContent.tagValuePairs.forEach { (tag, value) ->
@@ -138,6 +159,28 @@ class Logger(
             printLog("Dynamic Body Model: N/A")
             printLog("${generateDashLine(60)}\n")
         }
+    }
+
+    fun logLoadingURL(url: String) {
+        if (!isLoggingEnabled) return
+
+        printLog("${generateDashLine(20)} WebView URL ${generateDashLine(20)}")
+        printLog(url.trim())
+        printLog("${generateDashLine(60)}\n")
+    }
+
+    fun logApplicationResultDetails(payload: JSONObject) {
+        if (!isLoggingEnabled) return
+        printLog("\n${generateDashLine(20)} Application Result Details ${generateDashLine(20)}")
+        printLog("Application ID     : ${payload.optString("applicationId", "N/A")}")
+        printLog("Call ID            : ${payload.optString("callId", "N/A")}")
+        printLog("Card Type          : ${payload.optString("cardType", "N/A")}")
+        printLog("Email Address      : ${payload.optString("emailAddress", "N/A")}")
+        printLog("Message            : ${payload.optString("message", "N/A")}")
+        printLog("Mobile Phone       : ${payload.optString("mobilePhone", "N/A")}")
+        printLog("Result             : ${payload.optString("result", "N/A")}")
+        printLog("Status             : ${payload.optString("status", "N/A")}")
+        printLog("${generateDashLine(60)}\n")
     }
 }
 

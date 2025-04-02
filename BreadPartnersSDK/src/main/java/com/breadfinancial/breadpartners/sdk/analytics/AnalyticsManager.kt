@@ -1,6 +1,17 @@
+//------------------------------------------------------------------------------
+//  File:          AnalyticsManager.kt
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for Android,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 package com.breadfinancial.breadpartners.sdk.analytics
 
-import android.os.Build
 import com.breadfinancial.breadpartners.sdk.analytics.models.Analytics
 import com.breadfinancial.breadpartners.sdk.networking.APIClient
 import com.breadfinancial.breadpartners.sdk.networking.APIUrl
@@ -8,57 +19,78 @@ import com.breadfinancial.breadpartners.sdk.networking.APIUrlType
 import com.breadfinancial.breadpartners.sdk.networking.HTTPMethod
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementsResponse
 import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
+import com.breadfinancial.breadpartners.sdk.utilities.Constants
 
-
+/**
+ * `AnalyticsManager` logs user interactions with placements in the app.
+ * It tracks two events:
+ * 1. **Click Placement**: When the user clicks on the placement.
+ * 2. **View Placement**: When the user sees or interacts with the placement without clicking.
+ */
 class AnalyticsManager(
     private val apiClient: APIClient, private val commonUtils: CommonUtils
 ) {
 
+    private var apiKey: String = ""
+
+    fun setApiKey(newApiKey: String) {
+        apiKey = newApiKey
+    }
+
     // Helper function to send analytics payload
     private fun sendAnalyticsPayload(apiUrl: String, payload: Analytics.Payload) {
+        val headers = mapOf(
+            Constants.headerAuthorityKey to Constants.headerAuthorityValue,
+            Constants.headerAcceptKey to Constants.headerAcceptValue,
+            Constants.headerAcceptEncodingKey to Constants.headerAcceptEncodingValue,
+            Constants.headerAcceptLanguageKey to Constants.headerAcceptLanguageValue,
+            Constants.headerAccessControlRequestHeadersKey to Constants.headerAccessControlRequestHeadersValue,
+            Constants.headerAccessControlRequestMethodKey to Constants.headerAccessControlRequestMethodValue
+        )
         apiClient.request(
-            urlString = apiUrl, method = HTTPMethod.POST, body = payload
+            urlString = apiUrl, method = HTTPMethod.OPTIONS, body = payload, headers = headers
         ) {}
     }
 
+    // ToDo: Setup analytics payload
     // Helper function to create analytics payload
     private fun createAnalyticsPlacementPayload(
         name: String, placementResponse: PlacementsResponse
     ): Analytics.Payload {
         val timestamp = commonUtils.getCurrentTimestamp()
-        val osVersion = "Android ${Build.VERSION.RELEASE}" // e.g., "Android 13"
-        val deviceModel = Build.MODEL                    // e.g., "Pixel 7"
-        val manufacturer = Build.MANUFACTURER           // e.g., "Google"
 
         return Analytics.Payload(
             name = name, props = Analytics.Props(
                 eventProperties = Analytics.EventProperties(
                     placement = Analytics.Placement(
-                        id = "03d69ff1-f90c-41b2-8a27-836af7f1eb98",
-                        placementContentId = "0",
-                        overlayContentId = "0"
-                    ), placementContent = Analytics.PlacementContent(
+                        id = placementResponse.placements?.first()?.id,
+                        placementContentId = placementResponse.placementContent?.first()?.id,
+                        overlayContentId = placementResponse.placementContent?.first()?.id,
+                    ),
+                    placementContent = Analytics.PlacementContent(
                         id = placementResponse.placementContent?.first()?.id,
                         contentType = placementResponse.placementContent?.first()?.contentType,
                         metadata = placementResponse.placementContent?.first()?.metadata
-                    ), metadata = mapOf("location" to "Product"), actionTarget = null
+                    ),
+                    metadata = mapOf("location" to placementResponse.placements?.first()?.renderContext?.LOCATION),
+                    actionTarget = null
                 ), userProperties = emptyMap()
             ), context = Analytics.Context(
                 timestamp = timestamp,
-                apiKey = "8a9fcd35-7f4d-4e3c-a9cc-6f6e98064df7",
+                apiKey = apiKey,
                 browserCtx = Analytics.BrowserCtx(
                     library = Analytics.Library(
                         name = "bread-partners-sdk-android", version = "0.0.1"
                     ),
-                    userAgent = "$manufacturer $deviceModel; $osVersion", // Google Pixel 7; Android 13
+                    userAgent = commonUtils.getUserAgent(),
                     page = Analytics.Page(
-                        path = "/collections/living-room/products/benchwright-square-coffee-table",
-                        url = "https://aspire-ep-demo.myshopify.com/collections/living-room/products/benchwright-square-coffee-table"
+                        path = "ToDO:Android Screen Name",
+                        url = "ToDO"
                     )
                 ),
                 trackingInfo = Analytics.TrackingInfo(
-                    userTrackingId = "6f42d67e-cff4-4575-802a-e90a838981bb",
-                    sessionTrackingId = "d5cfaf50-f05f-42a8-adea-22d70da25b73"
+                    userTrackingId = placementResponse.placements?.first()?.renderContext?.SDK_TID,
+                    sessionTrackingId = "ToDO"
                 )
             )
         )

@@ -1,12 +1,26 @@
+//------------------------------------------------------------------------------
+//  File:          PopupUIExtension.kt
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for Android,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.extensions
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.StateListDrawable
+import android.text.Spanned
 import android.view.View
 import android.widget.LinearLayout
 import com.breadfinancial.breadpartners.sdk.R
-import com.breadfinancial.breadpartners.sdk.core.BreadPartnerEvent
-import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.BreadFinancialWebViewInterstitial
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
@@ -14,12 +28,17 @@ import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.Pop
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupDialog
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupElements
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.applyTextStyle
+import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnerDefaults
 import com.bumptech.glide.Glide
 
+/**
+ * Initializes and sets up the UI components of the popup,
+ * including layout, styling, and content binding.
+ */
 fun PopupDialog.setupUI() {
 
-    val configModel = BreadPartnersSDK.getInstance().placementsConfiguration
-    val popupStyle = configModel!!.popUpStyling
+    val popupStyle = BreadPartnerDefaults.shared.popUpStyling
+    val buttonStyle = popupStyle.actionButtonStyle
 
     closeButton = popupView.findViewById(R.id.close_button)
     brandLogo = popupView.findViewById(R.id.brand_logo)
@@ -41,7 +60,7 @@ fun PopupDialog.setupUI() {
     closeButton.setOnClickListener {
         closeButtonTapped()
     }
-    closeButton.setColorFilter(popupStyle!!.crossColor)
+    closeButton.setColorFilter(popupStyle.crossColor)
 
     Glide.with(this).load(popupModel.brandLogoUrl).into(brandLogo)
 
@@ -51,19 +70,48 @@ fun PopupDialog.setupUI() {
     subtitleLabel.applyTextStyle(popupStyle.subTitlePopupTextStyle)
     disclosureLabel.text = popupModel.disclosure
     disclosureLabel.applyTextStyle(popupStyle.disclosurePopupTextStyle)
-    headerLabel.text = popupModel.overlayContainerBarHeading
-    headerLabel.applyTextStyle(popupStyle.headerPopupTextStyle)
+    if (popupModel.overlayContainerBarHeading.isEmpty()) {
+        headerView.visibility = View.GONE
+    } else {
+        headerLabel.text = popupModel.overlayContainerBarHeading
+        headerLabel.applyTextStyle(popupStyle.headerPopupTextStyle)
+    }
 
     actionButton.text = popupModel.primaryActionButtonAttributes?.buttonText ?: "Action"
-    actionButton.setBackgroundColor(popupStyle.actionButtonColor)
+
+    val drawable = GradientDrawable().apply {
+        shape = GradientDrawable.RECTANGLE
+        cornerRadius = buttonStyle!!.cornerRadius
+        setColor(buttonStyle.backgroundColor)
+    }
+
+    val pressedDrawable = GradientDrawable().apply {
+        shape = GradientDrawable.RECTANGLE
+        cornerRadius = buttonStyle!!.cornerRadius
+        setColor(commonUtils.darkerColor(buttonStyle.backgroundColor))
+    }
+
+    val states = StateListDrawable().apply {
+        addState(intArrayOf(android.R.attr.state_pressed), pressedDrawable)
+        addState(intArrayOf(), drawable)
+    }
+
+    actionButton.background = states
+
 
     actionButton.setOnClickListener {
         callback(BreadPartnerEvent.PopupClosed)
 
-        onActionButtonTapped() }
+        onActionButtonTapped()
+    }
 
     context?.let {
-        webViewManager = BreadFinancialWebViewInterstitial(it)
+        webViewManager = BreadFinancialWebViewInterstitial(it, logger) { event ->
+            when (event) {
+                is BreadPartnerEvent.PopupClosed -> closeButtonTapped()
+                else -> callback(event)
+            }
+        }
         addSectionsToLinearLayout(
             popupModel, contentStackView, it, popupStyle
         )
@@ -91,6 +139,10 @@ fun PopupDialog.setupUI() {
     }
 }
 
+/**
+ * Dynamically adds header and paragraph sections to the popup's
+ * sub-container based on the provided placement configuration.
+ */
 fun PopupDialog.addSectionsToLinearLayout(
     popupModel: PopupPlacementModel,
     container: LinearLayout,
@@ -99,44 +151,54 @@ fun PopupDialog.addSectionsToLinearLayout(
 ) {
     val bodyDivModel = popupModel.dynamicBodyModel.bodyDiv
     val tagPriorityList = listOf("h3", "p", "connector")
-    val tagConnector = "connector"
-
-    bodyDivModel.entries.forEachIndexed { index, (_, value) ->
-        // Handle connectors on odd indexes
-        if (index % 2 != 0) {
-            findTagValue(popupModel, tagConnector)?.let { content ->
-                PopupElements.shared.createLabelForTag(
-                    popupStyle, tagConnector, content, context
-                )?.let {
-                    container.addView(it)
-                }
-            }
-        }
-
-        // Handle other tags (h3, p)
+    val sortedDictList = bodyDivModel.entries.sortedBy { entry ->
+        entry.key.replace("div", "").toIntOrNull() ?: 0
+    }
+    sortedDictList.forEachIndexed { _, (_, value) ->
         val tagValuePairs = value.tagValuePairs
-        tagPriorityList.filterNot { it == tagConnector }.forEach { tag ->
-            tagValuePairs[tag]?.let { content ->
-                PopupElements.shared.createLabelForTag(popupStyle, tag, content, context)?.let {
-                    container.addView(it)
+        tagPriorityList.forEach { tag ->
+            val content = tagValuePairs[tag]
+            content?.let {
+                PopupElements.shared.createLabelForTag(
+                    popupModel = popupStyle, tag = tag, value = it, context
+                )?.let { label ->
+                    container.addView(label)
                 }
             }
         }
     }
-}
+    val containerFooter = bodyDivModel.entries.firstOrNull { it.key.contains("footer") }
 
-@Suppress("SameParameterValue")
-fun PopupDialog.findTagValue(popupModel: PopupPlacementModel, searchTag: String): String? {
-    for (bodyDiv in popupModel.dynamicBodyModel.bodyDiv) {
-        for ((key, tagValuePair) in bodyDiv.value.tagValuePairs) {
-            if (key == searchTag) {
-                return tagValuePair
+    containerFooter.let { footerEntry ->
+        val labelValue = footerEntry?.value?.tagValuePairs
+        val valueFooter: Spanned? = labelValue?.get("footer")
+        if (valueFooter != null) {
+            PopupElements.shared.createLabelForTag(
+                popupModel = popupStyle, tag = "footer", value = valueFooter, context
+            )?.let { label ->
+                container.addView(label)
+            }
+        } else {
+            val firstValue = labelValue?.values?.firstOrNull()
+            firstValue?.let { spannedValue ->
+                PopupElements.shared.createLabelForTag(
+                    popupStyle, tag = "footer", value = spannedValue, context
+                )?.let { label ->
+                    container.addView(label)
+                }
             }
         }
     }
-    return null
+    if (bodyDivModel.isEmpty()) {
+        container.visibility = View.GONE
+    } else {
+        container.visibility = View.VISIBLE
+    }
 }
 
+/**
+ * Displays the product overlay view in the popup.
+ */
 fun PopupDialog.displayProductOverlay() {
     loader.visibility = View.GONE
     overlayEmbeddedView.visibility = View.GONE

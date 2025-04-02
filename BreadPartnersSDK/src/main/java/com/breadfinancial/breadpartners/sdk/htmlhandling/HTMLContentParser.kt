@@ -1,5 +1,18 @@
+//------------------------------------------------------------------------------
+//  File:          HTMLContentParser.kt
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for Android,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 package com.breadfinancial.breadpartners.sdk.htmlhandling
 
+import com.breadfinancial.breadpartners.sdk.htmlhandling.extensions.getHtmlAsSpanned
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementActionType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
@@ -10,35 +23,44 @@ import com.breadfinancial.breadpartners.sdk.utilities.Constants
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
+/**
+ * Interface for parsing HTML content into a Document.
+ */
 interface HTMLParser {
     fun parse(htmlContent: String): Document
 }
 
+/**
+ * HTML parser implementation using Jsoup library.
+ */
 class JsoupHTMLParser : HTMLParser {
     override fun parse(htmlContent: String): Document {
         return Jsoup.parse(htmlContent)
     }
 }
 
+/**
+ * Parses and processes HTML content for rendering and interaction handling.
+ */
 class HTMLContentParser(
-    private val alertHandler: AlertHandler,
-    private val htmlParser: HTMLParser
+    private val alertHandler: AlertHandler, private val htmlParser: HTMLParser
 ) {
 
+    /**
+     * Extracts a TextPlacementModel from the given HTML content.
+     */
     fun extractTextPlacementModel(htmlContent: String): TextPlacementModel {
         val document = htmlParser.parse(htmlContent)
 
         val actionType = document.select("[data-action-type]").attr("data-action-type")
             .takeIf { it.isNotEmpty() }
-        val actionTarget =
-            document.select("[data-action-target]").attr("data-action-target")
-                .takeIf { it.isNotEmpty() }
+        val actionTarget = document.select("[data-action-target]").attr("data-action-target")
+            .takeIf { it.isNotEmpty() }
         val actionContentId =
             document.select("[data-action-content-id]").attr("data-action-content-id")
                 .takeIf { it.isNotEmpty() }
         val contentText = document.select(".epjs-body").first()?.ownText().orEmpty().trim()
-        val actionLink =
-            document.select(".epjs-body-action a").text().takeIf { it.isNotEmpty() }
+        val actionLink = document.select(".epjs-body-action a").text().takeIf { it.isNotEmpty() }
         val paymentDetailsSup = document.select("sup").text()
         val paymentDetails =
             document.select(".ep-text-placement").text().replace(actionLink.orEmpty(), "")
@@ -60,6 +82,9 @@ class HTMLContentParser(
         )
     }
 
+    /**
+     * Parses HTML content to extract a PopupPlacementModel.
+     */
     fun extractPopupPlacementModel(htmlContent: String): PopupPlacementModel? {
         return try {
             val document = htmlParser.parse(htmlContent)
@@ -69,16 +94,12 @@ class HTMLContentParser(
                     .orEmpty()
             val brandLogoUrl = document.select(".brand.logo img").first()?.attr("src").orEmpty()
             val webViewUrl = document.select("iframe").first()?.attr("src").orEmpty()
-            val overlayTitle =
-                document.select(".epjs-css-overlay-title").first()?.text().orEmpty()
-            val overlaySubtitle =
-                document.select(".epjs-css-overlay-subtitle").first()?.text().orEmpty()
+            val overlayTitle = document.select(".epjs-css-overlay-title").getHtmlAsSpanned()
+            val overlaySubtitle = document.select(".epjs-css-overlay-subtitle").getHtmlAsSpanned()
             val overlayContainerBarHeading =
-                document.select(".epjs-css-overlay-body-title-bar").first()?.ownText().orEmpty()
-            val bodyHeader =
-                document.select(".epjs-css-overlay-header").first()?.text().orEmpty()
-            val disclosure =
-                document.select(".epjs-css-overlay-disclosures").first()?.text().orEmpty()
+                document.select(".epjs-css-overlay-body-title-bar").getHtmlAsSpanned()
+            val bodyHeader = document.select(".epjs-css-overlay-header").getHtmlAsSpanned()
+            val disclosure = document.select(".epjs-css-overlay-disclosures").getHtmlAsSpanned()
             val primaryActionButtonAttributes =
                 extractPrimaryCTAButtonAttributes(document, ".action-button")
 
@@ -107,49 +128,67 @@ class HTMLContentParser(
         }
     }
 
+    /**
+     * Processes the HTML document to generate a DynamicBodyModel for the popup.
+     */
     private fun processDynamicBodyModel(document: Document): PopupPlacementModel.DynamicBodyModel {
-        val bodyContainer = document.select(".epjs-css-overlay-body-content").first()
+        val bodyContainer = document.select(".epjs-css-overlay-body-content")
         val mutableBodyDiv = mutableMapOf<String, PopupPlacementModel.DynamicBodyContent>()
+        var sequenceCounter = 0
+        bodyContainer.forEachIndexed { _, mainParent ->
+            mainParent.children().forEach { child ->
+                when (child.className()) {
+                    "epjs-css-overlay-value-prop" -> {
+                        val bodyContent = PopupPlacementModel.DynamicBodyContent(
+                            child.children().associate { it.tagName() to it.getHtmlAsSpanned() })
+                        mutableBodyDiv["div${sequenceCounter++}"] = bodyContent
+                    }
 
-        bodyContainer?.let {
-            val valueProps = it.select(".epjs-css-overlay-value-prop")
-            val connectors = it.select(".epjs-css-overlay-value-prop-connector")
-            var sequenceCounter = 1
+                    "epjs-css-overlay-value-prop-connector" -> {
+                        val bodyContent = PopupPlacementModel.DynamicBodyContent(
+                            mapOf("connector" to child.getHtmlAsSpanned())
+                        )
+                        mutableBodyDiv["div${sequenceCounter++}"] = bodyContent
+                    }
 
-            valueProps.forEach { valueProp ->
-                val bodyContent = PopupPlacementModel.DynamicBodyContent(
-                    valueProp.children().associate { child -> child.tagName() to child.text() })
-                mutableBodyDiv["div${sequenceCounter++}"] = bodyContent
-            }
+                    "epjs-css-overlay-body-footer" -> {
+                        val bodyContent = PopupPlacementModel.DynamicBodyContent(
+                            child.children().associate { it.tagName() to it.getHtmlAsSpanned() })
 
-            connectors.forEach { connector ->
-                val connectorBodyContent = PopupPlacementModel.DynamicBodyContent(
-                    mapOf("connector" to connector.text())
-                )
-                mutableBodyDiv["div${sequenceCounter++}"] = connectorBodyContent
+                        mutableBodyDiv["footer${sequenceCounter++}"] = bodyContent
+                    }
+
+                    else -> {
+
+                    }
+                }
             }
         }
 
         return PopupPlacementModel.DynamicBodyModel(mutableBodyDiv.toMap())
     }
 
+    /**
+     * Extracts attributes for the primary CTA button from the HTML document.
+     */
     private fun extractPrimaryCTAButtonAttributes(
         document: Document, selector: String
     ): PrimaryActionButtonModel? {
         val button = document.select(selector).first() ?: return null
 
-        return PrimaryActionButtonModel(
-            dataOverlayType = document.select(".epjs-css-modal-footer")
-                .first()?.attr("data-overlay-type"),
+        return PrimaryActionButtonModel(dataOverlayType = document.select(".epjs-css-modal-footer")
+            .first()?.attr("data-overlay-type"),
             dataContentFetch = button.attr("data-content-fetch").takeIf { it.isNotEmpty() },
             dataActionTarget = button.attr("data-action-target").takeIf { it.isNotEmpty() },
             dataActionType = button.attr("data-action-type").takeIf { it.isNotEmpty() },
             dataActionContentId = button.attr("data-action-content-id").takeIf { it.isNotEmpty() },
             dataLocation = button.attr("data-location").takeIf { it.isNotEmpty() },
-            buttonText = button.select("span").text().takeIf { it.isNotEmpty() }
-        )
+            buttonText = button.select("span").text().takeIf { it.isNotEmpty() })
     }
 
+    /**
+     * Parses the given response string to a PlacementActionType.
+     */
     fun handleActionType(response: String): PlacementActionType? {
         return try {
             PlacementActionType.valueOf(response)
@@ -163,6 +202,9 @@ class HTMLContentParser(
         }
     }
 
+    /**
+     * Safely parses the given response string to a PlacementOverlayType.
+     */
     fun handleOverlayType(response: String): PlacementOverlayType? {
         return try {
             PlacementOverlayType.valueOf(response)

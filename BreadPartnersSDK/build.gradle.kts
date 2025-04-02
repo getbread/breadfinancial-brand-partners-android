@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("maven-publish")
 }
 
 android {
@@ -9,7 +10,7 @@ android {
 
     defaultConfig {
         minSdk = 24
-
+        multiDexEnabled = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
@@ -18,10 +19,12 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
+    }
+    publishing {
+        singleVariant("release") {}
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -42,12 +45,57 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
 //    #Change-breadpartnersdk
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.jsoup)
-    implementation(libs.gson)
-    implementation(libs.glide)
+    api(libs.kotlinx.serialization.json)
+    api(libs.jsoup)
+    api(libs.gson)
+    api(libs.glide)
     annotationProcessor(libs.glide.compiler)
-    implementation(libs.recaptcha)
-    implementation(libs.coordinatorlayout)
-    implementation(libs.constraintlayout)
+    api(libs.recaptcha)
+    api(libs.coordinatorlayout)
+    api(libs.constraintlayout)
+    api(libs.androidx.multidex)
 }
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Create Maven Publication and name it.
+            register<MavenPublication>("release"){
+                // Component for release variant.
+                from(components["release"])
+                groupId = "com.github.getbread"
+                artifactId = "breadfinancialbreadpartnerssdk"
+                version = "0.0.1"
+
+                pom {
+                    name = "Bread Financial Brand Partners SDK"
+                    description =
+                        "The Bread Financial Brand Partners SDK allows our Brand Partners to integrate Apply and Buy functionality within their native app."
+                    url = "https://github.com/getbread/breadfinancial-brand-partners-android.git"
+
+                    licenses {
+                        license {
+                            name = "The Apache License, Version 2.0"
+                            url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id = "com.breadfinancial.breadpartners"
+                            name = "Bread Financial"
+                            email = "BreadFinancialMobileSupport@breadfinancial.com"
+                        }
+                    }
+
+                    scm {
+                        url =
+                            "https://github.com/getbread/breadfinancial-brand-partners-android.git"
+                    }
+                }
+            }
+        }
+    }
+}
+
+version = "0.0.1"

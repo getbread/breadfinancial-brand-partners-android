@@ -1,7 +1,23 @@
+//------------------------------------------------------------------------------
+//  File:          AnalyticsModels.kt
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for Android,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 package com.breadfinancial.breadpartners.sdk.analytics.models
 
 import com.breadfinancial.breadpartners.sdk.networking.models.MetadataModel
 
+/**
+ * Data model representing analytics-related information for tracking events
+ * within the SDK.
+ */
 data class Analytics(
     val placementContent: PlacementContent?,
     val placement: Placement?,
@@ -23,7 +39,7 @@ data class Analytics(
     data class EventProperties(
         val placement: Placement?,
         val placementContent: PlacementContent?,
-        val metadata: Map<String, String>?,
+        val metadata: Map<String, String?>?,
         val actionTarget: String?
     )
 

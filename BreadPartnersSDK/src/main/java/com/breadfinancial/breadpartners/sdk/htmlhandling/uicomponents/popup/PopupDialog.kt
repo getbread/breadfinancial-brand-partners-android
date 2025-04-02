@@ -1,3 +1,15 @@
+//------------------------------------------------------------------------------
+//  File:          PopupDialog.kt
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for Android,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup
 
 import android.graphics.Color
@@ -14,20 +26,28 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.breadfinancial.breadpartners.sdk.R
-import com.breadfinancial.breadpartners.sdk.core.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
+import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentParser
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.BreadFinancialWebViewInterstitial
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.extensions.setupUI
 import com.breadfinancial.breadpartners.sdk.networking.APIClient
+import com.breadfinancial.breadpartners.sdk.networking.models.BrandConfigResponse
 import com.breadfinancial.breadpartners.sdk.utilities.AlertHandler
 import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
 import com.breadfinancial.breadpartners.sdk.utilities.LoaderIndicator
 import com.breadfinancial.breadpartners.sdk.utilities.Logger
 import com.bumptech.glide.Glide
 
+/**
+ * DialogFragment that renders a dynamic popup based on placement data,
+ * handling UI rendering, user interactions, and event callbacks.
+ */
 class PopupDialog(
+    internal val integrationKey: String,
     internal val popupModel: PopupPlacementModel,
     internal val overlayType: PlacementOverlayType,
     internal val apiClient: APIClient,
@@ -35,6 +55,9 @@ class PopupDialog(
     internal val commonUtils: CommonUtils,
     internal val htmlContentParser: HTMLContentParser,
     internal val logger: Logger,
+    internal var merchantConfiguration: MerchantConfiguration?,
+    internal var placementsConfiguration: PlacementsConfiguration?,
+    internal var brandConfiguration: BrandConfigResponse?,
     internal val callback: (BreadPartnerEvent) -> Unit?
 ) : DialogFragment() {
 
@@ -93,6 +116,9 @@ class PopupDialog(
         }
     }
 
+    /**
+     * Displays the embedded overlay UI using the provided placement model.
+     */
     internal fun displayEmbeddedOverlay(popupPlacementModel: PopupPlacementModel) {
         bottomBanner.visibility = View.GONE
         overlayProductView.visibility = View.GONE

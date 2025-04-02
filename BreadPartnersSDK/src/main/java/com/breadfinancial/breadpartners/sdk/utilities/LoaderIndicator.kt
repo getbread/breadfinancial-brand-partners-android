@@ -1,3 +1,15 @@
+//------------------------------------------------------------------------------
+//  File:          LoaderIndicator.kt
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for Android,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 package com.breadfinancial.breadpartners.sdk.utilities
 
 import android.animation.ValueAnimator
@@ -12,11 +24,13 @@ import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import kotlin.math.cos
 import kotlin.math.sin
 
+/**
+ * BallSpinFadeLoader class.
+ *
+ * Handles the animation or behavior for a ball spin fade loader, typically used for showing loading states.
+ */
 class LoaderIndicator @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0,
-    private val sdkConfiguration: PlacementsConfiguration = BreadPartnersSDK.getInstance().placementsConfiguration!!
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
     private val ballPaints: List<Paint> = createBallPaints()
@@ -27,14 +41,20 @@ class LoaderIndicator @JvmOverloads constructor(
     private val ballDistance: Float = 60f // Default value for ball distance
     private val duration: Long = 1000L // Default value for animation duration
 
+    private var sdkConfiguration: PlacementsConfiguration?
+
     init {
+        BreadPartnersSDK.getInstance().placementsConfiguration.let {
+            sdkConfiguration = it
+        }
         startAnimation()
     }
 
     private fun createBallPaints(): List<Paint> {
+        val loaderColor = BreadPartnerDefaults.shared.popUpStyling.loaderColor
         return List(8) {
             Paint().apply {
-                color = sdkConfiguration.popUpStyling!!.loaderColor
+                color = loaderColor
                 isAntiAlias = true
             }
         }

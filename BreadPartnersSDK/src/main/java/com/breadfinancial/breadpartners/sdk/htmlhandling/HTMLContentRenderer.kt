@@ -1,73 +1,88 @@
+//------------------------------------------------------------------------------
+//  File:          HTMLContentRenderer.kt
+//  Author(s):     Bread Financial
+//  Date:          27 March 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for Android,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
 package com.breadfinancial.breadpartners.sdk.htmlhandling
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Context
 import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
-import com.breadfinancial.breadpartners.sdk.core.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
-import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.InteractiveText
-import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupDialog
-import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementActionType
+import com.breadfinancial.breadpartners.sdk.htmlhandling.extensions.renderTextAndButton
+import com.breadfinancial.breadpartners.sdk.htmlhandling.extensions.renderTextViewWithLink
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.TextPlacementModel
+import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupDialog
 import com.breadfinancial.breadpartners.sdk.networking.APIClient
+import com.breadfinancial.breadpartners.sdk.networking.models.BrandConfigResponse
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementsResponse
 import com.breadfinancial.breadpartners.sdk.utilities.AlertHandler
 import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
 import com.breadfinancial.breadpartners.sdk.utilities.Constants
 import com.breadfinancial.breadpartners.sdk.utilities.Logger
 
+/**
+ * Responsible for parsing HTML content and rendering corresponding native UI elements.
+ */
 class HTMLContentRenderer(
-    private val htmlContentParser: HTMLContentParser,
-    private val analyticsManager: AnalyticsManager,
-    private val alertHandler: AlertHandler,
-    private val commonUtils: CommonUtils,
-    private val logger: Logger,
-    private val apiClient: APIClient,
-    private val callback: (BreadPartnerEvent) -> Unit?
+    val integrationKey: String,
+    val htmlContentParser: HTMLContentParser,
+    val analyticsManager: AnalyticsManager,
+    val alertHandler: AlertHandler,
+    val commonUtils: CommonUtils,
+    val logger: Logger,
+    val apiClient: APIClient,
+    var merchantConfiguration: MerchantConfiguration?,
+    var placementsConfiguration: PlacementsConfiguration?,
+    var brandConfiguration: BrandConfigResponse?,
+    var splitTextAndAction: Boolean = false,
+    val callback: (BreadPartnerEvent) -> Unit?
 ) {
 
+    var textPlacementModel: TextPlacementModel? = null
+    var responseModel: PlacementsResponse? = null
+    var thisContext: Context? = null
+
+    /**
+     * Handles rendering of text-based placement using the provided response model.
+     */
     fun handleTextPlacement(
         responseModel: PlacementsResponse,
-        sdkConfiguration: PlacementsConfiguration,
-        thisContext: AppCompatActivity
+        thisContext: Context
     ) {
+        this.responseModel = responseModel
+        this.thisContext = thisContext
         val indexOfPlacement = 0
-        val textPlacementModel = htmlContentParser.extractTextPlacementModel(
+        textPlacementModel = htmlContentParser.extractTextPlacementModel(
             htmlContent = responseModel.placementContent?.get(indexOfPlacement)?.contentData?.htmlContent
                 ?: ""
         )
-        logger.logTextPlacementModelDetails(textPlacementModel)
+
+        logger.logTextPlacementModelDetails(textPlacementModel!!)
         analyticsManager.sendViewPlacement(responseModel)
-        createTextView(textPlacementModel, responseModel, sdkConfiguration, thisContext)
-    }
-
-    private fun createTextView(
-        textPlacementModel: TextPlacementModel,
-        responseModel: PlacementsResponse,
-        sdkConfiguration: PlacementsConfiguration,
-        thisContext: AppCompatActivity
-    ) {
-        val interactiveText = InteractiveText(thisContext)
-        interactiveText.configure(textPlacementModel, sdkConfiguration.textPlacementStyling!!) {
-            handleLinkInteraction(textPlacementModel, responseModel)
-        }
-        callback(BreadPartnerEvent.RenderTextView(view = interactiveText))
-    }
-
-    private fun handleLinkInteraction(
-        textPlacementModel: TextPlacementModel, responseModel: PlacementsResponse
-    ) {
-        val actionType =
-            textPlacementModel.actionType?.let { htmlContentParser.handleActionType(it) }
-        if (actionType == PlacementActionType.SHOW_OVERLAY) {
-            handlePopupPlacement(textPlacementModel, responseModel)
+        if (splitTextAndAction) {
+            renderTextAndButton()
         } else {
-            showAlert(Constants.nativeSDKAlertTitle(), Constants.missingTextPlacementError)
+            renderTextViewWithLink()
         }
+
     }
 
-    private fun handlePopupPlacement(
+    /**
+     * Renders a popup overlay based on the given overlay placement model and response data.
+     * Sets up and displays the popup UI with dynamic content and configuration.
+     */
+    fun handlePopupPlacement(
         textPlacementModel: TextPlacementModel, responseModel: PlacementsResponse
     ) {
         val popupPlacementHTMLContent = responseModel.placementContent?.find {
@@ -91,10 +106,14 @@ class HTMLContentRenderer(
         createPopupOverlay(popupPlacementModel, overlayType)
     }
 
+    /**
+     * Initializes and displays a popup overlay based on the provided model and type.
+     */
     fun createPopupOverlay(
         popupPlacementModel: PopupPlacementModel, overlayType: PlacementOverlayType
     ) {
         val popupDialog = PopupDialog(
+            integrationKey,
             popupPlacementModel,
             overlayType,
             alertHandler = alertHandler,
@@ -102,16 +121,25 @@ class HTMLContentRenderer(
             commonUtils = commonUtils,
             apiClient = apiClient,
             htmlContentParser = htmlContentParser,
-            callback = callback
+            callback = callback,
+            merchantConfiguration = merchantConfiguration,
+            placementsConfiguration = placementsConfiguration,
+            brandConfiguration = brandConfiguration
         )
         configurePopupPresentation(popupDialog)
     }
 
+    /**
+     * Triggers the display of the popup dialog by invoking the render callback.
+     */
     private fun configurePopupPresentation(popupDialog: PopupDialog) {
-        callback(BreadPartnerEvent.RenderPopupView(view = popupDialog))
+        callback(BreadPartnerEvent.RenderPopupView(dialogFragment = popupDialog))
     }
 
-    private fun showAlert(title: String, message: String) {
+    /**
+     * Displays a simple alert dialog with a title, message, and a default OK button.
+     */
+    fun showAlert(title: String, message: String) {
         alertHandler.showAlert(title = title, message = message, showOkButton = true)
     }
 }

@@ -16,10 +16,13 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("https://www.jitpack.io")
+        }
     }
 }
 
-rootProject.name = "BreadPartnersSDKAndroid"
+rootProject.name = "BreadPartnersSDK"
 include(":app")
 //    #Change-breadpartnersdk
 include(":BreadPartnersSDK")

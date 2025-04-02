@@ -1,15 +1,59 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# Root-level .gitignore
+
+# Built files
+/build/
+/out/
+
+# Gradle
+.gradle/
+/**/build/
+
+# Local configuration file (sdk location, etc)
 local.properties
+
+# Log/Crash files
+*.log
+
+# IntelliJ / Android Studio
+.idea/
+*.iml
+*.iws
+
+# Keystore files
+*.jks
+*.keystore
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Generated files
+/captures/
+/output.json
+
+# NDK
+obj/
+*.so
+
+# Kotlin specific
+*.kotlin_module
+
+# Unit test coverage
+*.ec
+
+# Signing config
+signing.properties
+
+# Google Services (optional, only if used)
+google-services.json
+fabric.properties
+
+# Environment / CI
+.env
+.env.*
+
+# Misc
+*.orig
+
+**/TestData.kt
+.idea/
