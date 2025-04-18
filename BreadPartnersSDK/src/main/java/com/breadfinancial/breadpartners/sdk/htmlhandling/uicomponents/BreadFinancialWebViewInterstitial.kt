@@ -10,12 +10,14 @@
 //  © 2025 Bread Financial
 //------------------------------------------------------------------------------
 
-@file:Suppress("UNUSED_PARAMETER")
+@file:Suppress("UNUSED_PARAMETER", "unused", "SpellCheckingInspection")
 
 package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -54,6 +56,7 @@ internal class BreadFinancialWebViewInterstitial(
             )
             settings.apply {
                 javaScriptEnabled = true
+                javaScriptCanOpenWindowsAutomatically = true
                 domStorageEnabled = true
                 allowFileAccess = true
                 allowContentAccess = true
@@ -66,6 +69,9 @@ internal class BreadFinancialWebViewInterstitial(
 
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
+
+                    injectAnchorInterceptorScript(view)
+
                     url?.let {
                         onPageLoadCompleted(it)
                     }
@@ -101,6 +107,18 @@ internal class BreadFinancialWebViewInterstitial(
      * Interface to handle messages sent from JavaScript running in the WebView.
      */
     private inner class WebAppInterface(webView: WebView) {
+
+        @JavascriptInterface
+        fun log(data: String) {
+            logger.printWebAnchorLogs(data)
+        }
+
+        @JavascriptInterface
+        fun openExternally(url: String) {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            context.startActivity(intent)
+        }
+
         @JavascriptInterface
         fun postMessage(message: String) {
             Log.d("BreadPartnersSDK:", "WebViewMessage: $message")
@@ -168,4 +186,52 @@ internal class BreadFinancialWebViewInterstitial(
             }
         }
     }
+
+    private fun injectAnchorInterceptorScript(view: WebView?) {
+        view?.evaluateJavascript(
+            """
+        (function() {
+            function handleAnchors() {
+                const anchors = document.querySelectorAll('a[target="_blank"], a[data-open-externally="true"]');
+                const anchorsHTML = Array.from(anchors).map(a => a.outerHTML);
+                
+                if (anchorsHTML.length > 0) {
+                    window.Android.log('AnchorTags:\n' + anchorsHTML.join('\n'));
+                } else {
+                    window.Android.log('AnchorTags:No anchors found with target="_blank" or data-open-externally="true"');
+                }
+
+                anchors.forEach(a => {
+                    // Prevent attaching multiple listeners
+                    if (!a.__handled__) {
+                        a.__handled__ = true;
+                        a.addEventListener('click', function(event) {
+                            event.preventDefault();
+                            window.Android.openExternally(a.href);
+                        });
+                    }
+                });
+            }
+
+            // Initial run
+            handleAnchors();
+
+            // Observe for new anchor tags in SPA content
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.addedNodes.length) {
+                        handleAnchors();
+                    }
+                });
+            });
+
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        })();
+        """.trimIndent(), null
+        )
+    }
+
 }

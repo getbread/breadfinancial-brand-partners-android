@@ -12,6 +12,7 @@
 
 package com.breadfinancial.breadpartners.sdk.utilities
 
+import android.util.Log
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.TextPlacementModel
@@ -181,6 +182,13 @@ class Logger(
         printLog("Result             : ${payload.optString("result", "N/A")}")
         printLog("Status             : ${payload.optString("status", "N/A")}")
         printLog("${generateDashLine(60)}\n")
+    }
+
+    fun printWebAnchorLogs(data: String) {
+        if (!isLoggingEnabled) return
+        Log.i("", "\n${generateDashLine(20)} Anchor List ${generateDashLine(20)}")
+        Log.i("", data)
+        Log.i("", "${generateDashLine(60)}\n")
     }
 }
 
