@@ -73,16 +73,17 @@ We will provide a brief description of what issues were fixed and what new capab
 ## Integrate Android Mobile SDK via Gradle
 
 #### a. To integrate BreadPartnersSDK into your Android Studio project, add it as a Gradle dependency.
-```groovy
-implementation 'com.github.getbread:breadfinancial-brand-partners-android:<Ref>' 
-```
+<pre>
+implementation 'com.github.getbread:breadfinancial-brand-partners-android:Ref'
+</pre>
+
 Replace <Ref> with the reference you want to use. The <Ref> can be:
 - Commit Hash
 - Tag Version
 - Branch Name
 
 #### b, In your `settings.gradle.kts`, add the JitPack repository inside `dependencyResolutionManagement:`
-```groovy
+<pre>
 dependencyResolutionManagement {
     repositories {
         // Other repositories...
@@ -92,18 +93,18 @@ dependencyResolutionManagement {
         // Other repositories...
     }
 }
-```
+</pre>
 
 #### c. Select the appropriate version (or branch) for your project.
-```renderscript
+<pre>
 ./gradlew -refresh-dependencies
-```
+</pre>
 
 #### d, Import the `BreadPartnersSDK` to whichever class you need to utilize the SDK in:
 
-```markdown
+<pre>
 import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
-```
+</pre>
 
 ---
 
@@ -115,14 +116,14 @@ Call the setup function at the app launch to initialize the SDK with the require
 - `environment` determines whether the SDK runs in development or production.
 - `enableLog` flag controls logging for debugging.
 
-```markdown
+<pre>
 BreadPartnersSDK.getInstance().setup(
     environment = BreadPartnersEnvironment.STAGE,
     enableLog = true,
     integrationKey = brandID,
     application = application
 )
-```
+</pre>
 
 ---
 
@@ -134,7 +135,7 @@ To register a placement, you need to configure the placement data, UI styling, a
 
 Create a `PlacementData` object to specify the financing type, order details, and placement ID. This includes subtotal, discounts, total price, shipping, tax, discount codes, and pickup information like name, phone, address, and email.
 
-```markdown
+<pre>
 val placementData = PlacementData(
     financingType = BreadPartnersFinancingType.INSTALLMENTS,
     locationType = BreadPartnersLocationType.CATEGORY,
@@ -166,23 +167,23 @@ val placementData = PlacementData(
         items = emptyList()
     )
 )
-```
+</pre>
 
 ### 2. Configure
 
 Pass the `placementData` inside a `PlacementConfiguration` object.
 
-```markdown
+<pre>
 val placementsConfiguration = PlacementsConfiguration(
     placementData = placementData
 )
-```
+</pre>
 
 ### 3. Set Up Merchant Information
 
 Define the merchant and buyer details in `MerchantConfiguration`. This includes buyer information like name, birth date, email, phone, billing address, and optional shipping address. It also contains merchant-related data like store number, channel, and subchannel.
 
-```markdown
+<pre>
 val merchantConfiguration = MerchantConfiguration(
     buyer = BreadPartnersBuyer(
         givenName = "Jack",
@@ -206,7 +207,7 @@ val merchantConfiguration = MerchantConfiguration(
     channel = "P",
     subchannel = "X"
 )
-```
+</pre>
 
 ### 4. Register the Placement
 
@@ -217,7 +218,7 @@ Call the registerPlacements method with the configured merchantConfiguration and
 - `splitTextAndAction`: Set this to true if you want the placement to return either text with a link or a combination of text and button.
 - `callback`: A function that handles user interactions and ongoing events related to the placements.
 
-```markdown
+<pre>
 BreadPartnersSDK.getInstance().registerPlacements(
     merchantConfiguration = merchantConfiguration,
     placementsConfiguration = placementsConfiguration,
@@ -226,7 +227,7 @@ BreadPartnersSDK.getInstance().registerPlacements(
 ) { breadPartnerEvent ->
 
 }
-```
+</pre>
 
 ## Making a RTPS Request
 
@@ -238,7 +239,7 @@ If any step in the RTPS (Real-Time Pre-Screen) flow fails, the user experience w
 
 Create a RTPSData object to specify the location type, order details, and mockResponse type. Order includes subtotal, discounts, total price, shipping, tax, discount codes, and pickup information like name, phone, address, and email.
 
-```markdown
+<pre>
 val rtpsData = RTPSData(
     locationType = BreadPartnersLocationType.CHECKOUT,
     order = Order(
@@ -248,23 +249,23 @@ val rtpsData = RTPSData(
     ),
     mockResponse = BreadPartnersMockOptions.SUCCESS
 )
-```
+</pre>
 
 ### 2. Configure UI & Styling:
 
 Pass the placementData inside a PlacementConfiguration object.
 
-```markdown
+<pre>
 val placementsConfiguration = PlacementsConfiguration(
     rtpsData = rtpsData
 )
-```
+</pre>
 
 ### 3. Set Up Merchant Information
 
 Define the merchant and buyer details in MerchantConfiguration. This includes buyer information like name, birth date, email, phone, billing address, and optional shipping address. It also contains merchant-related data like store number, channel, and subchannel.
 
-```markdown
+<pre>
 val merchantConfiguration = MerchantConfiguration(
     buyer = BreadPartnersBuyer(
         givenName = "Jack",
@@ -288,7 +289,7 @@ val merchantConfiguration = MerchantConfiguration(
     channel = "P",
     subchannel = "X"
 )
-```
+</pre>
 
 ### 4. Make the RTPS call
 
@@ -299,7 +300,7 @@ Call the silentRTPSRequest method with the configured merchantConfiguration and 
 - `splitTextAndAction`: Set this to true if you want the placement to return either text with a link or a combination of text and button.
 - `callback`: A function that handles user interactions and ongoing events related to the placements.
 
-```markdown
+<pre>
 BreadPartnersSDK.getInstance().silentRTPSRequest(
     merchantConfiguration = merchantConfiguration,
     placementsConfiguration = placementsConfiguration,
@@ -307,7 +308,7 @@ BreadPartnersSDK.getInstance().silentRTPSRequest(
 ) { breadPartnerEvent ->
 
 }
-```
+</pre>
 
 ### Flow Illustration.
 <p align="center">
@@ -320,7 +321,7 @@ BreadPartnersSDK.getInstance().silentRTPSRequest(
 
 The following is a list of callback events from the Register Placement and RTPS function:
 
-```markdown
+<pre>
 /// Renders a text view containing a clickable hyperlink.
 /// - Parameter spannableText: A Spannable object containing the text with a clickable link.
 data class RenderTextViewWithLink(val spannableText: Spannable) : BreadPartnerEvent()
@@ -368,13 +369,13 @@ data class cardApplicationStatus(val status: Any) : BreadPartnerEvent()
 
 /// Logs requests, responses, errors, and successes.
 data class OnSDKEventLog(val log: Any) : BreadPartnerEvent()
-```
+</pre>
 
 ## Examples of dealing with Register Placement Callbacks
 
-### 1. Render a TextView in UIKit
+### 1. Render a TextView in XML/Binding
 
-```markdown
+<pre>
 is BreadPartnerEvent.RenderTextViewWithLink -> {
 
     /**
@@ -426,11 +427,62 @@ is BreadPartnerEvent.RenderTextViewWithLink -> {
     textView.typeface = customFont
     textView.movementMethod = LinkMovementMethod.getInstance()
 }
-```
+</pre>
 
-### 2. Render a Popup View in UIKit
+### 2. Render a Text and Button View separately in XML/Binding
 
-```markdown
+<pre>
+is BreadPartnerEvent.RenderSeparateTextAndButton -> {
+    /**
+     * Handles rendering of a popup view.
+     *
+     * - Modifies the font, text color for the text view, and the button's title color, font, and background.
+     * - Adds the text view and button to the main view and sets up their layout constraints.
+     * - `replaceTextView` and `replaceButton` are helper functions provided by the SDK
+     *   to replace existing views with the new customized ones.
+     */
+    event.textView.apply {
+        setTextColor(Color.BLACK)
+        textSize = 24f
+        typeface = customFont
+    }
+
+    event.button.apply {
+        setTextColor(Color.WHITE)
+        textSize = 24f
+        typeface = customFont
+        setPadding(50, 0, 50, 0)
+
+        val drawable = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 55.0f
+            setColor(Color.parseColor(primaryColor))
+        }
+
+        val pressedDrawable = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 55.0f
+            setColor(Color.parseColor(primaryColor))
+        }
+
+        val states = StateListDrawable().apply {
+            addState(intArrayOf(android.R.attr.state_pressed), pressedDrawable)
+            addState(intArrayOf(), drawable)
+        }
+
+        background = states
+    }
+
+    binding.actionButton.visibility = View.VISIBLE
+    val parent = binding.textView.parent as ViewGroup
+    parent.replaceTextView(binding.textView, event.textView)
+    parent.replaceButton(binding.actionButton, event.button)
+}
+</pre>
+
+### 3. Render a Popup View in XML/Binding
+
+<pre>
 is BreadPartnerEvent.RenderPopupView -> {
 
     /**
@@ -449,7 +501,101 @@ is BreadPartnerEvent.RenderPopupView -> {
         }
     }
 }
-```
+</pre>
+
+### 4. Render a TextView in Jetpack Compose
+
+<pre>
+val placementResponse by viewModel.placementResponse.collectAsState()
+
+placementResponse?.let {
+    when (it) {
+        is BreadPartnerEvent.RenderTextViewWithLink -> {
+            /**
+             * Handles rendering of a text view with a clickable link in Jetpack Compose.
+             *
+             * - Applies font styling and colors dynamically.
+             * - Supports SDK-defined link actions using passed spannable content.
+             * - `InteractiveTextViewFromSDK` is a helper composable function provided by the SDK.
+             */
+            InteractiveTextViewFromSDK(
+                spannableText = it.spannableText,
+                formData = formData
+            )
+        }
+    }
+}
+</pre>
+
+### 5. Render a Text and Button View separately in Jetpack Compose
+
+<pre>
+is BreadPartnerEvent.RenderSeparateTextAndButton -> {
+    /**
+     * Handles rendering of a popup view.
+     *
+     * - Modifies the font, text color for the text view, and the button's title color, font, and background.
+     * - Adds the text view and button to the main view and sets up their layout constraints.
+     */
+    Text(
+        text = it.textView.text.toString(),
+        style = TextStyle(
+            fontSize = 24.sp,
+            fontFamily = FontFamily(
+                Font(R.font.custom_font, FontWeight.Normal)
+            ),
+            color = Color.Black
+        )
+    )
+    val text = it.button.text.toString()
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Button(
+            onClick = { it.button.performClick() },
+            colors = ButtonDefaults.buttonColors(
+                contentColor = Color.White,
+                containerColor = Color(0xFF007AFF)
+            ),
+            modifier = Modifier.padding(5.dp)
+        ) {
+            Text(
+                text = text,
+                style = TextStyle(
+                    fontSize = 24.sp,
+                    fontFamily = FontFamily(
+                        Font(R.font.custom_font, FontWeight.Normal)
+                    ),
+                    color = Color.White
+                )
+            )
+        }
+    }
+}
+</pre>
+
+### 6. Render a Popup View in Jetpack Compose
+
+<pre>
+val overlayResponse by viewModel.overlayResponse.collectAsState()
+
+overlayResponse?.let {
+    val fragmentManager = activity.supportFragmentManager
+
+    /**
+     * Displays a popup dialog provided by the SDK.
+     *
+     * - Uses the dialog fragment bundled within the SDK event.
+     * - `ShowPopupDialog` is a helper composable function provided by the SDK.
+     */
+    ShowPopupDialog(
+        dialogFragment = (it as BreadPartnerEvent.RenderPopupView).dialogFragment,
+        fragmentManager = fragmentManager
+    )
+}
+</pre>
 
 ## Register Placement Customization (Styling and display)
 
@@ -481,7 +627,7 @@ The SDK returns this `DialogFragment` instance to the app, allowing the app to p
 
 ### The View Fragments (Web View) Callbacks are listed below:
 
-```markdown
+<pre>
 BreadPartnerEvent.ActionButtonTapped -> {
     print("BreadPartnerSDK::Popup action button was tapped!")
 }
@@ -512,7 +658,7 @@ is BreadPartnerEvent.SdkError -> {
     val error = event.error
     print("BreadPartnerSDK::SDK encountered an error: ${error}")
 }
-```
+</pre>
 
 ## Customer Application Status Event
 
@@ -529,7 +675,7 @@ The responses available for the Credit Application Status are:
 
 The response object that you receive from the SDK View Fragment event callback once a customer has been approved looks like the example below:
 
-```json
+<pre>
 {
   "alternativePhone": "undefined",
   "applicationId": "516495689845349",
@@ -542,7 +688,7 @@ The response object that you receive from the SDK View Fragment event callback o
   "rewards": "undefined",
   "status": 200
 }
-```
+</pre>
 
 ## Token Usage at Checkout
 
