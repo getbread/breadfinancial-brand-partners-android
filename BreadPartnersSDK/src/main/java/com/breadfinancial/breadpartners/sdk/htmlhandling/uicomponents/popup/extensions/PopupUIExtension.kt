@@ -112,6 +112,7 @@ fun PopupDialog.setupUI() {
                 else -> callback(event)
             }
         }
+        webViewManager.setOnAppRestartListener(this)
         addSectionsToLinearLayout(
             popupModel, contentStackView, it, popupStyle
         )

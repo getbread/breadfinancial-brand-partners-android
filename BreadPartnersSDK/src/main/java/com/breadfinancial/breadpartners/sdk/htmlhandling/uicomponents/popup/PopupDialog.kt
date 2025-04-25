@@ -16,6 +16,8 @@ import android.graphics.Color
 import android.graphics.drawable.ShapeDrawable
 import android.graphics.drawable.shapes.RoundRectShape
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -59,7 +61,7 @@ class PopupDialog(
     internal var placementsConfiguration: PlacementsConfiguration?,
     internal var brandConfiguration: BrandConfigResponse?,
     internal val callback: (BreadPartnerEvent) -> Unit?
-) : DialogFragment() {
+) : DialogFragment(), BreadFinancialWebViewInterstitial.WebViewRestartButtonListener  {
 
     internal lateinit var popupView: View
     internal lateinit var closeButton: ImageView
@@ -133,4 +135,15 @@ class PopupDialog(
         Glide.with(this).load(popupPlacementModel.brandLogoUrl).into(brandLogo)
     }
 
+    override fun onAppRestartClicked(url: String) {
+        val placeholder = popupView.findViewById<FrameLayout>(R.id.overlay_embedded_view)
+
+        Handler(Looper.getMainLooper()).post {
+            webViewManager.replaceViewWithWebView(
+                placeholder, url
+            ) {
+                loader.visibility = View.GONE
+            }
+        }
+    }
 }

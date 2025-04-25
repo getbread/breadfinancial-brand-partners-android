@@ -109,8 +109,13 @@ internal class BreadFinancialWebViewInterstitial(
     private inner class WebAppInterface(webView: WebView) {
 
         @JavascriptInterface
-        fun log(data: String) {
-            logger.printWebAnchorLogs(data)
+        fun onAppRestartClicked(url: String) {
+            listener?.onAppRestartClicked(url)
+        }
+
+        @JavascriptInterface
+        fun logAnchorTags(data: String) {
+//            logger.printWebAnchorLogs(data)
         }
 
         @JavascriptInterface
@@ -191,14 +196,17 @@ internal class BreadFinancialWebViewInterstitial(
         view?.evaluateJavascript(
             """
         (function() {
+            function isVisible(elem) {
+                return !!(elem.offsetWidth || elem.offsetHeight || elem.getClientRects().length);
+            }        
             function handleAnchors() {
                 const anchors = document.querySelectorAll('a[target="_blank"], a[data-open-externally="true"]');
                 const anchorsHTML = Array.from(anchors).map(a => a.outerHTML);
                 
                 if (anchorsHTML.length > 0) {
-                    window.Android.log('AnchorTags:\n' + anchorsHTML.join('\n'));
+                    window.Android.logAnchorTags('AnchorTags:\n' + anchorsHTML.join('\n'));
                 } else {
-                    window.Android.log('AnchorTags:No anchors found with target="_blank" or data-open-externally="true"');
+                    window.Android.logAnchorTags('AnchorTags:No anchors found with target="_blank" or data-open-externally="true"');
                 }
 
                 anchors.forEach(a => {
@@ -213,16 +221,39 @@ internal class BreadFinancialWebViewInterstitial(
                 });
             }
 
+            function handleRestartButton() {
+                const btn = document.querySelector('#appRestart');
+                if (btn && isVisible(btn)) {
+                    if (!btn.__handled__) {
+                        btn.__handled__ = true;
+                        btn.addEventListener('click', function(event) {
+                            event.preventDefault();
+                            if (btn.href) {
+                                window.Android.onAppRestartClicked(btn.href);
+                            }
+                        });
+                    }
+                }
+            }
+
+
             // Initial run
             handleAnchors();
-
-            // Observe for new anchor tags in SPA content
+            handleRestartButton();
+            
+            // Watch for DOM changes
             const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
+                let shouldHandle = false;
+                for (const mutation of mutations) {
                     if (mutation.addedNodes.length) {
-                        handleAnchors();
+                        shouldHandle = true;
+                        break;
                     }
-                });
+                }
+                if (shouldHandle) {
+                    handleAnchors();
+                    handleRestartButton();
+                }
             });
 
             observer.observe(document.body, {
@@ -234,4 +265,13 @@ internal class BreadFinancialWebViewInterstitial(
         )
     }
 
+    interface WebViewRestartButtonListener {
+        fun onAppRestartClicked(url: String)
+    }
+
+    private var listener: WebViewRestartButtonListener? = null
+
+    fun setOnAppRestartListener(listener: WebViewRestartButtonListener) {
+        this.listener = listener
+    }
 }
