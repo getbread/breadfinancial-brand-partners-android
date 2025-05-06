@@ -15,12 +15,11 @@ package com.breadfinancial.breadpartners.sdk.utilities
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
-import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
-import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -41,23 +40,25 @@ class LoaderIndicator @JvmOverloads constructor(
     private val ballDistance: Float = 60f // Default value for ball distance
     private val duration: Long = 1000L // Default value for animation duration
 
-    private var sdkConfiguration: PlacementsConfiguration?
-
     init {
-        BreadPartnersSDK.getInstance().placementsConfiguration.let {
-            sdkConfiguration = it
-        }
         startAnimation()
     }
 
     private fun createBallPaints(): List<Paint> {
-        val loaderColor = BreadPartnerDefaults.shared.popUpStyling.loaderColor
+        val loaderColor = Color.BLACK
         return List(8) {
             Paint().apply {
                 color = loaderColor
                 isAntiAlias = true
             }
         }
+    }
+
+    fun updateLoaderColor(color: Int) {
+        ballPaints.forEach {
+            it.color = color
+        }
+        invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {

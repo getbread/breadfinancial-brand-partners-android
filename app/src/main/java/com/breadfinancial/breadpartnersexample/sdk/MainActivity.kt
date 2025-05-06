@@ -18,6 +18,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.StateListDrawable
 import android.os.Build
@@ -48,15 +49,16 @@ import com.breadfinancial.breadpartners.sdk.core.models.Order
 import com.breadfinancial.breadpartners.sdk.core.models.PickupInformation
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementData
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
-import com.breadfinancial.breadpartnersexample.sdk.databinding.ActivityMainBinding
-import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnerDefaults
+import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
+import com.breadfinancial.breadpartners.sdk.core.models.PopupActionButtonStyle
+import com.breadfinancial.breadpartners.sdk.core.models.PopupTextStyle
 import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnersExtensions.replaceButton
 import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnersExtensions.replaceTextView
+import com.breadfinancial.breadpartnersexample.sdk.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var style: Map<String, Any>
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,7 +74,9 @@ class MainActivity : AppCompatActivity() {
     private fun setupAndFetchPlacementUI() {
 
         // MARK:For development purposes
-        val placementRequestType = mapOf<String, Any>()
+//        val placementRequestType =
+//            TestData.shared.placementConfigurations["textPlacementRequestType1"] ?: emptyMap()
+        val placementRequestType = emptyMap<String, Any>()
         val placementID = placementRequestType["placementID"] as String?
         val price = placementRequestType["price"] as? Int?
         val loyaltyId = placementRequestType["loyaltyId"] as? String?
@@ -85,15 +89,78 @@ class MainActivity : AppCompatActivity() {
             placementRequestType["financingType"] as? BreadPartnersFinancingType?
 
         // MARK: For development purposes
-        style = BreadPartnerDefaults.shared.styleStruct["cadet"]!!
+//        val style = TestData.shared.styleStruct["red"] ?: emptyMap()
+        val style = emptyMap<String, Any>()
 
-        val primaryColor = style["primaryColor"] as String
-        val fontFamily = style["fontFamily"] as String
-        val largeTextSize = style["large"] as Int
+        val primaryColor = style["primaryColor"] as? String? ?: "#d50132"
+        val lightColor = style["lightColor"] as? String ?: "#b8bdc0"
+        val darkColor = style["darkColor"] as? String ?: "#000000"
+        val boxColor = style["boxColor"] as? String ?: "#ececec"
+        val fontFamily = style["fontFamily"] as? String ?: "poppins_bold"
+        val smallTextSize = style["smallTextSize"] as? Int ?: 12
+        val mediumTextSize = style["mediumTextSize"] as? Int ?: 15
+        val largeTextSize = style["largeTextSize"] as? Int ?: 18
+        val xlargeTextSize = style["xlargeTextSize"] as? Int ?: 20
 
         val customFont = ResourcesCompat.getFont(
             this, this.resources.getIdentifier(fontFamily, "font", this.packageName)
         )
+
+        // region Popup Styling
+        /**
+         * Prepares a popup styling configuration object for each style element.
+         */
+        val popUpStyling = PopUpStyling(
+            loaderColor = Color.parseColor(primaryColor),
+            crossColor = Color.parseColor(primaryColor),
+            dividerColor = Color.parseColor(boxColor),
+            borderColor = Color.parseColor(boxColor),
+            titlePopupTextStyle = PopupTextStyle(
+                font = Typeface.create(
+                    fontFamily, Typeface.BOLD
+                ), textColor = Color.parseColor(darkColor), textSize = xlargeTextSize.toFloat()
+            ),
+            subTitlePopupTextStyle = PopupTextStyle(
+                font = Typeface.create(
+                    fontFamily, Typeface.NORMAL
+                ), textColor = Color.parseColor(lightColor), textSize = mediumTextSize.toFloat()
+            ),
+            headerPopupTextStyle = PopupTextStyle(
+                font = Typeface.create(
+                    fontFamily, Typeface.BOLD
+                ), textColor = Color.parseColor(darkColor), textSize = mediumTextSize.toFloat()
+            ),
+            headerBgColor = Color.parseColor(boxColor),
+            headingThreePopupTextStyle = PopupTextStyle(
+                font = Typeface.create(
+                    fontFamily, Typeface.BOLD
+                ), textColor = Color.parseColor(primaryColor), textSize = largeTextSize.toFloat()
+            ),
+            paragraphPopupTextStyle = PopupTextStyle(
+                font = Typeface.create(
+                    fontFamily, Typeface.NORMAL
+                ), textColor = Color.parseColor(lightColor), textSize = smallTextSize.toFloat()
+            ),
+            connectorPopupTextStyle = PopupTextStyle(
+                font = Typeface.create(
+                    fontFamily, Typeface.BOLD
+                ), textColor = Color.parseColor(darkColor), textSize = largeTextSize.toFloat()
+            ),
+            disclosurePopupTextStyle = PopupTextStyle(
+                font = Typeface.create(
+                    fontFamily, Typeface.NORMAL
+                ), textColor = Color.parseColor(lightColor), textSize = smallTextSize.toFloat()
+            ),
+            actionButtonStyle = PopupActionButtonStyle(
+                font = Typeface.create(
+                    fontFamily, Typeface.NORMAL
+                ),
+                textColor = Color.WHITE,
+                backgroundColor = Color.parseColor(primaryColor),
+                cornerRadius = 30.0F
+            )
+        )
+        // endregion
 
         binding.preScreenBtn.typeface = customFont
         binding.preScreenBtn.textSize = largeTextSize.toFloat()
@@ -144,7 +211,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         val placementsConfiguration = PlacementsConfiguration(
-            placementData = placementData
+            placementData = placementData, popUpStyling = popUpStyling
         )
 
         val merchantConfiguration = MerchantConfiguration(
@@ -308,7 +375,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showYesNoAlert(context: Context, onResult: (Boolean) -> Unit) {
-        val primaryColor = style["primaryColor"] as String
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Are you authenticated?")
 
@@ -326,9 +392,9 @@ class MainActivity : AppCompatActivity() {
         alertDialog.show()
 
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            ?.setTextColor(Color.parseColor(primaryColor))
+            ?.setTextColor(Color.parseColor("#d50132"))
         alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-            ?.setTextColor(Color.parseColor(primaryColor))
+            ?.setTextColor(Color.parseColor("#d50132"))
     }
 
     fun openExperience(view: View) {

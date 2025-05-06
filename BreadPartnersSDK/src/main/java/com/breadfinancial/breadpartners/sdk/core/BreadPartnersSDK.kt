@@ -33,6 +33,7 @@ import com.breadfinancial.breadpartners.sdk.networking.APIUrl
 import com.breadfinancial.breadpartners.sdk.networking.models.BrandConfigResponse
 import com.breadfinancial.breadpartners.sdk.security.RecaptchaManager
 import com.breadfinancial.breadpartners.sdk.utilities.AlertHandler
+import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnerDefaults
 import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
 import com.breadfinancial.breadpartners.sdk.utilities.Logger
 import kotlinx.coroutines.CoroutineScope
@@ -116,6 +117,11 @@ class BreadPartnersSDK private constructor() {
                     error = Exception("Brand configurations are missing or unavailable.")
                 )
             )
+        }
+
+        placementsConfiguration?.popUpStyling ?: run {
+            placementsConfiguration?.popUpStyling =
+                BreadPartnerDefaults.shared.createPopUpStyling(thisContext)
         }
 
         merchantConfiguration?.env = sdkEnvironment

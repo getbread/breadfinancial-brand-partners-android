@@ -13,7 +13,6 @@
 package com.breadfinancial.breadpartners.sdk.core.models
 
 import android.graphics.Color
-import android.graphics.Rect
 import android.graphics.Typeface
 
 /**
@@ -21,10 +20,12 @@ import android.graphics.Typeface
  *
  * @property placementData Defines text placements on the brand partner screen for the `registerPlacementFlow`.
  * @property rtpsData Specifies the real-time pre-screen configuration for the prescreen flow.
+ * @property popUpStyling Configures the popup styling for each element rendered within the popup.
  */
 data class PlacementsConfiguration(
     val placementData: PlacementData? = null,
-    val rtpsData: RTPSData? = null
+    val rtpsData: RTPSData? = null,
+    var popUpStyling: PopUpStyling? = null,
 )
 
 /**
@@ -64,7 +65,7 @@ data class PopupTextStyle(
 /**
  * Structure that defines style configurations for action buttons in popups.
  *
- * - `font`: Specifies the font for the button title.
+ * - `font`: Specifies the font family and font size for the button title.
  * - `textColor`: Specifies the color of the button title text.
  * - `frame`: Specifies the frame dimensions for the button.
  * - `backgroundColor`: Specifies the background color of the button.
@@ -72,13 +73,10 @@ data class PopupTextStyle(
  * - `padding`: Specifies the padding within the button and title.
  */
 data class PopupActionButtonStyle(
-    val font: Int = Typeface.NORMAL,
+    val font: Typeface? = null,
     val textColor: Int = Color.WHITE,
     val textSize: Float = 12F,
     val backgroundColor: Int = Color.BLACK,
     val cornerRadius: Float = 60.0F
 )
 
-data class ViewFrame(
-    val width: Int, val height: Int
-)

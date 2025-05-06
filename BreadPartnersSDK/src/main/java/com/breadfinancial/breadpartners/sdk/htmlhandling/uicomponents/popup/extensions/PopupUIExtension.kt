@@ -14,6 +14,7 @@ package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.ext
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.StateListDrawable
 import android.text.Spanned
@@ -28,7 +29,6 @@ import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.Pop
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupDialog
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupElements
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.applyTextStyle
-import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnerDefaults
 import com.bumptech.glide.Glide
 
 /**
@@ -37,7 +37,7 @@ import com.bumptech.glide.Glide
  */
 fun PopupDialog.setupUI() {
 
-    val popupStyle = BreadPartnerDefaults.shared.popUpStyling
+    val popupStyle = placementsConfiguration?.popUpStyling!!
     val buttonStyle = popupStyle.actionButtonStyle
 
     closeButton = popupView.findViewById(R.id.close_button)
@@ -56,6 +56,7 @@ fun PopupDialog.setupUI() {
     overlayProductView = popupView.findViewById(R.id.overlay_product_view)
     overlayEmbeddedView = popupView.findViewById(R.id.overlay_embedded_view)
     loader = popupView.findViewById(R.id.loader_indicator)
+    loader.updateLoaderColor(placementsConfiguration?.popUpStyling?.loaderColor!!)
 
     closeButton.setOnClickListener {
         closeButtonTapped()
@@ -78,6 +79,7 @@ fun PopupDialog.setupUI() {
     }
 
     actionButton.text = popupModel.primaryActionButtonAttributes?.buttonText ?: "Action"
+    actionButton.typeface = Typeface.create(buttonStyle?.font, Typeface.BOLD)
 
     val drawable = GradientDrawable().apply {
         shape = GradientDrawable.RECTANGLE
@@ -98,6 +100,9 @@ fun PopupDialog.setupUI() {
 
     actionButton.background = states
 
+    dividerTop.setBackgroundColor(popupStyle.dividerColor)
+
+    dividerBottom.setBackgroundColor(popupStyle.dividerColor)
 
     actionButton.setOnClickListener {
         callback(BreadPartnerEvent.PopupClosed)
