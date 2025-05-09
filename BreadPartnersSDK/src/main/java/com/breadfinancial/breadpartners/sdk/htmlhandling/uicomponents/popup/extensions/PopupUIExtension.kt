@@ -29,6 +29,7 @@ import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.Pop
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupDialog
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupElements
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.applyTextStyle
+import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
 import com.bumptech.glide.Glide
 
 /**
@@ -90,7 +91,7 @@ fun PopupDialog.setupUI() {
     val pressedDrawable = GradientDrawable().apply {
         shape = GradientDrawable.RECTANGLE
         cornerRadius = buttonStyle!!.cornerRadius
-        setColor(commonUtils.darkerColor(buttonStyle.backgroundColor))
+        setColor(CommonUtils().darkerColor(buttonStyle.backgroundColor))
     }
 
     val states = StateListDrawable().apply {
@@ -111,7 +112,7 @@ fun PopupDialog.setupUI() {
     }
 
     context?.let {
-        webViewManager = BreadFinancialWebViewInterstitial(it, logger) { event ->
+        webViewManager = BreadFinancialWebViewInterstitial(it) { event ->
             when (event) {
                 is BreadPartnerEvent.PopupClosed -> closeButtonTapped()
                 else -> callback(event)

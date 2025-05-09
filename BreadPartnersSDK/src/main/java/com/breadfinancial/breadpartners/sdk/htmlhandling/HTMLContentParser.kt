@@ -18,39 +18,19 @@ import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.Pla
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PrimaryActionButtonModel
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.TextPlacementModel
-import com.breadfinancial.breadpartners.sdk.utilities.AlertHandler
-import com.breadfinancial.breadpartners.sdk.utilities.Constants
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 /**
- * Interface for parsing HTML content into a Document.
- */
-interface HTMLParser {
-    fun parse(htmlContent: String): Document
-}
-
-/**
- * HTML parser implementation using Jsoup library.
- */
-class JsoupHTMLParser : HTMLParser {
-    override fun parse(htmlContent: String): Document {
-        return Jsoup.parse(htmlContent)
-    }
-}
-
-/**
  * Parses and processes HTML content for rendering and interaction handling.
  */
-class HTMLContentParser(
-    private val alertHandler: AlertHandler, private val htmlParser: HTMLParser
-) {
+class HTMLContentParser {
 
     /**
      * Extracts a TextPlacementModel from the given HTML content.
      */
     fun extractTextPlacementModel(htmlContent: String): TextPlacementModel {
-        val document = htmlParser.parse(htmlContent)
+        val document = Jsoup.parse(htmlContent)
 
         val actionType = document.select("[data-action-type]").attr("data-action-type")
             .takeIf { it.isNotEmpty() }
@@ -87,7 +67,7 @@ class HTMLContentParser(
      */
     fun extractPopupPlacementModel(htmlContent: String): PopupPlacementModel? {
         return try {
-            val document = htmlParser.parse(htmlContent)
+            val document = Jsoup.parse(htmlContent)
 
             val overlayType =
                 document.select("[data-overlay-metadata]").first()?.attr("data-overlay-type")
@@ -119,12 +99,7 @@ class HTMLContentParser(
                 disclosure = disclosure
             )
         } catch (error: Exception) {
-            alertHandler.showAlert(
-                title = Constants.nativeSDKAlertTitle(),
-                message = Constants.catchError(message = error.message.orEmpty()),
-                showOkButton = true
-            )
-            null
+            throw error
         }
     }
 
@@ -193,12 +168,7 @@ class HTMLContentParser(
         return try {
             PlacementActionType.valueOf(response)
         } catch (error: Exception) {
-            alertHandler.showAlert(
-                title = Constants.nativeSDKAlertTitle(),
-                message = Constants.catchError(message = "${error.message}"),
-                showOkButton = true
-            )
-            null
+            throw error
         }
     }
 
@@ -209,12 +179,7 @@ class HTMLContentParser(
         return try {
             PlacementOverlayType.valueOf(response)
         } catch (error: Exception) {
-            alertHandler.showAlert(
-                title = Constants.nativeSDKAlertTitle(),
-                message = Constants.catchError(message = "${error.message}"),
-                showOkButton = true
-            )
-            null
+            throw error
         }
     }
 }

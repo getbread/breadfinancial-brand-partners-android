@@ -12,145 +12,119 @@
 
 package com.breadfinancial.breadpartners.sdk.core.extensions
 
+import android.content.Context
 import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
+import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
+import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentParser
+import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentRenderer
+import com.breadfinancial.breadpartners.sdk.networking.APIClient
 import com.breadfinancial.breadpartners.sdk.networking.APIUrl
 import com.breadfinancial.breadpartners.sdk.networking.APIUrlType
 import com.breadfinancial.breadpartners.sdk.networking.HTTPMethod
 import com.breadfinancial.breadpartners.sdk.networking.Result
-import com.breadfinancial.breadpartners.sdk.networking.models.BrandConfigResponse
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementsResponse
 import com.breadfinancial.breadpartners.sdk.networking.requestbuilders.PlacementRequestBuilder
+import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
 import com.breadfinancial.breadpartners.sdk.utilities.Constants
-import kotlinx.coroutines.launch
-
-/**
- * Retrieves brand-specific configurations, such as the Recaptcha key.
- */
-fun BreadPartnersSDK.fetchBrandConfig() {
-    coroutineScope.launch {
-        val apiUrl = APIUrl(
-            urlType = APIUrlType.BrandConfig(integrationKey)
-        ).url
-        apiClient.request(
-            urlString = apiUrl, method = HTTPMethod.GET, body = null
-        ) { result ->
-            when (result) {
-                is Result.Success -> {
-                    commonUtils.decodeJSON(result.data.toString(),
-                        BrandConfigResponse::class.java,
-                        onSuccess = { response ->
-                            brandConfiguration = response
-                        },
-                        onError = { error ->
-                            alertHandler.showAlert(
-                                title = Constants.nativeSDKAlertTitle(),
-                                message = Constants.catchError(
-                                    error.localizedMessage?.toString() ?: ""
-                                ),
-                                showOkButton = true
-                            )
-                        })
-                }
-
-                is Result.Failure -> {
-                    alertHandler.showAlert(
-                        title = Constants.nativeSDKAlertTitle(), message = Constants.catchError(
-                            result.error.localizedMessage ?: "Unknown error"
-                        ), showOkButton = true
-                    )
-                }
-            }
-        }
-    }
-}
+import com.breadfinancial.breadpartners.sdk.utilities.Logger
 
 /**
  * Fetches placement data to be displayed as a text view with a clickable button
  * in the brand partner's UI.
  */
-fun BreadPartnersSDK.fetchPlacementData() {
+fun BreadPartnersSDK.fetchPlacementData(
+    merchantConfiguration: MerchantConfiguration,
+    placementsConfiguration: PlacementsConfiguration,
+    context: Context,
+    splitTextAndAction: Boolean = false,
+    openPlacementExperience: Boolean = false,
+    callback: (BreadPartnerEvent) -> Unit
+) {
     val apiUrl = APIUrl(
         urlType = APIUrlType.GeneratePlacements
     ).url
     val builder = PlacementRequestBuilder(
         integrationKey = integrationKey,
         merchantConfiguration,
-        placementsConfiguration?.placementData
+        placementsConfiguration.placementData
     )
     val placementRequest = builder.build()
-    coroutineScope.launch {
-        apiClient.request(
-            urlString = apiUrl, method = HTTPMethod.POST, body = placementRequest
-        ) { result ->
-            when (result) {
-                is Result.Success -> {
-                    try {
-                        handlePlacementResponse(result.data)
-                    } catch (error: Exception) {
-                        alertHandler.showAlert(
-                            title = Constants.nativeSDKAlertTitle(),
-                            message = Constants.catchError(message = "${error.message}"),
-                            showOkButton = true
-                        )
-                    }
-                }
 
-                is Result.Failure -> {
-                    alertHandler.showAlert(
-                        title = Constants.nativeSDKAlertTitle(),
-                        message = Constants.generatePlacementAPIError(message = "${result.error}"),
-                        showOkButton = true
+    APIClient().request(
+        urlString = apiUrl, method = HTTPMethod.POST, body = placementRequest
+    ) { result ->
+        when (result) {
+            is Result.Success -> {
+                CommonUtils().decodeJSON(result.data.toString(),
+                    PlacementsResponse::class.java,
+                    onSuccess = { placementsResponse ->
+                        if (openPlacementExperience) {
+                            val popupPlacementHTMLContent =
+                                placementsResponse.placementContent?.firstOrNull()
+                            try {
+                                HTMLContentParser().extractPopupPlacementModel(
+                                    popupPlacementHTMLContent?.contentData?.htmlContent ?: ""
+                                )?.let { popupPlacementModel ->
+                                    Logger().logPopupPlacementModelDetails(popupPlacementModel)
+                                    val overlayType =
+                                        HTMLContentParser().handleOverlayType(popupPlacementModel.overlayType)
+                                    if (overlayType != null) {
+                                        HTMLContentRenderer(
+                                            integrationKey,
+                                            merchantConfiguration,
+                                            placementsConfiguration,
+                                            brandConfiguration,
+                                            splitTextAndAction,
+                                            callback
+                                        ).createPopupOverlay(
+                                            popupPlacementModel, overlayType
+                                        )
+                                    } else {
+                                        callback(
+                                            BreadPartnerEvent.SdkError(
+                                                error = Exception(Constants.missingPopupPlacementError)
+                                            )
+                                        )
+                                    }
+                                }
+                            } catch (error: Exception) {
+                                callback(
+                                    BreadPartnerEvent.SdkError(
+                                        error = Exception(error.message)
+                                    )
+                                )
+                            }
+                        } else {
+                            HTMLContentRenderer(
+                                integrationKey,
+                                merchantConfiguration,
+                                placementsConfiguration,
+                                brandConfiguration,
+                                splitTextAndAction,
+                                callback
+                            ).handleTextPlacement(
+                                placementsResponse, application
+                            )
+                        }
+                    },
+                    onError = { error ->
+                        callback(
+                            BreadPartnerEvent.SdkError(
+                                error = Exception(error.message)
+                            )
+                        )
+                    })
+            }
+
+            is Result.Failure -> {
+                callback(
+                    BreadPartnerEvent.SdkError(
+                        error = Exception(result.error)
                     )
-                }
+                )
             }
         }
     }
-}
-
-fun BreadPartnersSDK.handlePlacementResponse(response: Any) {
-    commonUtils.decodeJSON(response.toString(),
-        PlacementsResponse::class.java,
-        onSuccess = { placementsResponse ->
-            if (openPlacementExperience) {
-                val popupPlacementHTMLContent = placementsResponse.placementContent?.firstOrNull()
-                try {
-                    htmlContentParser.extractPopupPlacementModel(
-                        popupPlacementHTMLContent?.contentData?.htmlContent ?: ""
-                    )?.let { popupPlacementModel ->
-                        logger.logPopupPlacementModelDetails(popupPlacementModel)
-                        val overlayType =
-                            htmlContentParser.handleOverlayType(popupPlacementModel.overlayType)
-                        if (overlayType != null) {
-                            htmlContentRenderer?.createPopupOverlay(
-                                popupPlacementModel, overlayType
-                            )
-                        } else {
-                            alertHandler.showAlert(
-                                title = Constants.nativeSDKAlertTitle(),
-                                message = Constants.missingPopupPlacementError,
-                                showOkButton = true
-                            )
-                        }
-                    }
-                } catch (error: Exception) {
-                    alertHandler.showAlert(
-                        title = Constants.nativeSDKAlertTitle(),
-                        message = Constants.catchError(message = "${error.message}"),
-                        showOkButton = true
-                    )
-                }
-            } else {
-                htmlContentRenderer?.handleTextPlacement(
-                    placementsResponse, thisContext
-                )
-            }
-
-        },
-        onError = { error ->
-            alertHandler.showAlert(
-                title = Constants.nativeSDKAlertTitle(),
-                message = Constants.catchError(message = "${error.message}"),
-                showOkButton = true
-            )
-        })
 }

@@ -12,7 +12,10 @@
 
 package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.extensions
 
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentParser
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupDialog
+import com.breadfinancial.breadpartners.sdk.networking.APIClient
 import com.breadfinancial.breadpartners.sdk.networking.APIUrl
 import com.breadfinancial.breadpartners.sdk.networking.APIUrlType
 import com.breadfinancial.breadpartners.sdk.networking.HTTPMethod
@@ -21,7 +24,8 @@ import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequest
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementRequestBody
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementsResponse
 import com.breadfinancial.breadpartners.sdk.networking.requestbuilders.PlacementRequestBuilder
-import com.breadfinancial.breadpartners.sdk.utilities.Constants
+import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
+import com.breadfinancial.breadpartners.sdk.utilities.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -56,46 +60,34 @@ fun PopupDialog.fetchData(requestBody: PlacementRequest) {
         urlType = APIUrlType.GeneratePlacements
     ).url
     CoroutineScope(Dispatchers.Main).launch {
-        apiClient.request(
+        APIClient().request(
             urlString = apiUrl, body = requestBody, method = HTTPMethod.POST
         ) { result ->
             when (result) {
                 is Result.Success -> {
-                    commonUtils.decodeJSON(result.data.toString(),
+                    CommonUtils().decodeJSON(result.data.toString(),
                         PlacementsResponse::class.java,
                         onSuccess = { placementsResponse ->
                             val popupPlacementHTMLContent =
                                 placementsResponse.placementContent?.firstOrNull()
                             try {
-                                htmlContentParser.extractPopupPlacementModel(
+                                HTMLContentParser().extractPopupPlacementModel(
                                     popupPlacementHTMLContent?.contentData?.htmlContent ?: ""
                                 )?.let { popupPlacementModel ->
-                                    logger.logPopupPlacementModelDetails(popupPlacementModel)
+                                    Logger().logPopupPlacementModelDetails(popupPlacementModel)
                                     webViewPlacementModel = popupPlacementModel
                                 }
                             } catch (error: Exception) {
-                                alertHandler.showAlert(
-                                    title = Constants.nativeSDKAlertTitle(),
-                                    message = Constants.catchError(message = "${error.message}"),
-                                    showOkButton = true
-                                )
+                                callback(BreadPartnerEvent.SdkError(error = Exception(error.message)))
                             }
                         },
                         onError = { error ->
-                            alertHandler.showAlert(
-                                title = Constants.nativeSDKAlertTitle(),
-                                message = Constants.catchError(message = "${error.message}"),
-                                showOkButton = true
-                            )
+                            callback(BreadPartnerEvent.SdkError(error = Exception(error.message)))
                         })
                 }
 
                 is Result.Failure -> {
-                    alertHandler.showAlert(
-                        title = Constants.nativeSDKAlertTitle(),
-                        message = Constants.generatePlacementAPIError(message = "${result.error}"),
-                        showOkButton = true
-                    )
+                    callback(BreadPartnerEvent.SdkError(error = Exception(result.error)))
                 }
             }
         }

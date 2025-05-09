@@ -31,17 +31,12 @@ import com.breadfinancial.breadpartners.sdk.R
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
-import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentParser
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.BreadFinancialWebViewInterstitial
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.extensions.setupUI
-import com.breadfinancial.breadpartners.sdk.networking.APIClient
 import com.breadfinancial.breadpartners.sdk.networking.models.BrandConfigResponse
-import com.breadfinancial.breadpartners.sdk.utilities.AlertHandler
-import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
 import com.breadfinancial.breadpartners.sdk.utilities.LoaderIndicator
-import com.breadfinancial.breadpartners.sdk.utilities.Logger
 import com.bumptech.glide.Glide
 
 /**
@@ -52,16 +47,11 @@ class PopupDialog(
     internal val integrationKey: String,
     internal val popupModel: PopupPlacementModel,
     internal val overlayType: PlacementOverlayType,
-    internal val apiClient: APIClient,
-    internal val alertHandler: AlertHandler,
-    internal val commonUtils: CommonUtils,
-    internal val htmlContentParser: HTMLContentParser,
-    internal val logger: Logger,
     internal var merchantConfiguration: MerchantConfiguration?,
     internal var placementsConfiguration: PlacementsConfiguration?,
     internal var brandConfiguration: BrandConfigResponse?,
     internal val callback: (BreadPartnerEvent) -> Unit?
-) : DialogFragment(), BreadFinancialWebViewInterstitial.WebViewRestartButtonListener  {
+) : DialogFragment(), BreadFinancialWebViewInterstitial.WebViewRestartButtonListener {
 
     internal lateinit var popupView: View
     internal lateinit var closeButton: ImageView

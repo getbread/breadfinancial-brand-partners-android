@@ -23,11 +23,8 @@ import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.Pla
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.TextPlacementModel
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.popup.PopupDialog
-import com.breadfinancial.breadpartners.sdk.networking.APIClient
 import com.breadfinancial.breadpartners.sdk.networking.models.BrandConfigResponse
 import com.breadfinancial.breadpartners.sdk.networking.models.PlacementsResponse
-import com.breadfinancial.breadpartners.sdk.utilities.AlertHandler
-import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
 import com.breadfinancial.breadpartners.sdk.utilities.Constants
 import com.breadfinancial.breadpartners.sdk.utilities.Logger
 
@@ -36,12 +33,6 @@ import com.breadfinancial.breadpartners.sdk.utilities.Logger
  */
 class HTMLContentRenderer(
     val integrationKey: String,
-    val htmlContentParser: HTMLContentParser,
-    val analyticsManager: AnalyticsManager,
-    val alertHandler: AlertHandler,
-    val commonUtils: CommonUtils,
-    val logger: Logger,
-    val apiClient: APIClient,
     var merchantConfiguration: MerchantConfiguration?,
     var placementsConfiguration: PlacementsConfiguration?,
     var brandConfiguration: BrandConfigResponse?,
@@ -57,25 +48,23 @@ class HTMLContentRenderer(
      * Handles rendering of text-based placement using the provided response model.
      */
     fun handleTextPlacement(
-        responseModel: PlacementsResponse,
-        thisContext: Context
+        responseModel: PlacementsResponse, thisContext: Context
     ) {
         this.responseModel = responseModel
         this.thisContext = thisContext
         val indexOfPlacement = 0
-        textPlacementModel = htmlContentParser.extractTextPlacementModel(
+        textPlacementModel = HTMLContentParser().extractTextPlacementModel(
             htmlContent = responseModel.placementContent?.get(indexOfPlacement)?.contentData?.htmlContent
                 ?: ""
         )
 
-        logger.logTextPlacementModelDetails(textPlacementModel!!)
-        analyticsManager.sendViewPlacement(responseModel)
+        Logger().logTextPlacementModelDetails(textPlacementModel!!)
+        AnalyticsManager().sendViewPlacement(responseModel)
         if (splitTextAndAction) {
             renderTextAndButton()
         } else {
             renderTextViewWithLink()
         }
-
     }
 
     /**
@@ -89,19 +78,19 @@ class HTMLContentRenderer(
             it.id == textPlacementModel.actionContentId
         }
 
-        val popupPlacementModel = htmlContentParser.extractPopupPlacementModel(
+        val popupPlacementModel = HTMLContentParser().extractPopupPlacementModel(
             popupPlacementHTMLContent?.contentData?.htmlContent ?: ""
         ) ?: return showAlert(
             Constants.nativeSDKAlertTitle(), Constants.popupPlacementParsingError
         )
 
-        logger.logPopupPlacementModelDetails(popupPlacementModel)
+        Logger().logPopupPlacementModelDetails(popupPlacementModel)
 
-        val overlayType = htmlContentParser.handleOverlayType(popupPlacementModel.overlayType)
+        val overlayType = HTMLContentParser().handleOverlayType(popupPlacementModel.overlayType)
             ?: return showAlert(
                 Constants.nativeSDKAlertTitle(), Constants.missingPopupPlacementError
             )
-        analyticsManager.sendClickPlacement(responseModel)
+        AnalyticsManager().sendClickPlacement(responseModel)
 
         createPopupOverlay(popupPlacementModel, overlayType)
     }
@@ -116,16 +105,12 @@ class HTMLContentRenderer(
             integrationKey,
             popupPlacementModel,
             overlayType,
-            alertHandler = alertHandler,
-            logger = logger,
-            commonUtils = commonUtils,
-            apiClient = apiClient,
-            htmlContentParser = htmlContentParser,
-            callback = callback,
-            merchantConfiguration = merchantConfiguration,
-            placementsConfiguration = placementsConfiguration,
-            brandConfiguration = brandConfiguration
+            merchantConfiguration,
+            placementsConfiguration,
+            brandConfiguration,
+            callback
         )
+
         configurePopupPresentation(popupDialog)
     }
 
@@ -140,6 +125,6 @@ class HTMLContentRenderer(
      * Displays a simple alert dialog with a title, message, and a default OK button.
      */
     fun showAlert(title: String, message: String) {
-        alertHandler.showAlert(title = title, message = message, showOkButton = true)
+        callback(BreadPartnerEvent.SdkError(error = Exception(message)))
     }
 }

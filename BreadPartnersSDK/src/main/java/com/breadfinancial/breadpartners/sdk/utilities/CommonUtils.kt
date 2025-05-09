@@ -15,6 +15,7 @@ package com.breadfinancial.breadpartners.sdk.utilities
 import android.graphics.Color
 import android.os.Build
 import android.os.Handler
+import android.os.Looper
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.RTPSData
 import com.breadfinancial.breadpartners.sdk.networking.APIUrl
@@ -27,30 +28,7 @@ import java.net.URL
  * Utility class for handling common operations across the SDK.
  */
 class CommonUtils(
-    private val handler: Handler, private val alertHandler: AlertHandler
 ) {
-
-    // Executes a given block after a specified delay.
-    //   - delay: The delay in seconds.
-    fun executeAfterDelay(delay: Long, completion: () -> Unit) {
-        handler.postDelayed({
-            completion()
-        }, delay)
-    }
-
-    fun handleSecurityCheckFailure(error: Throwable?) {
-        executeAfterDelay(2000) { // 2 seconds delay
-            alertHandler.hideAlert()
-        }
-
-        executeAfterDelay(2500) { // 2.5 seconds delay
-            alertHandler.showAlert(
-                title = Constants.securityCheckFailureAlertTitle,
-                message = Constants.securityCheckAlertFailedMessage(error?.localizedMessage ?: ""),
-                showOkButton = true
-            )
-        }
-    }
 
     /**
      * Returns the current timestamp.
@@ -86,7 +64,6 @@ class CommonUtils(
         integrationKey: String,
         merchantConfiguration: MerchantConfiguration,
         rtpsConfig: RTPSData,
-        prescreenId: Long?
     ): URL? {
         val queryParams = mapOf(
             "mockMO" to rtpsConfig.mockResponse?.value.takeIfNotEmpty(),
@@ -94,7 +71,7 @@ class CommonUtils(
             "mockVL" to rtpsConfig.mockResponse?.value.takeIfNotEmpty(),
             "embedded" to "true",
             "clientKey" to integrationKey.takeIfNotEmpty(),
-            "prescreenId" to prescreenId,
+            "prescreenId" to rtpsConfig.prescreenId,
             "cardType" to rtpsConfig.cardType.takeIfNotEmpty(),
             "urlPath" to rtpsConfig.screenName.takeIfNotEmpty(),
             "firstName" to merchantConfiguration.buyer?.givenName.takeIfNotEmpty(),

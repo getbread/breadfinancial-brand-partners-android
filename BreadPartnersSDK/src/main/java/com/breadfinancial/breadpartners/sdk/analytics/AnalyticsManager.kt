@@ -27,9 +27,7 @@ import com.breadfinancial.breadpartners.sdk.utilities.Constants
  * 1. **Click Placement**: When the user clicks on the placement.
  * 2. **View Placement**: When the user sees or interacts with the placement without clicking.
  */
-class AnalyticsManager(
-    private val apiClient: APIClient, private val commonUtils: CommonUtils
-) {
+class AnalyticsManager{
 
     private var apiKey: String = ""
 
@@ -47,7 +45,7 @@ class AnalyticsManager(
             Constants.headerAccessControlRequestHeadersKey to Constants.headerAccessControlRequestHeadersValue,
             Constants.headerAccessControlRequestMethodKey to Constants.headerAccessControlRequestMethodValue
         )
-        apiClient.request(
+        APIClient().request(
             urlString = apiUrl, method = HTTPMethod.OPTIONS, body = payload, headers = headers
         ) {}
     }
@@ -57,7 +55,7 @@ class AnalyticsManager(
     private fun createAnalyticsPlacementPayload(
         name: String, placementResponse: PlacementsResponse
     ): Analytics.Payload {
-        val timestamp = commonUtils.getCurrentTimestamp()
+        val timestamp = CommonUtils().getCurrentTimestamp()
 
         return Analytics.Payload(
             name = name, props = Analytics.Props(
@@ -82,7 +80,7 @@ class AnalyticsManager(
                     library = Analytics.Library(
                         name = "bread-partners-sdk-android", version = "0.0.1"
                     ),
-                    userAgent = commonUtils.getUserAgent(),
+                    userAgent = CommonUtils().getUserAgent(),
                     page = Analytics.Page(
                         path = "ToDO:Android Screen Name",
                         url = "ToDO"

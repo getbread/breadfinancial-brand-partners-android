@@ -31,17 +31,13 @@ sealed class Result<out T> {
 }
 
 enum class HTTPMethod(val value: String) {
-    GET("GET"), POST("POST"),OPTIONS("OPTIONS")
+    GET("GET"), POST("POST"), OPTIONS("OPTIONS")
 }
 
 /**
  * A utility class for making HTTP API requests.
  */
-class APIClient(
-    private val coroutineScope: CoroutineScope,
-    private val logger: Logger,
-    private val commonUtils: CommonUtils
-) {
+class APIClient {
 
     /**
      * Generic API call function.
@@ -60,7 +56,7 @@ class APIClient(
         headers: Map<String, String>? = null,
         completion: (Result<Any>) -> Unit
     ) {
-        coroutineScope.launch {
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 // Create URL and open connection
                 val url = URL(urlString)
@@ -69,7 +65,7 @@ class APIClient(
 
                 val genericHeader = mapOf(
                     Constants.headerContentType to Constants.headerContentTypeValue,
-                    Constants.headerUserAgentKey to commonUtils.getUserAgent(),
+                    Constants.headerUserAgentKey to CommonUtils().getUserAgent(),
                     Constants.headerOriginKey to Constants.headerOriginValue
                 )
                 val updatedHeaders = (headers ?: emptyMap()) + genericHeader
@@ -78,7 +74,7 @@ class APIClient(
                     connection.setRequestProperty(key, value)
                 }
 
-                logger.logRequestDetails(urlString,
+                Logger().logRequestDetails(urlString,
                     method.value,
                     updatedHeaders,
                     body?.let { Gson().toJson(it).toByteArray() })
@@ -97,10 +93,11 @@ class APIClient(
                 val responseMessage = if (responseCode in 200..299) {
                     connection.inputStream.bufferedReader().use { it.readText() }
                 } else {
-                    connection.errorStream?.bufferedReader()?.use { it.readText() } ?: "Unknown error"
+                    connection.errorStream?.bufferedReader()?.use { it.readText() }
+                        ?: "Unknown error"
                 }
 
-                logger.logResponseDetails(
+                Logger().logResponseDetails(
                     urlString,
                     responseCode,
                     connection.headerFields,

@@ -15,30 +15,24 @@ package com.breadfinancial.breadpartners.sdk.core
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
-import com.breadfinancial.breadpartners.sdk.analytics.AnalyticsManager
-import com.breadfinancial.breadpartners.sdk.core.extensions.fetchBrandConfig
+import android.util.Log
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchPlacementData
 import com.breadfinancial.breadpartners.sdk.core.extensions.preScreenLookupCall
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
-import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentParser
-import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentRenderer
-import com.breadfinancial.breadpartners.sdk.htmlhandling.JsoupHTMLParser
 import com.breadfinancial.breadpartners.sdk.networking.APIClient
 import com.breadfinancial.breadpartners.sdk.networking.APIUrl
+import com.breadfinancial.breadpartners.sdk.networking.APIUrlType
+import com.breadfinancial.breadpartners.sdk.networking.HTTPMethod
+import com.breadfinancial.breadpartners.sdk.networking.Result
 import com.breadfinancial.breadpartners.sdk.networking.models.BrandConfigResponse
-import com.breadfinancial.breadpartners.sdk.security.RecaptchaManager
-import com.breadfinancial.breadpartners.sdk.utilities.AlertHandler
 import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnerDefaults
 import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
-import com.breadfinancial.breadpartners.sdk.utilities.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import java.util.UUID
+import kotlinx.coroutines.launch
 
 /**
  * Primary interface class for interacting with the Bread Partners SDK.
@@ -58,95 +52,10 @@ class BreadPartnersSDK private constructor() {
     }
 
     internal lateinit var integrationKey: String
-
-    lateinit var callback: ((BreadPartnerEvent) -> Unit?)
-
-    val logger: Logger by lazy {
-        Logger(
-            outputStream = System.out, isLoggingEnabled = true
-        )
-    }
-    internal val alertHandler: AlertHandler by lazy { AlertHandler(contextRef = null) }
-    internal val commonUtils: CommonUtils by lazy {
-        CommonUtils(
-            handler = Handler(Looper.getMainLooper()), alertHandler = alertHandler
-        )
-    }
-    internal val apiClient: APIClient by lazy {
-        APIClient(
-            coroutineScope = CoroutineScope(Dispatchers.IO),
-            logger = logger,
-            commonUtils = commonUtils
-        )
-    }
-    internal val recaptchaManager: RecaptchaManager by lazy { RecaptchaManager(logger = logger) }
-    private val analyticsManager: AnalyticsManager by lazy {
-        AnalyticsManager(
-            apiClient = apiClient, commonUtils = commonUtils
-        )
-    }
-    private val jsoupHTMLParser: JsoupHTMLParser by lazy { JsoupHTMLParser() }
-    val htmlContentParser: HTMLContentParser by lazy {
-        HTMLContentParser(
-            alertHandler = alertHandler, htmlParser = jsoupHTMLParser
-        )
-    }
-
-    internal val coroutineScope: CoroutineScope by lazy { CoroutineScope(Dispatchers.Main) }
-
-    internal var htmlContentRenderer: HTMLContentRenderer? = null
     internal lateinit var application: Application
-    internal lateinit var thisContext: Context
-
-    internal var sdkEnvironment: BreadPartnersEnvironment = BreadPartnersEnvironment.STAGE
-    internal var merchantConfiguration: MerchantConfiguration? = null
-    internal var placementsConfiguration: PlacementsConfiguration? = null
     internal var brandConfiguration: BrandConfigResponse? = null
-    internal var openPlacementExperience: Boolean = false
-    internal var rtpsFlow: Boolean = false
-    internal var prescreenId: Long? = null
-    private var splitTextAndAction: Boolean = false
-
-    private fun setUpInjectables() {
-
-        logger.callback = callback
-
-        if (brandConfiguration == null) {
-            callback.invoke(
-                BreadPartnerEvent.SdkError(
-                    error = Exception("Brand configurations are missing or unavailable.")
-                )
-            )
-        }
-
-        placementsConfiguration?.popUpStyling ?: run {
-            placementsConfiguration?.popUpStyling =
-                BreadPartnerDefaults.shared.createPopUpStyling(thisContext)
-        }
-
-        merchantConfiguration?.env = sdkEnvironment
-
-        alertHandler.initialize(
-            context = thisContext, rtpsFlow = rtpsFlow, logger = logger, callback = callback
-        )
-
-        analyticsManager.setApiKey(integrationKey)
-
-        htmlContentRenderer = HTMLContentRenderer(
-            integrationKey = integrationKey,
-            htmlContentParser = htmlContentParser,
-            analyticsManager = analyticsManager,
-            logger = logger,
-            apiClient = apiClient,
-            alertHandler = alertHandler,
-            commonUtils = commonUtils,
-            callback = callback,
-            merchantConfiguration = merchantConfiguration,
-            placementsConfiguration = placementsConfiguration,
-            brandConfiguration = brandConfiguration,
-            splitTextAndAction = splitTextAndAction
-        )
-    }
+    internal var sdkEnvironment: BreadPartnersEnvironment = BreadPartnersEnvironment.STAGE
+    internal var enableLog: Boolean = false
 
     /**
      * Call this function when the app launches.
@@ -164,12 +73,41 @@ class BreadPartnersSDK private constructor() {
         application: Application
     ) {
         APIUrl.setEnvironment(environment)
-        sdkEnvironment = environment
         this.integrationKey = integrationKey
-        logger.loggingEnabled = enableLog
         this.application = application
-
+        this.sdkEnvironment = environment
+        this.enableLog = enableLog
         fetchBrandConfig()
+    }
+
+    /**
+     * Retrieves brand-specific configurations, such as the Recaptcha key.
+     */
+    private fun fetchBrandConfig() {
+        val apiUrl = APIUrl(
+            urlType = APIUrlType.BrandConfig(integrationKey)
+        ).url
+        APIClient().request(
+            urlString = apiUrl, method = HTTPMethod.GET, body = null
+        ) { result ->
+            when (result) {
+                is Result.Success -> {
+                    CommonUtils().decodeJSON(result.data.toString(),
+                        BrandConfigResponse::class.java,
+                        onSuccess = { response ->
+                            brandConfiguration = response
+
+                        },
+                        onError = { error ->
+                            Log.i("", "")
+                        })
+                }
+
+                is Result.Failure -> {
+                    Log.i("", "")
+                }
+            }
+        }
     }
 
     /**
@@ -188,18 +126,20 @@ class BreadPartnersSDK private constructor() {
         splitTextAndAction: Boolean = false,
         callback: (BreadPartnerEvent) -> Unit
     ) {
-        this.merchantConfiguration = merchantConfiguration
-        this.placementsConfiguration = placementsConfiguration
-        this.splitTextAndAction = splitTextAndAction
-        this.callback = callback
-        this.thisContext = viewContext
-        this.rtpsFlow = false
-        this.openPlacementExperience = false
-
-        setUpInjectables()
-
-        fetchPlacementData()
-
+        CoroutineScope(Dispatchers.Main).launch {
+            if (placementsConfiguration.popUpStyling == null) {
+                placementsConfiguration.popUpStyling =
+                    BreadPartnerDefaults.shared.createPopUpStyling(viewContext)
+            }
+            fetchPlacementData(
+                merchantConfiguration,
+                placementsConfiguration,
+                viewContext,
+                splitTextAndAction,
+                false,
+                callback
+            )
+        }
     }
 
     /**
@@ -220,17 +160,15 @@ class BreadPartnersSDK private constructor() {
         viewContext: Context,
         callback: (BreadPartnerEvent) -> Unit
     ) {
-        this.merchantConfiguration = merchantConfiguration
-        this.placementsConfiguration = placementsConfiguration
-        this.callback = callback
-        this.thisContext = viewContext
-        this.rtpsFlow = true
-        this.openPlacementExperience = false
-
-        setUpInjectables()
-
-//        executeSecurityCheck()
-        preScreenLookupCall(token = UUID.randomUUID().toString())
+        CoroutineScope(Dispatchers.Main).launch {
+            if (placementsConfiguration.popUpStyling == null) {
+                placementsConfiguration.popUpStyling =
+                    BreadPartnerDefaults.shared.createPopUpStyling(viewContext)
+            }
+            preScreenLookupCall(
+                merchantConfiguration, placementsConfiguration, viewContext, callback
+            )
+        }
     }
 
     /**
@@ -247,16 +185,19 @@ class BreadPartnersSDK private constructor() {
         viewContext: Context,
         callback: (BreadPartnerEvent) -> Unit
     ) {
-        this.merchantConfiguration = merchantConfiguration
-        this.placementsConfiguration = placementsConfiguration
-        this.callback = callback
-        this.thisContext = viewContext
-        this.rtpsFlow = false
-        this.openPlacementExperience = true
-
-        setUpInjectables()
-
-        fetchPlacementData()
-
+        CoroutineScope(Dispatchers.Main).launch {
+            if (placementsConfiguration.popUpStyling == null) {
+                placementsConfiguration.popUpStyling =
+                    BreadPartnerDefaults.shared.createPopUpStyling(viewContext)
+            }
+            fetchPlacementData(
+                merchantConfiguration,
+                placementsConfiguration,
+                viewContext,
+                splitTextAndAction = false,
+                openPlacementExperience = true,
+                callback = callback
+            )
+        }
     }
 }

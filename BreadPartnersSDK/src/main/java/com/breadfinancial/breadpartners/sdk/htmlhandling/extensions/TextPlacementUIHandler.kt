@@ -14,6 +14,7 @@ package com.breadfinancial.breadpartners.sdk.htmlhandling.extensions
 
 import android.widget.Button
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentParser
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentRenderer
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.InteractiveText
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementActionType
@@ -52,7 +53,7 @@ fun HTMLContentRenderer.handleButtonTap(sender: Button) {
  * Handles user interactions with links rendered.
  */
 fun HTMLContentRenderer.handleLinkInteraction() {
-    val actionType = textPlacementModel?.actionType?.let { htmlContentParser.handleActionType(it) }
+    val actionType = textPlacementModel?.actionType?.let { HTMLContentParser().handleActionType(it) }
     when (actionType) {
         PlacementActionType.SHOW_OVERLAY -> {
             handlePopupPlacement(textPlacementModel!!, responseModel!!)

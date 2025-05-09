@@ -14,14 +14,13 @@
 
 package com.breadfinancial.breadpartnersexample.sdk
 
-import android.annotation.SuppressLint
+import TestData
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.StateListDrawable
-import android.os.Build
 import android.os.Bundle
 import android.text.Spannable
 import android.text.method.LinkMovementMethod
@@ -31,7 +30,6 @@ import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
@@ -42,6 +40,7 @@ import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersBuyer
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersFinancingType
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersLocationType
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersMockOptions
 import com.breadfinancial.breadpartners.sdk.core.models.CurrencyValue
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.Name
@@ -52,6 +51,7 @@ import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PopUpStyling
 import com.breadfinancial.breadpartners.sdk.core.models.PopupActionButtonStyle
 import com.breadfinancial.breadpartners.sdk.core.models.PopupTextStyle
+import com.breadfinancial.breadpartners.sdk.core.models.RTPSData
 import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnersExtensions.replaceButton
 import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnersExtensions.replaceTextView
 import com.breadfinancial.breadpartnersexample.sdk.databinding.ActivityMainBinding
@@ -60,19 +60,55 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        setupAndFetchPlacementUI()
+
+        openExperienceFlow()
+        rtpsFlow()
+        generatePlacement()
+
     }
 
-    @SuppressLint("DiscouragedApi")
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun setupAndFetchPlacementUI() {
+    // Reusable Alert
+    private fun showYesNoAlert(context: Context, onResult: (Boolean) -> Unit) {
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Are you authenticated?")
 
+        builder.setPositiveButton("Yes") { dialog: DialogInterface, _ ->
+            onResult(true)
+            dialog.dismiss()
+        }
+
+        builder.setNegativeButton("No") { dialog: DialogInterface, _ ->
+            onResult(false)
+            dialog.dismiss()
+        }
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            ?.setTextColor(Color.parseColor("#d50132"))
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+            ?.setTextColor(Color.parseColor("#d50132"))
+    }
+
+    // Button Click
+    fun preScreenCheck(view: View) {
+        val bottomSheet = RTPSView()
+        bottomSheet.show(supportFragmentManager, "RTPSView")
+    }
+
+    // Button Click
+    fun openExperience(view: View) {
+        val bottomSheet = OpenExperienceView()
+        bottomSheet.show(supportFragmentManager, "OpenExperienceView")
+    }
+
+    private fun generatePlacement() {
         // MARK:For development purposes
 //        val placementRequestType =
 //            TestData.shared.placementConfigurations["textPlacementRequestType1"] ?: emptyMap()
@@ -176,7 +212,6 @@ class MainActivity : AppCompatActivity() {
             integrationKey = brandId ?: "",
             application = application
         )
-
         /**
          * Configuration for defining placement options in BreadPartners.
          *
@@ -366,40 +401,167 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
     }
 
-    fun preScreenCheck(view: View) {
-        val bottomSheet = RTPSView()
-        bottomSheet.show(supportFragmentManager, "RTPSView")
-    }
+    private fun rtpsFlow() {
+        val rtpsData = RTPSData(
+            locationType = BreadPartnersLocationType.CHECKOUT, order = Order(
+                totalPrice = CurrencyValue(
+                    currency = "USD", value = 5000.0
+                )
+            ), mockResponse = BreadPartnersMockOptions.SUCCESS
+        )
 
-    private fun showYesNoAlert(context: Context, onResult: (Boolean) -> Unit) {
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("Are you authenticated?")
+        val placementsConfiguration = PlacementsConfiguration(
+            rtpsData = rtpsData
+        )
 
-        builder.setPositiveButton("Yes") { dialog: DialogInterface, _ ->
-            onResult(true)
-            dialog.dismiss()
+        val merchantConfiguration = MerchantConfiguration(
+            buyer = BreadPartnersBuyer(
+                givenName = "Jack",
+                familyName = "Seamus",
+                additionalName = "C.",
+                birthDate = "1974-08-21",
+                email = "johncseamus@gmail.com",
+                phone = "+13235323423",
+                billingAddress = BreadPartnersAddress(
+                    address1 = "323 something lane",
+                    address2 = "apt. B",
+                    country = "USA",
+                    locality = "NYC",
+                    region = "NY",
+                    postalCode = "11222"
+                ),
+                shippingAddress = null
+            ),
+            loyaltyID = "xxxxxx",
+            storeNumber = "1234567",
+            env = BreadPartnersEnvironment.STAGE,
+            channel = "P",
+            subchannel = "X"
+        )
+        BreadPartnersSDK.getInstance().silentRTPSRequest(
+            merchantConfiguration = merchantConfiguration,
+            placementsConfiguration = placementsConfiguration,
+            viewContext = application
+        ) { event ->
+
+            when (event) {
+                is BreadPartnerEvent.RenderPopupView -> {
+                    val view = event.dialogFragment
+                    view.show(supportFragmentManager, "PopupDialog")
+                    Log.i("BreadPartnerSDK::", "Successfully rendered PopupView.")
+                }
+
+                else -> {
+                    Log.i("BreadPartnerSDK::", "Event:$event")
+                }
+            }
         }
+    }
 
-        builder.setNegativeButton("No") { dialog: DialogInterface, _ ->
-            onResult(false)
-            dialog.dismiss()
+    private fun openExperienceFlow() {
+
+        // MARK:For development purposes
+        // These configurations are used to test different types of placement requests.
+        // Each placement type corresponds to a specific configuration that includes parameters
+        // like placement ID, SDK transaction ID, environment, price, and brand ID.
+        // This allows testing of various placement setups by fetching specific configurations
+        // based on the placement type key.
+//        val placementRequestType =
+//            TestData.shared.placementConfigurations["textPlacementRequestType6"] ?: emptyMap()
+                val placementRequestType = emptyMap<String, Any>()
+        val placementID = placementRequestType["placementID"] as String?
+        val price = placementRequestType["price"] as? Int?
+        val loyaltyId = placementRequestType["loyaltyId"] as? String?
+        val channel = placementRequestType["channel"] as? String?
+        val subChannel = placementRequestType["subchannel"] as? String?
+        val env = placementRequestType["env"] as? BreadPartnersEnvironment?
+        val location = placementRequestType["location"] as? BreadPartnersLocationType?
+        val breadPartnersFinancingType =
+            placementRequestType["financingType"] as? BreadPartnersFinancingType?
+
+        /**
+         * Configuration for defining placement options in BreadPartners.
+         *
+         * Modify the Placement ID and total price to test different placements.
+         */
+        val placementData = PlacementData(
+            financingType = breadPartnersFinancingType,
+            locationType = location,
+            placementId = placementID,
+            domID = "123",
+            order = Order(
+                subTotal = CurrencyValue(currency = "USD", value = 0.0),
+                totalDiscounts = CurrencyValue(currency = "USD", value = 0.0),
+                totalPrice = CurrencyValue(currency = "USD", value = price?.toDouble()),
+                totalShipping = CurrencyValue(currency = "USD", value = 0.0),
+                totalTax = CurrencyValue(currency = "USD", value = 0.0),
+                discountCode = "string",
+                pickupInformation = PickupInformation(
+                    name = Name(
+                        givenName = "John", familyName = "Doe"
+                    ), phone = "+14539842345", address = BreadPartnersAddress(
+                        address1 = "156 5th Avenue",
+                        locality = "New York",
+                        postalCode = "10019",
+                        region = "US-NY",
+                        country = "US"
+                    ), email = "john.doe@gmail.com"
+                ),
+                fulfillmentType = "type",
+                items = emptyList()
+            )
+        )
+
+        val placementsConfiguration = PlacementsConfiguration(
+            placementData = placementData
+        )
+
+        val merchantConfiguration = MerchantConfiguration(
+            buyer = BreadPartnersBuyer(
+                givenName = "Jack",
+                familyName = "Seamus",
+                additionalName = "C.",
+                birthDate = "1974-08-21",
+                email = "johncseamus@gmail.com",
+                phone = "+13235323423",
+                billingAddress = BreadPartnersAddress(
+                    address1 = "323 something lane",
+                    address2 = "apt. B",
+                    country = "USA",
+                    locality = "NYC",
+                    region = "NY",
+                    postalCode = "11222"
+                ),
+                shippingAddress = null
+            ),
+            loyaltyID = loyaltyId,
+            storeNumber = "1234567",
+            env = env,
+            channel = channel,
+            subchannel = subChannel
+        )
+
+        BreadPartnersSDK.getInstance().openExperienceForPlacement(
+            merchantConfiguration = merchantConfiguration,
+            placementsConfiguration = placementsConfiguration,
+            viewContext = application
+        ) { event ->
+            when (event) {
+                is BreadPartnerEvent.RenderPopupView -> {
+                    val view = event.dialogFragment
+                    view.show(supportFragmentManager, "PopupDialog")
+                }
+
+                is BreadPartnerEvent.OnSDKEventLog -> {}
+
+                else -> {
+                    Log.i("BreadPartnerSDK::", "Event:$event")
+                }
+            }
         }
-
-        val alertDialog = builder.create()
-        alertDialog.show()
-
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            ?.setTextColor(Color.parseColor("#d50132"))
-        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-            ?.setTextColor(Color.parseColor("#d50132"))
     }
 
-    fun openExperience(view: View) {
-        val bottomSheet = OpenExperienceView()
-        bottomSheet.show(supportFragmentManager, "OpenExperienceView")
-    }
 }
 

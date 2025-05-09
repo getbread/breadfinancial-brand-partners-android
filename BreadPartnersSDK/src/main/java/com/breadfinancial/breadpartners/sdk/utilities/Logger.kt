@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//  File:          Logger.kt
+//  File:          Logger().kt
 //  Author(s):     Bread Financial
 //  Date:          27 March 2025
 //
@@ -17,15 +17,15 @@ import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.TextPlacementModel
 import org.json.JSONObject
-import java.io.OutputStream
 import java.nio.charset.StandardCharsets
 
 /**
  * Class responsible for logging information for debugging and tracking purposes.
  */
 class Logger(
-    private val outputStream: OutputStream, private var isLoggingEnabled: Boolean
 ) {
+
+    private var isLoggingEnabled: Boolean = true
 
     var loggingEnabled: Boolean
         get() = isLoggingEnabled
@@ -46,8 +46,8 @@ class Logger(
     internal fun printLog(message: String) {
         if (!isLoggingEnabled) return
         callback?.invoke(BreadPartnerEvent.OnSDKEventLog(message))
-        outputStream.write(message.toByteArray())
-        outputStream.write("\n".toByteArray())  // Adding a newline after the log
+        System.out.write(message.toByteArray())
+        System.out.write("\n".toByteArray())  // Adding a newline after the log
     }
 
     fun logRequestDetails(
