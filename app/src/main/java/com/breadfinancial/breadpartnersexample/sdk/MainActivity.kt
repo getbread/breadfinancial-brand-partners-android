@@ -14,7 +14,6 @@
 
 package com.breadfinancial.breadpartnersexample.sdk
 
-import TestData
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
@@ -470,7 +469,7 @@ class MainActivity : AppCompatActivity() {
         // based on the placement type key.
 //        val placementRequestType =
 //            TestData.shared.placementConfigurations["textPlacementRequestType6"] ?: emptyMap()
-                val placementRequestType = emptyMap<String, Any>()
+        val placementRequestType = emptyMap<String, Any>()
         val placementID = placementRequestType["placementID"] as String?
         val price = placementRequestType["price"] as? Int?
         val loyaltyId = placementRequestType["loyaltyId"] as? String?
