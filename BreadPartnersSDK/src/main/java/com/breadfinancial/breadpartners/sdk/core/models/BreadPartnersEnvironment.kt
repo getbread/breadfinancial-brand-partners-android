@@ -20,5 +20,6 @@ package com.breadfinancial.breadpartners.sdk.core.models
  */
 enum class BreadPartnersEnvironment(val value: String) {
     STAGE("STAGE"),
-    PROD("PROD")
+    PROD("PROD"),
+    UAT("UAT")
 }

@@ -52,6 +52,11 @@ class APIUrl(private val urlType: APIUrlType) {
                 baseURL = "https://brands.kmsmep.com"
                 rtpsBaseURL = "https://acquire1.comenity.net"
             }
+
+            BreadPartnersEnvironment.UAT -> {
+                baseURL = "https://brands.kmsmep.com"
+                rtpsBaseURL = "https://acquire1-uat.comenity.net"
+            }
         }
     }
 
