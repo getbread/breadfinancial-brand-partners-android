@@ -62,7 +62,7 @@ fun BreadPartnersSDK.fetchPlacementData(
                     onSuccess = { placementsResponse ->
                         if (openPlacementExperience) {
                             val popupPlacementHTMLContent =
-                                placementsResponse.placementContent?.firstOrNull()
+                                placementsResponse.placementContent?.firstOrNull { it.metadata?.templateId?.contains("overlay") == true }
                             try {
                                 HTMLContentParser().extractPopupPlacementModel(
                                     popupPlacementHTMLContent?.contentData?.htmlContent ?: ""

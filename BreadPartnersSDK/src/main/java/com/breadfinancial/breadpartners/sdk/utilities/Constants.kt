@@ -27,7 +27,7 @@ object Constants {
     const val headerContentType = "Content-Type"
     const val headerContentTypeValue = "application/json"
     const val headerOriginKey = "Origin"
-    const val headerOriginValue = "https://aspire-ep-demo.myshopify.com"
+    const val headerOriginValue = "https://brand-sdk.kmsmep.com"
     const val headerAuthorityKey = "authority"
     const val headerAuthorityValue = "metrics.kmsmep.com"
     const val headerAcceptKey = "Accept"
