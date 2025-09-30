@@ -71,9 +71,7 @@ class OpenExperienceView : BottomSheetDialogFragment() {
         // This allows testing of various placement setups by fetching specific configurations
         // based on the placement type key.
         val placementRequestType = mapOf<String, Any>()
-        // TODO Comment previous line and uncomment this one to test. TestData file should be in place.
-//        val placementRequestType =
-//            TestData.shared.placementConfigurations["textPlacementRequestType200"] ?: emptyMap()
+        // If using TestData file do: val placementRequestType = TestData.shared.placementConfigurations["textPlacementRequestType200"] ?: emptyMap()
         val placementID = placementRequestType["placementID"] as String?
         val price = placementRequestType["price"] as? Int?
         val loyaltyId = placementRequestType["loyaltyId"] as? String?

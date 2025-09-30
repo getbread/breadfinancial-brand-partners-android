@@ -64,11 +64,7 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-//        openExperienceFlow()
-//        rtpsFlow()
         generatePlacement()
-
     }
 
     // Reusable Alert
@@ -108,10 +104,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun generatePlacement() {
-        // MARK:For development purposes
-        val placementRequestType =
-            TestData.shared.placementConfigurations["textPlacementRequestType100"] ?: emptyMap()
-//        val placementRequestType = emptyMap<String, Any>()
+        // For using TestData file do val placementRequestType = TestData.shared.placementConfigurations["textPlacementRequestType1"] ?: emptyMap()
+        val placementRequestType = emptyMap<String, Any>()
         val placementID = placementRequestType["placementID"] as String?
         val price = placementRequestType["price"] as? Int?
         val loyaltyId = placementRequestType["loyaltyId"] as? String?
@@ -123,9 +117,8 @@ class MainActivity : AppCompatActivity() {
         val breadPartnersFinancingType =
             placementRequestType["financingType"] as? BreadPartnersFinancingType?
 
-        // MARK: For development purposes
-        val style = TestData.shared.styleStruct["red"] ?: emptyMap()
-//        val style = emptyMap<String, Any>()
+        // If using TestData file do: val style = TestData.shared.styleStruct["red"] ?: emptyMap()
+        val style = emptyMap<String, Any>()
 
         val primaryColor = style["primaryColor"] as? String? ?: "#d50132"
         val lightColor = style["lightColor"] as? String ?: "#b8bdc0"
@@ -267,7 +260,6 @@ class MainActivity : AppCompatActivity() {
                 shippingAddress = null
             ),
             loyaltyID = loyaltyId,
-//            storeNumber = "1234567",
             env = env ?: BreadPartnersEnvironment.STAGE,
             channel = channel,
             subchannel = subChannel
@@ -467,8 +459,6 @@ class MainActivity : AppCompatActivity() {
         // like placement ID, SDK transaction ID, environment, price, and brand ID.
         // This allows testing of various placement setups by fetching specific configurations
         // based on the placement type key.
-//        val placementRequestType =
-//            TestData.shared.placementConfigurations["textPlacementRequestType6"] ?: emptyMap()
         val placementRequestType = emptyMap<String, Any>()
         val placementID = placementRequestType["placementID"] as String?
         val price = placementRequestType["price"] as? Int?
