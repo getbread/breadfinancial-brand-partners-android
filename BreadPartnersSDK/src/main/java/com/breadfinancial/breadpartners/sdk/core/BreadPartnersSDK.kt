@@ -16,6 +16,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import com.breadfinancial.breadpartners.sdk.core.extensions.executeSecurityCheck
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchPlacementData
 import com.breadfinancial.breadpartners.sdk.core.extensions.preScreenLookupCall
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
@@ -165,7 +166,7 @@ class BreadPartnersSDK private constructor() {
                 placementsConfiguration.popUpStyling =
                     BreadPartnerDefaults.shared.createPopUpStyling(viewContext)
             }
-            preScreenLookupCall(
+            executeSecurityCheck(
                 merchantConfiguration, placementsConfiguration, viewContext, callback
             )
         }
