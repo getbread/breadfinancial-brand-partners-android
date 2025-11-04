@@ -16,6 +16,7 @@ import android.content.Context
 import android.text.SpannedString
 import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentRenderer
@@ -54,7 +55,9 @@ fun BreadPartnersSDK.executeSecurityCheck(
     callback: (BreadPartnerEvent) -> Unit
 ) {
     GlobalScope.launch {
-        val siteKey = brandConfiguration?.config?.recaptchaSiteKeyQA
+        val siteKey = brandConfiguration?.config?.getRecaptchaKey(
+            merchantConfiguration.env ?: BreadPartnersEnvironment.PROD
+        )
         RecaptchaManager.init(Logger()).executeReCaptcha(
             context = application,
             siteKey = siteKey ?: "",

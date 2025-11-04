@@ -14,6 +14,8 @@
 
 package com.breadfinancial.breadpartners.sdk.networking.models
 
+import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersEnvironment
+
 /**
  * Data model represents brand-specific configuration response.
  */
@@ -25,12 +27,22 @@ data class BrandConfigResponse(
  * Holds various configuration values used for brand customization and environment handling.
  */
 data class Config(
-    val AEMContent: String = "",
-    val OVERRIDE_KEY: String = "",
-    val clientName: String = "",
-    val prodAdServerUrl: String = "",
-    val qaAdServerUrl: String = "",
     val recaptchaEnabledQA: String = "",
     val recaptchaSiteKeyQA: String = "",
-    val test: String = ""
-)
+    val recaptchaSiteKeyPROD: String = "",
+    val recaptchaEnabledPROD: String = "",
+    val AEMContent: String = "",
+    val clientName: String = "",
+    val rsk_UAT_NATIVE_IOS: String = "",
+    val rsk_UAT_NATIVE_ANDROID: String = "",
+    val rsk_STAGE_NATIVE_IOS: String = "",
+    val rsk_STAGE_NATIVE_ANDROID: String = "",
+    val rsk_PROD_NATIVE_IOS: String = "",
+    val rsk_PROD_NATIVE_ANDROID: String = ""
+) {
+    fun getRecaptchaKey(environment: BreadPartnersEnvironment): String = when (environment) {
+        BreadPartnersEnvironment.UAT -> rsk_UAT_NATIVE_ANDROID
+        BreadPartnersEnvironment.STAGE -> rsk_STAGE_NATIVE_ANDROID
+        BreadPartnersEnvironment.PROD -> rsk_PROD_NATIVE_ANDROID
+    }
+}
