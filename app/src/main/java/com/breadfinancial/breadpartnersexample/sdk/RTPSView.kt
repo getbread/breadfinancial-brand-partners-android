@@ -92,9 +92,9 @@ class RTPSView : BottomSheetDialogFragment() {
                 shippingAddress = null
             ),
             loyaltyID = "xxxxxx",
-            storeNumber = "1234567",
+            storeNumber = "8883",
             env = BreadPartnersEnvironment.STAGE,
-            channel = "P",
+            channel = "X",
             subchannel = "X"
         )
 

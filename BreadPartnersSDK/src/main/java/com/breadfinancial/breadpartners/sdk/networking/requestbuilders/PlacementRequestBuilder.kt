@@ -52,7 +52,8 @@ class PlacementRequestBuilder(
             channel = merchantConfiguration?.channel.takeIfNotEmpty(),
             subchannel = merchantConfiguration?.subchannel.takeIfNotEmpty(),
             CMP = merchantConfiguration?.campaignID.takeIfNotEmpty(),
-            ALLOW_CHECKOUT = placementData?.allowCheckout ?: false
+            ALLOW_CHECKOUT = placementData?.allowCheckout ?: false,
+            LOCATION = placementData?.locationType?.value.takeIfNotEmpty(),
         )
 
         val placement = PlacementRequestBody(

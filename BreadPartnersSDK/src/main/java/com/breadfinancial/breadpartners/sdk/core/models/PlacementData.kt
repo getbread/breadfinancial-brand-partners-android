@@ -37,7 +37,7 @@ enum class BreadPartnersLocationType(val value: String) {
     FOOTER("footer"), HOMEPAGE("homepage"), LANDING("landing"), LOYALTY("loyalty"), MOBILE("mobile"), PRODUCT(
         "product"
     ),
-    HEADER("header"), SEARCH("search")
+    HEADER("header"), SEARCH("search"), MYACCOUNT("myaccount")
 }
 
 /**
