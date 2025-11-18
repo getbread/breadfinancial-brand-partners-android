@@ -49,10 +49,12 @@ class PlacementRequestBuilder(
             CLIENT_VAR_3 = merchantConfiguration?.clientVariable3.takeIfNotEmpty(),
             CLIENT_VAR_4 = merchantConfiguration?.clientVariable4.takeIfNotEmpty(),
             DEPARTMENT_ID = merchantConfiguration?.departmentId.takeIfNotEmpty(),
-            channel = merchantConfiguration?.channel.takeIfNotEmpty(),
-            subchannel = merchantConfiguration?.subchannel.takeIfNotEmpty(),
+            channel = merchantConfiguration?.channel ?:
+                placementData?.locationType?.getChannelCode() ?: "X",
+            subchannel = merchantConfiguration?.subchannel ?: "X",
             CMP = merchantConfiguration?.campaignID.takeIfNotEmpty(),
-            ALLOW_CHECKOUT = placementData?.allowCheckout ?: false
+            ALLOW_CHECKOUT = placementData?.allowCheckout ?: false,
+            LOCATION = placementData?.locationType?.value.takeIfNotEmpty(),
         )
 
         val placement = PlacementRequestBody(
