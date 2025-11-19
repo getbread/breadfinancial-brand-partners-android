@@ -37,7 +37,7 @@ enum class HTTPMethod(val value: String) {
 /**
  * A utility class for making HTTP API requests.
  */
-class APIClient {
+class APIClient(private val logger: Logger = Logger()) {
 
     /**
      * Generic API call function.
@@ -74,7 +74,7 @@ class APIClient {
                     connection.setRequestProperty(key, value)
                 }
 
-                Logger().logRequestDetails(urlString,
+                logger.logRequestDetails(urlString,
                     method.value,
                     updatedHeaders,
                     body?.let { Gson().toJson(it).toByteArray() })
@@ -97,7 +97,7 @@ class APIClient {
                         ?: "Unknown error"
                 }
 
-                Logger().logResponseDetails(
+                logger.logResponseDetails(
                     urlString,
                     responseCode,
                     connection.headerFields,

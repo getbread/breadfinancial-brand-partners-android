@@ -73,6 +73,7 @@ fun BreadPartnersSDK.preScreenLookupCall(
     merchantConfiguration: MerchantConfiguration,
     placementsConfiguration: PlacementsConfiguration,
     viewContext: Context,
+    logger: Logger,
     callback: (BreadPartnerEvent) -> Unit
 ) {
     val apiUrl = APIUrl(
@@ -86,7 +87,7 @@ fun BreadPartnersSDK.preScreenLookupCall(
         Constants.headerClientKey to integrationKey,
         Constants.headerRequestedWithKey to Constants.headerRequestedWithValue
     )
-    APIClient().request(
+    APIClient(logger).request(
         urlString = apiUrl, method = HTTPMethod.POST, body = rtpsRequest, headers = headers
     ) { result ->
         when (result) {
@@ -97,7 +98,7 @@ fun BreadPartnersSDK.preScreenLookupCall(
                         val returnResultType = response.returnCode
                         val prescreenResult = getPrescreenResult(returnResultType)
                         placementsConfiguration.rtpsData.prescreenId = response.prescreenId
-                        Logger().printLog("PreScreenID:Result: $prescreenResult")
+                        logger.printLog("PreScreenID:Result: $prescreenResult")
 
                         /**
                          * This call runs in the background without user interaction.
@@ -114,7 +115,7 @@ fun BreadPartnersSDK.preScreenLookupCall(
                             )
                         }
                         fetchRTPSData(
-                            merchantConfiguration, placementsConfiguration, viewContext, callback
+                            merchantConfiguration, placementsConfiguration, viewContext, logger, callback
                         )
                     },
                     onError = { error ->
@@ -145,6 +146,7 @@ fun BreadPartnersSDK.fetchRTPSData(
     merchantConfiguration: MerchantConfiguration,
     placementsConfiguration: PlacementsConfiguration,
     viewContext: Context,
+    logger: Logger,
     callback: (BreadPartnerEvent) -> Unit
 ) {
     val apiUrl = APIUrl(
@@ -169,7 +171,7 @@ fun BreadPartnersSDK.fetchRTPSData(
         ), brandId = integrationKey
     )
 
-    APIClient().request(
+    APIClient(logger).request(
         urlString = apiUrl, method = HTTPMethod.POST, body = placementRequest
     ) { result ->
         when (result) {
