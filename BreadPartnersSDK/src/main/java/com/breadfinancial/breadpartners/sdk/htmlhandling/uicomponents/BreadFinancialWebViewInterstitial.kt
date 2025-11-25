@@ -169,6 +169,13 @@ internal class BreadFinancialWebViewInterstitial(
                         }
                     }
 
+                    "RECEIVE_PRESCREEN_APPLICATION_RESULT" -> {
+                        action.optJSONObject("payload")?.let { payload ->
+                            Logger().logApplicationResultDetails(payload)
+                            callback(BreadPartnerEvent.WebViewSuccess(result = payload))
+                        }
+                    }
+
                     "APPLICATION_COMPLETED" -> {
                         callback(BreadPartnerEvent.ScreenName(name = "application-completed"))
                         callback(BreadPartnerEvent.PopupClosed)
