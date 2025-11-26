@@ -37,7 +37,29 @@ enum class BreadPartnersLocationType(val value: String) {
     FOOTER("footer"), HOMEPAGE("homepage"), LANDING("landing"), LOYALTY("loyalty"), MOBILE("mobile"), PRODUCT(
         "product"
     ),
-    HEADER("header"), SEARCH("search")
+    HEADER("header"), SEARCH("search"), MYACCOUNT("myaccount");
+
+    companion object {
+        val locationChannelMap: Map<BreadPartnersLocationType, String> = mapOf(
+            HOMEPAGE to "H",
+            LANDING to "L",
+            SEARCH to "S",
+            PRODUCT to "P",
+            CATEGORY to "C",
+            BANNER to "U",
+            CHECKOUT to "O",
+            CART to "A",
+            MOBILE to "E",
+            LOYALTY to "D",
+            FOOTER to "F",
+            BAG to "2",
+            DASHBOARD to "5",
+            MYACCOUNT to "5",
+            HEADER to "R"
+        )
+    }
+
+    fun getChannelCode(): String? = locationChannelMap[this]
 }
 
 /**
