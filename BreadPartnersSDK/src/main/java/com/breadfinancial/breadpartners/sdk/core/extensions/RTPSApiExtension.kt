@@ -84,7 +84,8 @@ fun BreadPartnersSDK.preScreenLookupCall(
     val rtpsRequest = rtpsRequestBuilder.build()
     val headers = mapOf(
         Constants.headerClientKey to integrationKey,
-        Constants.headerRequestedWithKey to Constants.headerRequestedWithValue
+        Constants.headerRequestedWithKey to Constants.headerRequestedWithValue,
+        "X-Bread-Testing" to "captcha"
     )
     APIClient().request(
         urlString = apiUrl, method = HTTPMethod.POST, body = rtpsRequest, headers = headers
