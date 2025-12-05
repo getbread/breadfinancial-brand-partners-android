@@ -45,7 +45,7 @@ class APIUrl(private val urlType: APIUrlType) {
         when (currentBreadPartnersEnvironment) {
             BreadPartnersEnvironment.STAGE -> {
                 baseURL = "https://brands.kmsmep.com"
-                rtpsBaseURL = "https://acquire1uat.comenity.net"
+                rtpsBaseURL = "https://acquire1stage.comenity.net"
             }
 
             BreadPartnersEnvironment.PROD -> {
@@ -55,7 +55,7 @@ class APIUrl(private val urlType: APIUrlType) {
 
             BreadPartnersEnvironment.UAT -> {
                 baseURL = "https://brands.kmsmep.com"
-                rtpsBaseURL = "https://acquire1-uat.comenity.net"
+                rtpsBaseURL = "https://acquire1uat.comenity.net"
             }
         }
     }
