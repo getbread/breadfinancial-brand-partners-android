@@ -104,7 +104,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun generatePlacement() {
-        val placementRequestType = TestData.shared.placementConfigurations["textPlacementRequestType200"] ?: emptyMap()
+        // For using TestData file do val placementRequestType = TestData.shared.placementConfigurations["textPlacementRequestType1"] ?: emptyMap()
+        val placementRequestType = emptyMap<String, Any>()
         val placementID = placementRequestType["placementID"] as String?
         val price = placementRequestType["price"] as? Int?
         val loyaltyId = placementRequestType["loyaltyId"] as? String?
@@ -259,7 +260,7 @@ class MainActivity : AppCompatActivity() {
                 shippingAddress = null
             ),
             loyaltyID = loyaltyId,
-            env = env ?: BreadPartnersEnvironment.UAT,
+            env = env ?: BreadPartnersEnvironment.STAGE,
             channel = channel,
             subchannel = subChannel
         )
@@ -425,8 +426,10 @@ class MainActivity : AppCompatActivity() {
                 shippingAddress = null
             ),
             loyaltyID = "xxxxxx",
-            storeNumber = "8883",
-            env = BreadPartnersEnvironment.UAT
+            storeNumber = "1234567",
+            env = BreadPartnersEnvironment.STAGE,
+            channel = "P",
+            subchannel = "X"
         )
         BreadPartnersSDK.getInstance().silentRTPSRequest(
             merchantConfiguration = merchantConfiguration,

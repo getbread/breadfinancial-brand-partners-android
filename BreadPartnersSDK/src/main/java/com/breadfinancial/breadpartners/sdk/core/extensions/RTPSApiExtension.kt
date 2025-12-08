@@ -70,8 +70,7 @@ fun BreadPartnersSDK.executeSecurityCheck(
                     placementsConfiguration = placementsConfiguration,
                     viewContext = viewContext,
                     callback = callback,
-                    token = it,
-                    showCaptcha = true
+                    token = it
                 )
             }
             result.onFailure {
@@ -94,8 +93,7 @@ fun BreadPartnersSDK.preScreenLookupCall(
     placementsConfiguration: PlacementsConfiguration,
     viewContext: Context,
     callback: (BreadPartnerEvent) -> Unit,
-    token: String,
-    showCaptcha: Boolean = false
+    token: String
 ) {
     val apiUrl = APIUrl(
         urlType = if (placementsConfiguration.rtpsData?.prescreenId == null) APIUrlType.PreScreen else APIUrlType.VirtualLookup
@@ -104,13 +102,10 @@ fun BreadPartnersSDK.preScreenLookupCall(
         merchantConfiguration, placementsConfiguration.rtpsData!!, reCaptchaToken = token
     )
     val rtpsRequest = rtpsRequestBuilder.build()
-    val headers = buildMap {
-        put(Constants.headerClientKey, integrationKey)
-        put(Constants.headerRequestedWithKey, Constants.headerRequestedWithValue)
-        if (showCaptcha) {
-            put("X-Bread-Testing", "captcha")
-        }
-    }
+    val headers = mapOf(
+        Constants.headerClientKey to integrationKey,
+        Constants.headerRequestedWithKey to Constants.headerRequestedWithValue
+    )
     APIClient().request(
         urlString = apiUrl, method = HTTPMethod.POST, body = rtpsRequest, headers = headers
     ) { result ->

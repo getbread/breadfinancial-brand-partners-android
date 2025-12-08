@@ -92,8 +92,10 @@ class RTPSView : BottomSheetDialogFragment() {
                 shippingAddress = null
             ),
             loyaltyID = "xxxxxx",
-            storeNumber = "2009",
+            storeNumber = "1234567",
             env = BreadPartnersEnvironment.STAGE,
+            channel = "X",
+            subchannel = "X"
         )
 
         BreadPartnersSDK.getInstance().silentRTPSRequest(
