@@ -22,6 +22,7 @@ import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentRenderer
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
+import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.security.ChallengeDialog
 import com.breadfinancial.breadpartners.sdk.networking.APIClient
 import com.breadfinancial.breadpartners.sdk.networking.APIUrl
 import com.breadfinancial.breadpartners.sdk.networking.APIUrlType
@@ -69,7 +70,8 @@ fun BreadPartnersSDK.executeSecurityCheck(
                     placementsConfiguration = placementsConfiguration,
                     viewContext = viewContext,
                     callback = callback,
-                    token = it
+                    token = it,
+                    showCaptcha = true
                 )
             }
             result.onFailure {
@@ -92,7 +94,8 @@ fun BreadPartnersSDK.preScreenLookupCall(
     placementsConfiguration: PlacementsConfiguration,
     viewContext: Context,
     callback: (BreadPartnerEvent) -> Unit,
-    token: String
+    token: String,
+    showCaptcha: Boolean = false
 ) {
     val apiUrl = APIUrl(
         urlType = if (placementsConfiguration.rtpsData?.prescreenId == null) APIUrlType.PreScreen else APIUrlType.VirtualLookup
@@ -101,11 +104,13 @@ fun BreadPartnersSDK.preScreenLookupCall(
         merchantConfiguration, placementsConfiguration.rtpsData!!, reCaptchaToken = token
     )
     val rtpsRequest = rtpsRequestBuilder.build()
-    val headers = mapOf(
-        Constants.headerClientKey to integrationKey,
-        Constants.headerRequestedWithKey to Constants.headerRequestedWithValue,
-        "X-Bread-Testing" to "captcha"
-    )
+    val headers = buildMap {
+        put(Constants.headerClientKey, integrationKey)
+        put(Constants.headerRequestedWithKey, Constants.headerRequestedWithValue)
+        if (showCaptcha) {
+            put("X-Bread-Testing", "captcha")
+        }
+    }
     APIClient().request(
         urlString = apiUrl, method = HTTPMethod.POST, body = rtpsRequest, headers = headers
     ) { result ->
@@ -147,11 +152,29 @@ fun BreadPartnersSDK.preScreenLookupCall(
             }
 
             is Result.Failure -> {
-                callback(
-                    BreadPartnerEvent.SdkError(
-                        error = Exception(result.error)
+                // Check if this is an Incapsula challenge
+                val errorMessage = result.error.message ?: ""
+                if (errorMessage.startsWith("Security challenge detected:", ignoreCase = true)) {
+                    val htmlContent =
+                        errorMessage.removePrefix("Security challenge detected:").trim()
+
+                    val challengeDialog = ChallengeDialog(
+                        htmlContent = htmlContent,
+                        baseUrl = apiUrl.substringBefore("/api"),
+                        onComplete = {
+                            // Retry the API call after challenge completion
+                            preScreenLookupCall(
+                                merchantConfiguration,
+                                placementsConfiguration,
+                                viewContext,
+                                callback,
+                                token
+                            )
+                        }
                     )
-                )
+
+                    callback(BreadPartnerEvent.RenderPopupView(dialogFragment = challengeDialog))
+                }
             }
         }
     }
