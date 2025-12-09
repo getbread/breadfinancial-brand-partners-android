@@ -147,7 +147,7 @@ fun BreadPartnersSDK.preScreenLookupCall(
             }
 
             is Result.Failure -> {
-                // Check if this is an Incapsula challenge
+                // Check if this is an security challenge
                 val errorMessage = result.error.message ?: ""
                 if (errorMessage.startsWith("Security challenge detected:", ignoreCase = true)) {
                     val htmlContent =
