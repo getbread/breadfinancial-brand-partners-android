@@ -22,6 +22,7 @@ import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentRenderer
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
+import com.breadfinancial.breadpartners.sdk.htmlhandling.ChallengeDialog
 import com.breadfinancial.breadpartners.sdk.networking.APIClient
 import com.breadfinancial.breadpartners.sdk.networking.APIUrl
 import com.breadfinancial.breadpartners.sdk.networking.APIUrlType
@@ -146,11 +147,29 @@ fun BreadPartnersSDK.preScreenLookupCall(
             }
 
             is Result.Failure -> {
-                callback(
-                    BreadPartnerEvent.SdkError(
-                        error = Exception(result.error)
+                // Check if this is an security challenge
+                val errorMessage = result.error.message ?: ""
+                if (errorMessage.startsWith("Security challenge detected:", ignoreCase = true)) {
+                    val htmlContent =
+                        errorMessage.removePrefix("Security challenge detected:").trim()
+
+                    val challengeDialog = ChallengeDialog(
+                        htmlContent = htmlContent,
+                        baseUrl = apiUrl.substringBefore("/api"),
+                        onComplete = {
+                            // Retry the API call after challenge completion
+                            preScreenLookupCall(
+                                merchantConfiguration,
+                                placementsConfiguration,
+                                viewContext,
+                                callback,
+                                token
+                            )
+                        }
                     )
-                )
+
+                    callback(BreadPartnerEvent.RenderPopupView(dialogFragment = challengeDialog))
+                }
             }
         }
     }

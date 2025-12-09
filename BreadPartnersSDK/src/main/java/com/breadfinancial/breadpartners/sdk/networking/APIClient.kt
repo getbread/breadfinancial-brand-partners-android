@@ -97,6 +97,9 @@ class APIClient {
                         ?: "Unknown error"
                 }
 
+                val contentType = connection.contentType ?:
+                    connection.getHeaderField("Content-Type") ?: ""
+
                 Logger().logResponseDetails(
                     urlString,
                     responseCode,
@@ -106,9 +109,25 @@ class APIClient {
 
                 // Handle response based on status code
                 if (responseCode in 200..299) {
-                    val jsonResponse = JSONObject(responseMessage)
-                    withContext(Dispatchers.Main) {
-                        completion(Result.Success(jsonResponse))
+                    try {
+                        // Check if response is a Captcha challenge
+                        if (contentType.contains("text/html", ignoreCase = true) ||
+                            responseMessage.contains("_Incapsula_Resource", ignoreCase = true)) {
+                            withContext(Dispatchers.Main) {
+                                completion(Result.Failure(Exception("Security challenge detected: $responseMessage.")))
+                            }
+                        } else {
+                            // Try to parse as JSON
+                            val jsonResponse = JSONObject(responseMessage)
+                            withContext(Dispatchers.Main) {
+                                completion(Result.Success(jsonResponse))
+                            }
+                        }
+                    } catch (e: Exception) {
+                        // Failed to parse JSON, treat as error
+                        withContext(Dispatchers.Main) {
+                            completion(Result.Failure(Exception("Invalid response format: ${e.message}")))
+                        }
                     }
                 } else {
                     withContext(Dispatchers.Main) {
