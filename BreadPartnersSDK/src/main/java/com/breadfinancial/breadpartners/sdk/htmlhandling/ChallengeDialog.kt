@@ -1,4 +1,16 @@
-package com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.security
+//------------------------------------------------------------------------------
+//  File:          ChallengeDialog.kt
+//  Author(s):     Bread Financial
+//  Date:          08 December 2025
+//
+//  Descriptions:  This file is part of the BreadPartnersSDK for Android,
+//  providing UI components and functionalities to integrate Bread Financial
+//  services into partner applications.
+//
+//  © 2025 Bread Financial
+//------------------------------------------------------------------------------
+
+package com.breadfinancial.breadpartners.sdk.htmlhandling
 
 import android.annotation.SuppressLint
 import android.graphics.Color
