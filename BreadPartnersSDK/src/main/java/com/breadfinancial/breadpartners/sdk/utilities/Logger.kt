@@ -22,8 +22,7 @@ import java.nio.charset.StandardCharsets
 /**
  * Class responsible for logging information for debugging and tracking purposes.
  */
-class Logger(
-) {
+object Logger {
 
     private var isLoggingEnabled: Boolean = true
 

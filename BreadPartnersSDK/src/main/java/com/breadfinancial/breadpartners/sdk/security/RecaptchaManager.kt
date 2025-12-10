@@ -41,18 +41,18 @@ object RecaptchaManager {
             val client = Recaptcha.fetchClient(context, siteKey)
             val result = client.execute(action, timeout)
             result.onSuccess { token ->
-                Logger().printLog("Recaptcha_Token: $token")
+                Logger.printLog("Recaptcha_Token: $token")
                 completion(Result.success(token))
             }.onFailure {
-                Logger().printLog("Recaptcha_Error: $it")
+                Logger.printLog("Recaptcha_Error: $it")
                 completion(Result.failure(it))
             }
 
         } catch (error: RecaptchaException) {
-            Logger().printLog("Recaptcha_Error: ${error.message}")
+            Logger.printLog("Recaptcha_Error: ${error.message}")
             completion(Result.failure(error))
         } catch (exception: Exception) {
-            Logger().printLog("Recaptcha_Exception: ${exception.message}")
+            Logger.printLog("Recaptcha_Exception: ${exception.message}")
             completion(Result.failure(exception))
         }
     }

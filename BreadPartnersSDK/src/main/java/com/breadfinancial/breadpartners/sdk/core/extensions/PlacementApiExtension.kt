@@ -40,7 +40,6 @@ fun BreadPartnersSDK.fetchPlacementData(
     context: Context,
     splitTextAndAction: Boolean = false,
     openPlacementExperience: Boolean = false,
-    logger: Logger,
     callback: (BreadPartnerEvent) -> Unit
 ) {
     val apiUrl = APIUrl(
@@ -53,7 +52,7 @@ fun BreadPartnersSDK.fetchPlacementData(
     )
     val placementRequest = builder.build()
 
-    APIClient(logger).request(
+    APIClient().request(
         urlString = apiUrl, method = HTTPMethod.POST, body = placementRequest
     ) { result ->
         when (result) {
@@ -68,7 +67,7 @@ fun BreadPartnersSDK.fetchPlacementData(
                                 HTMLContentParser().extractPopupPlacementModel(
                                     popupPlacementHTMLContent?.contentData?.htmlContent ?: ""
                                 )?.let { popupPlacementModel ->
-                                    logger.logPopupPlacementModelDetails(popupPlacementModel)
+                                    Logger.logPopupPlacementModelDetails(popupPlacementModel)
                                     val overlayType =
                                         HTMLContentParser().handleOverlayType(popupPlacementModel.overlayType)
                                     if (overlayType != null) {

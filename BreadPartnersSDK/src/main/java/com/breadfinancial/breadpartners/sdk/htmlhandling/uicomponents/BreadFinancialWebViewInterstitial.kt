@@ -63,7 +63,7 @@ internal class BreadFinancialWebViewInterstitial(
                 setWebContentsDebuggingEnabled(true)
             }
 
-            Logger().logLoadingURL(url = url)
+            Logger.logLoadingURL(url = url)
             webViewClient = object : WebViewClient() {
 
                 override fun onPageFinished(view: WebView?, url: String?) {
@@ -143,7 +143,7 @@ internal class BreadFinancialWebViewInterstitial(
                     "LOAD_ADOBE_TRACKING_ID" -> {
                         action.optJSONObject("payload")?.let { payload ->
                             val adobeTrackingId = payload.optString("adobeTrackingId")
-                            Logger().printLog("BreadPartnersSDK: AdobeTrackingID: $adobeTrackingId")
+                            Logger.printLog("BreadPartnersSDK: AdobeTrackingID: $adobeTrackingId")
                         }
                     }
 
@@ -164,14 +164,14 @@ internal class BreadFinancialWebViewInterstitial(
 
                     "RECEIVE_APPLICATION_RESULT" -> {
                         action.optJSONObject("payload")?.let { payload ->
-                            Logger().logApplicationResultDetails(payload)
+                            Logger.logApplicationResultDetails(payload)
                             callback(BreadPartnerEvent.WebViewSuccess(result = payload))
                         }
                     }
 
                     "RECEIVE_PRESCREEN_APPLICATION_RESULT" -> {
                         action.optJSONObject("payload")?.let { payload ->
-                            Logger().logApplicationResultDetails(payload)
+                            Logger.logApplicationResultDetails(payload)
                             callback(BreadPartnerEvent.WebViewSuccess(result = payload))
                         }
                     }

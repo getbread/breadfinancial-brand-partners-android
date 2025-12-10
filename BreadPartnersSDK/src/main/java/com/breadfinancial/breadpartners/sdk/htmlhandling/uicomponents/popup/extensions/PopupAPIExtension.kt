@@ -74,7 +74,7 @@ fun PopupDialog.fetchData(requestBody: PlacementRequest) {
                                 HTMLContentParser().extractPopupPlacementModel(
                                     popupPlacementHTMLContent?.contentData?.htmlContent ?: ""
                                 )?.let { popupPlacementModel ->
-                                    Logger().logPopupPlacementModelDetails(popupPlacementModel)
+                                    Logger.logPopupPlacementModelDetails(popupPlacementModel)
                                     webViewPlacementModel = popupPlacementModel
                                 }
                             } catch (error: Exception) {
