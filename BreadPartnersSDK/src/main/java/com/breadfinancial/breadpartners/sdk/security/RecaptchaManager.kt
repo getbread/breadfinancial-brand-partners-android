@@ -21,7 +21,13 @@ import com.google.android.recaptcha.RecaptchaException
 /**
  * `RecaptchaManager` handles the process of executing a reCAPTCHA for verifying user actions.
  */
-class RecaptchaManager(private val logger: Logger) {
+object RecaptchaManager {
+    private lateinit var logger: Logger
+
+    fun init(logger: Logger): RecaptchaManager {
+        this.logger = logger
+        return this
+    }
 
     suspend fun executeReCaptcha(
         context: Application,

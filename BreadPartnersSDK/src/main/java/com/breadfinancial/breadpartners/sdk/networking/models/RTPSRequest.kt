@@ -30,7 +30,8 @@ data class RTPSRequest(
     var reCaptchaToken: String? = null,
     val mockResponse: String? = null,
     val overrideConfig: OverrideConfig? = null,
-    val prescreenId: String? = null
+    val prescreenId: String? = null,
+    val platform: String = "android"
 ) {
 
     data class OverrideConfig(

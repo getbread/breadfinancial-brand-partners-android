@@ -16,6 +16,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import com.breadfinancial.breadpartners.sdk.core.extensions.executeSecurityCheck
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchPlacementData
 import com.breadfinancial.breadpartners.sdk.core.extensions.preScreenLookupCall
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
@@ -30,7 +31,6 @@ import com.breadfinancial.breadpartners.sdk.networking.Result
 import com.breadfinancial.breadpartners.sdk.networking.models.BrandConfigResponse
 import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnerDefaults
 import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
-import com.breadfinancial.breadpartners.sdk.utilities.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -88,7 +88,7 @@ class BreadPartnersSDK private constructor() {
         val apiUrl = APIUrl(
             urlType = APIUrlType.BrandConfig(integrationKey)
         ).url
-        APIClient(Logger()).request(
+        APIClient().request(
             urlString = apiUrl, method = HTTPMethod.GET, body = null
         ) { result ->
             when (result) {
@@ -132,17 +132,12 @@ class BreadPartnersSDK private constructor() {
                 placementsConfiguration.popUpStyling =
                     BreadPartnerDefaults.shared.createPopUpStyling(viewContext)
             }
-            val logger = Logger().apply {
-                loggingEnabled = enableLog
-            }
-            logger.callback = callback
             fetchPlacementData(
                 merchantConfiguration,
                 placementsConfiguration,
                 viewContext,
                 splitTextAndAction,
                 false,
-                logger,
                 callback
             )
         }
@@ -171,12 +166,8 @@ class BreadPartnersSDK private constructor() {
                 placementsConfiguration.popUpStyling =
                     BreadPartnerDefaults.shared.createPopUpStyling(viewContext)
             }
-            val logger = Logger().apply {
-                loggingEnabled = enableLog
-                this.callback = callback
-            }
-            preScreenLookupCall(
-                merchantConfiguration, placementsConfiguration, viewContext, logger, callback
+            executeSecurityCheck(
+                merchantConfiguration, placementsConfiguration, viewContext, callback
             )
         }
     }
@@ -200,17 +191,12 @@ class BreadPartnersSDK private constructor() {
                 placementsConfiguration.popUpStyling =
                     BreadPartnerDefaults.shared.createPopUpStyling(viewContext)
             }
-            val logger = Logger().apply {
-                loggingEnabled = enableLog
-                this.callback = callback
-            }
             fetchPlacementData(
                 merchantConfiguration,
                 placementsConfiguration,
                 viewContext,
                 splitTextAndAction = false,
                 openPlacementExperience = true,
-                logger = logger,
                 callback = callback
             )
         }

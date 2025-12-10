@@ -37,7 +37,7 @@ enum class HTTPMethod(val value: String) {
 /**
  * A utility class for making HTTP API requests.
  */
-class APIClient(private val logger: Logger = Logger()) {
+class APIClient {
 
     /**
      * Generic API call function.
@@ -74,7 +74,7 @@ class APIClient(private val logger: Logger = Logger()) {
                     connection.setRequestProperty(key, value)
                 }
 
-                logger.logRequestDetails(urlString,
+                Logger().logRequestDetails(urlString,
                     method.value,
                     updatedHeaders,
                     body?.let { Gson().toJson(it).toByteArray() })
@@ -97,7 +97,10 @@ class APIClient(private val logger: Logger = Logger()) {
                         ?: "Unknown error"
                 }
 
-                logger.logResponseDetails(
+                val contentType = connection.contentType ?:
+                    connection.getHeaderField("Content-Type") ?: ""
+
+                Logger().logResponseDetails(
                     urlString,
                     responseCode,
                     connection.headerFields,
@@ -106,9 +109,25 @@ class APIClient(private val logger: Logger = Logger()) {
 
                 // Handle response based on status code
                 if (responseCode in 200..299) {
-                    val jsonResponse = JSONObject(responseMessage)
-                    withContext(Dispatchers.Main) {
-                        completion(Result.Success(jsonResponse))
+                    try {
+                        // Check if response is a Captcha challenge
+                        if (contentType.contains("text/html", ignoreCase = true) ||
+                            responseMessage.contains("_Incapsula_Resource", ignoreCase = true)) {
+                            withContext(Dispatchers.Main) {
+                                completion(Result.Failure(Exception("Security challenge detected: $responseMessage.")))
+                            }
+                        } else {
+                            // Try to parse as JSON
+                            val jsonResponse = JSONObject(responseMessage)
+                            withContext(Dispatchers.Main) {
+                                completion(Result.Success(jsonResponse))
+                            }
+                        }
+                    } catch (e: Exception) {
+                        // Failed to parse JSON, treat as error
+                        withContext(Dispatchers.Main) {
+                            completion(Result.Failure(Exception("Invalid response format: ${e.message}")))
+                        }
                     }
                 } else {
                     withContext(Dispatchers.Main) {
