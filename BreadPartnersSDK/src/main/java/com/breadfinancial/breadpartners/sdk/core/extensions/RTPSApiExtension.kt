@@ -169,6 +169,12 @@ fun BreadPartnersSDK.preScreenLookupCall(
                     )
 
                     callback(BreadPartnerEvent.RenderPopupView(dialogFragment = challengeDialog))
+                } else {
+                    callback(
+                        BreadPartnerEvent.SdkError(
+                            error = Exception(errorMessage)
+                        )
+                    )
                 }
             }
         }
