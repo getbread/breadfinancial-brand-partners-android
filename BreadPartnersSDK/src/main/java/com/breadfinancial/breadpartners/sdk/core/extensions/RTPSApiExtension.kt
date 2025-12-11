@@ -59,7 +59,7 @@ fun BreadPartnersSDK.executeSecurityCheck(
         val siteKey = brandConfiguration?.config?.getRecaptchaKey(
             merchantConfiguration.env ?: BreadPartnersEnvironment.PROD
         )
-        RecaptchaManager.init(Logger()).executeReCaptcha(
+        RecaptchaManager.init(Logger).executeReCaptcha(
             context = application,
             siteKey = siteKey ?: "",
             action = RecaptchaAction.custom(customAction = "checkout")
@@ -117,7 +117,7 @@ fun BreadPartnersSDK.preScreenLookupCall(
                         val returnResultType = response.returnCode
                         val prescreenResult = getPrescreenResult(returnResultType)
                         placementsConfiguration.rtpsData.prescreenId = response.prescreenId
-                        Logger().printLog("PreScreenID:Result: $prescreenResult")
+                        Logger.printLog("PreScreenID:Result: $prescreenResult")
 
                         /**
                          * This call runs in the background without user interaction.

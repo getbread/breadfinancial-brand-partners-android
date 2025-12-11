@@ -74,7 +74,7 @@ class APIClient {
                     connection.setRequestProperty(key, value)
                 }
 
-                Logger().logRequestDetails(urlString,
+                Logger.logRequestDetails(urlString,
                     method.value,
                     updatedHeaders,
                     body?.let { Gson().toJson(it).toByteArray() })
@@ -100,7 +100,7 @@ class APIClient {
                 val contentType = connection.contentType ?:
                     connection.getHeaderField("Content-Type") ?: ""
 
-                Logger().logResponseDetails(
+                Logger.logResponseDetails(
                     urlString,
                     responseCode,
                     connection.headerFields,

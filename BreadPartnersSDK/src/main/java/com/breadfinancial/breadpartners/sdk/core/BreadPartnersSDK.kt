@@ -18,7 +18,6 @@ import android.content.Context
 import android.util.Log
 import com.breadfinancial.breadpartners.sdk.core.extensions.executeSecurityCheck
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchPlacementData
-import com.breadfinancial.breadpartners.sdk.core.extensions.preScreenLookupCall
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
@@ -31,6 +30,8 @@ import com.breadfinancial.breadpartners.sdk.networking.Result
 import com.breadfinancial.breadpartners.sdk.networking.models.BrandConfigResponse
 import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnerDefaults
 import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
+import com.breadfinancial.breadpartners.sdk.utilities.Logger
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -57,6 +58,7 @@ class BreadPartnersSDK private constructor() {
     internal var brandConfiguration: BrandConfigResponse? = null
     internal var sdkEnvironment: BreadPartnersEnvironment = BreadPartnersEnvironment.STAGE
     internal var enableLog: Boolean = false
+    private val brandConfigDeferred = CompletableDeferred<Unit>()
 
     /**
      * Call this function when the app launches.
@@ -97,15 +99,16 @@ class BreadPartnersSDK private constructor() {
                         BrandConfigResponse::class.java,
                         onSuccess = { response ->
                             brandConfiguration = response
-
+                            brandConfigDeferred.complete(Unit)
                         },
                         onError = { error ->
                             Log.i("", "")
+                            brandConfigDeferred.complete(Unit)
                         })
                 }
-
                 is Result.Failure -> {
                     Log.i("", "")
+                    brandConfigDeferred.complete(Unit)
                 }
             }
         }
@@ -127,6 +130,7 @@ class BreadPartnersSDK private constructor() {
         splitTextAndAction: Boolean = false,
         callback: (BreadPartnerEvent) -> Unit
     ) {
+        Logger.callback = callback
         CoroutineScope(Dispatchers.Main).launch {
             if (placementsConfiguration.popUpStyling == null) {
                 placementsConfiguration.popUpStyling =
@@ -161,7 +165,11 @@ class BreadPartnersSDK private constructor() {
         viewContext: Context,
         callback: (BreadPartnerEvent) -> Unit
     ) {
+        Logger.callback = callback
         CoroutineScope(Dispatchers.Main).launch {
+            if (brandConfiguration == null) {
+                brandConfigDeferred.await()
+            }
             if (placementsConfiguration.popUpStyling == null) {
                 placementsConfiguration.popUpStyling =
                     BreadPartnerDefaults.shared.createPopUpStyling(viewContext)
@@ -186,6 +194,7 @@ class BreadPartnersSDK private constructor() {
         viewContext: Context,
         callback: (BreadPartnerEvent) -> Unit
     ) {
+        Logger.callback = callback
         CoroutineScope(Dispatchers.Main).launch {
             if (placementsConfiguration.popUpStyling == null) {
                 placementsConfiguration.popUpStyling =

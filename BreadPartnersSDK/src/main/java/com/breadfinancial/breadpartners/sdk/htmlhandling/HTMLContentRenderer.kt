@@ -58,7 +58,7 @@ class HTMLContentRenderer(
                 ?: ""
         )
 
-        Logger().logTextPlacementModelDetails(textPlacementModel!!)
+        Logger.logTextPlacementModelDetails(textPlacementModel!!)
         AnalyticsManager().sendViewPlacement(responseModel)
         if (splitTextAndAction) {
             renderTextAndButton()
@@ -84,7 +84,7 @@ class HTMLContentRenderer(
             Constants.nativeSDKAlertTitle(), Constants.popupPlacementParsingError
         )
 
-        Logger().logPopupPlacementModelDetails(popupPlacementModel)
+        Logger.logPopupPlacementModelDetails(popupPlacementModel)
 
         val overlayType = HTMLContentParser().handleOverlayType(popupPlacementModel.overlayType)
             ?: return showAlert(

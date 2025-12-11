@@ -67,7 +67,7 @@ fun BreadPartnersSDK.fetchPlacementData(
                                 HTMLContentParser().extractPopupPlacementModel(
                                     popupPlacementHTMLContent?.contentData?.htmlContent ?: ""
                                 )?.let { popupPlacementModel ->
-                                    Logger().logPopupPlacementModelDetails(popupPlacementModel)
+                                    Logger.logPopupPlacementModelDetails(popupPlacementModel)
                                     val overlayType =
                                         HTMLContentParser().handleOverlayType(popupPlacementModel.overlayType)
                                     if (overlayType != null) {
