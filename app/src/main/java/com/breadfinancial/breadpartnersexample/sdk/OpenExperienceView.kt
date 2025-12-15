@@ -70,8 +70,7 @@ class OpenExperienceView : BottomSheetDialogFragment() {
         // like placement ID, SDK transaction ID, environment, price, and brand ID.
         // This allows testing of various placement setups by fetching specific configurations
         // based on the placement type key.
-        val placementRequestType = mapOf<String, Any>()
-        // If using TestData file do: val placementRequestType = TestData.shared.placementConfigurations["textPlacementRequestType200"] ?: emptyMap()
+        val placementRequestType = TestData.shared.placementConfigurations["textPlacementRequestType200"] ?: emptyMap()
         val placementID = placementRequestType["placementID"] as String?
         val price = placementRequestType["price"] as? Int?
         val loyaltyId = placementRequestType["loyaltyId"] as? String?
@@ -91,28 +90,6 @@ class OpenExperienceView : BottomSheetDialogFragment() {
             financingType = breadPartnersFinancingType,
             locationType = location,
             placementId = placementID,
-            domID = "123",
-            order = Order(
-                subTotal = CurrencyValue(currency = "USD", value = 0.0),
-                totalDiscounts = CurrencyValue(currency = "USD", value = 0.0),
-                totalPrice = CurrencyValue(currency = "USD", value = price?.toDouble()),
-                totalShipping = CurrencyValue(currency = "USD", value = 0.0),
-                totalTax = CurrencyValue(currency = "USD", value = 0.0),
-                discountCode = "string",
-                pickupInformation = PickupInformation(
-                    name = Name(
-                        givenName = "John", familyName = "Doe"
-                    ), phone = "+14539842345", address = BreadPartnersAddress(
-                        address1 = "156 5th Avenue",
-                        locality = "New York",
-                        postalCode = "10019",
-                        region = "US-NY",
-                        country = "US"
-                    ), email = "john.doe@gmail.com"
-                ),
-                fulfillmentType = "type",
-                items = emptyList()
-            )
         )
 
         val placementsConfiguration = PlacementsConfiguration(
@@ -120,25 +97,8 @@ class OpenExperienceView : BottomSheetDialogFragment() {
         )
 
         val merchantConfiguration = MerchantConfiguration(
-            buyer = BreadPartnersBuyer(
-                givenName = "Jack",
-                familyName = "Seamus",
-                additionalName = "C.",
-                birthDate = "1974-08-21",
-                email = "johncseamus@gmail.com",
-                phone = "+13235323423",
-                billingAddress = BreadPartnersAddress(
-                    address1 = "323 something lane",
-                    address2 = "apt. B",
-                    country = "USA",
-                    locality = "NYC",
-                    region = "NY",
-                    postalCode = "11222"
-                ),
-                shippingAddress = null
-            ),
             loyaltyID = loyaltyId,
-            storeNumber = "1234567",
+            storeNumber = "8883",
             env = env,
             channel = channel,
             subchannel = subChannel

@@ -104,8 +104,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun generatePlacement() {
-        // For using TestData file do val placementRequestType = TestData.shared.placementConfigurations["textPlacementRequestType1"] ?: emptyMap()
-        val placementRequestType = emptyMap<String, Any>()
+        val placementRequestType = TestData.shared.placementConfigurations["textPlacementRequestType200"] ?: emptyMap()
         val placementID = placementRequestType["placementID"] as String?
         val price = placementRequestType["price"] as? Int?
         val loyaltyId = placementRequestType["loyaltyId"] as? String?
@@ -242,27 +241,11 @@ class MainActivity : AppCompatActivity() {
         )
 
         val merchantConfiguration = MerchantConfiguration(
-            buyer = BreadPartnersBuyer(
-                givenName = "Jack",
-                familyName = "Seamus",
-                additionalName = "C.",
-                birthDate = "1974-08-21",
-                email = "johncseamus@gmail.com",
-                phone = "+13235323423",
-                billingAddress = BreadPartnersAddress(
-                    address1 = "323 something lane",
-                    address2 = "apt. B",
-                    country = "USA",
-                    locality = "NYC",
-                    region = "NY",
-                    postalCode = "11222"
-                ),
-                shippingAddress = null
-            ),
             loyaltyID = loyaltyId,
             env = env ?: BreadPartnersEnvironment.STAGE,
             channel = channel,
-            subchannel = subChannel
+            subchannel = subChannel,
+            storeNumber = "8883"
         )
 
         BreadPartnersSDK.getInstance().registerPlacements(
