@@ -130,6 +130,11 @@ class BreadPartnersSDK private constructor() {
         splitTextAndAction: Boolean = false,
         callback: (BreadPartnerEvent) -> Unit
     ) {
+        if (!::integrationKey.isInitialized) {
+            callback(BreadPartnerEvent.SdkError(
+                Exception("SDK not initialized. Call setup() first.")))
+            return
+        }
         Logger.callback = callback
         CoroutineScope(Dispatchers.Main).launch {
             if (placementsConfiguration.popUpStyling == null) {
@@ -165,6 +170,11 @@ class BreadPartnersSDK private constructor() {
         viewContext: Context,
         callback: (BreadPartnerEvent) -> Unit
     ) {
+        if (!::integrationKey.isInitialized) {
+            callback(BreadPartnerEvent.SdkError(
+                Exception("SDK not initialized. Call setup() first.")))
+            return
+        }
         Logger.callback = callback
         CoroutineScope(Dispatchers.Main).launch {
             if (brandConfiguration == null) {
@@ -194,6 +204,11 @@ class BreadPartnersSDK private constructor() {
         viewContext: Context,
         callback: (BreadPartnerEvent) -> Unit
     ) {
+        if (!::integrationKey.isInitialized) {
+            callback(BreadPartnerEvent.SdkError(
+                Exception("SDK not initialized. Call setup() first.")))
+            return
+        }
         Logger.callback = callback
         CoroutineScope(Dispatchers.Main).launch {
             if (placementsConfiguration.popUpStyling == null) {
