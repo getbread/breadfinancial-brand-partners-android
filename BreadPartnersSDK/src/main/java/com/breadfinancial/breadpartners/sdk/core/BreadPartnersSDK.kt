@@ -59,6 +59,7 @@ class BreadPartnersSDK private constructor() {
     internal var sdkEnvironment: BreadPartnersEnvironment = BreadPartnersEnvironment.STAGE
     internal var enableLog: Boolean = false
     private val brandConfigDeferred = CompletableDeferred<Unit>()
+    private var isInitialized = false
 
     /**
      * Call this function when the app launches.
@@ -80,6 +81,7 @@ class BreadPartnersSDK private constructor() {
         this.application = application
         this.sdkEnvironment = environment
         this.enableLog = enableLog
+        this.isInitialized = true
         fetchBrandConfig()
     }
 
@@ -114,6 +116,15 @@ class BreadPartnersSDK private constructor() {
         }
     }
 
+    private fun checkInitialized(callback: (BreadPartnerEvent) -> Unit): Boolean {
+        if (!isInitialized) {
+            callback(BreadPartnerEvent.SdkError(
+                Exception("SDK not initialized. Call setup() first.")))
+            return false
+        }
+        return true
+    }
+
     /**
      * Use this function to display text placements in your app's UI.
      *
@@ -130,11 +141,7 @@ class BreadPartnersSDK private constructor() {
         splitTextAndAction: Boolean = false,
         callback: (BreadPartnerEvent) -> Unit
     ) {
-        if (!::integrationKey.isInitialized) {
-            callback(BreadPartnerEvent.SdkError(
-                Exception("SDK not initialized. Call setup() first.")))
-            return
-        }
+        if (!checkInitialized(callback)) return
         Logger.callback = callback
         CoroutineScope(Dispatchers.Main).launch {
             if (placementsConfiguration.popUpStyling == null) {
@@ -170,11 +177,7 @@ class BreadPartnersSDK private constructor() {
         viewContext: Context,
         callback: (BreadPartnerEvent) -> Unit
     ) {
-        if (!::integrationKey.isInitialized) {
-            callback(BreadPartnerEvent.SdkError(
-                Exception("SDK not initialized. Call setup() first.")))
-            return
-        }
+        if (!checkInitialized(callback)) return
         Logger.callback = callback
         CoroutineScope(Dispatchers.Main).launch {
             if (brandConfiguration == null) {
@@ -204,11 +207,7 @@ class BreadPartnersSDK private constructor() {
         viewContext: Context,
         callback: (BreadPartnerEvent) -> Unit
     ) {
-        if (!::integrationKey.isInitialized) {
-            callback(BreadPartnerEvent.SdkError(
-                Exception("SDK not initialized. Call setup() first.")))
-            return
-        }
+        if (!checkInitialized(callback)) return
         Logger.callback = callback
         CoroutineScope(Dispatchers.Main).launch {
             if (placementsConfiguration.popUpStyling == null) {
