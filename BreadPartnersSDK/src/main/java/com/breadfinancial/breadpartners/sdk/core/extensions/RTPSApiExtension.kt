@@ -132,10 +132,11 @@ fun BreadPartnersSDK.preScreenLookupCall(
                                     )
                                 )
                             )
+                        } else {
+                            fetchRTPSData(
+                                merchantConfiguration, placementsConfiguration, viewContext, callback
+                            )
                         }
-                        fetchRTPSData(
-                            merchantConfiguration, placementsConfiguration, viewContext, callback
-                        )
                     },
                     onError = { error ->
                         callback(
