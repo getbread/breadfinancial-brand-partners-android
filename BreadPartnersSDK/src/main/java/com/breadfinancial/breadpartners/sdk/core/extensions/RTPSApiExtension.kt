@@ -13,7 +13,6 @@
 package com.breadfinancial.breadpartners.sdk.core.extensions
 
 import android.content.Context
-import android.text.SpannedString
 import com.breadfinancial.breadpartners.sdk.core.BreadPartnersSDK
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersEnvironment
@@ -21,8 +20,8 @@ import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentRenderer
 import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
-import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PopupPlacementModel
 import com.breadfinancial.breadpartners.sdk.htmlhandling.ChallengeDialog
+import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentParser
 import com.breadfinancial.breadpartners.sdk.networking.APIClient
 import com.breadfinancial.breadpartners.sdk.networking.APIUrl
 import com.breadfinancial.breadpartners.sdk.networking.APIUrlType
@@ -265,28 +264,27 @@ fun BreadPartnersSDK.handleRTPSResponse(
     CommonUtils().decodeJSON(response.toString(),
         PlacementsResponse::class.java,
         onSuccess = { placementsResponse ->
-            val popupPlacementModel = PopupPlacementModel(
-                overlayType = "EMBEDDED_OVERLAY",
-                location = placementsResponse.placements?.first()?.renderContext?.LOCATION.toString(),
-                brandLogoUrl = "",
-                webViewUrl = placementsResponse.placements?.first()?.renderContext?.embeddedUrl
-                    ?: "",
-                overlayTitle = SpannedString(""),
-                overlaySubtitle = SpannedString(""),
-                overlayContainerBarHeading = SpannedString(""),
-                bodyHeader = SpannedString(""),
-                dynamicBodyModel = PopupPlacementModel.DynamicBodyModel(
-                    bodyDiv = mapOf(
-                        "" to PopupPlacementModel.DynamicBodyContent(
-                            tagValuePairs = mapOf(
-                                "" to SpannedString("")
-                            )
-                        )
+            val htmlContent = placementsResponse.placementContent
+                ?.firstOrNull()
+                ?.contentData
+                ?.htmlContent
+                .orEmpty()
+
+            val popupPlacementModel = HTMLContentParser().extractPopupPlacementModel(htmlContent)
+                ?: return@decodeJSON callback(
+                    BreadPartnerEvent.SdkError(
+                        error = Exception(Constants.popupPlacementParsingError)
                     )
-                ),
-                disclosure = SpannedString(""),
-                primaryActionButtonAttributes = null
-            )
+                )
+
+            // Update location from render context
+            val location = placementsResponse.placements?.first()?.renderContext?.LOCATION.toString()
+            val updatedModel = popupPlacementModel.copy(location = location)
+
+            // Determine overlay type
+            val overlayType = HTMLContentParser().handleOverlayType(updatedModel.overlayType)
+                ?: PlacementOverlayType.EMBEDDED_OVERLAY
+
             HTMLContentRenderer(
                 integrationKey,
                 merchantConfiguration,
@@ -295,8 +293,8 @@ fun BreadPartnersSDK.handleRTPSResponse(
                 false,
                 callback
             ).createPopupOverlay(
-                popupPlacementModel = popupPlacementModel,
-                overlayType = PlacementOverlayType.EMBEDDED_OVERLAY
+                popupPlacementModel = updatedModel,
+                overlayType = overlayType
             )
         },
         onError = { error ->
