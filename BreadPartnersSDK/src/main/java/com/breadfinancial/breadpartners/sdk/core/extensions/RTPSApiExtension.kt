@@ -18,10 +18,10 @@ import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
-import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentRenderer
-import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
 import com.breadfinancial.breadpartners.sdk.htmlhandling.ChallengeDialog
 import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentParser
+import com.breadfinancial.breadpartners.sdk.htmlhandling.HTMLContentRenderer
+import com.breadfinancial.breadpartners.sdk.htmlhandling.uicomponents.models.PlacementOverlayType
 import com.breadfinancial.breadpartners.sdk.networking.APIClient
 import com.breadfinancial.breadpartners.sdk.networking.APIUrl
 import com.breadfinancial.breadpartners.sdk.networking.APIUrlType
@@ -94,6 +94,16 @@ fun BreadPartnersSDK.preScreenLookupCall(
     callback: (BreadPartnerEvent) -> Unit,
     token: String
 ) {
+
+    if (placementsConfiguration.rtpsData?.customerAcceptedOffer == true) {
+        fetchRTPSData(
+            merchantConfiguration = merchantConfiguration,
+            placementsConfiguration = placementsConfiguration,
+            viewContext = viewContext,
+            callback = callback,
+        )
+    }
+
     val apiUrl = APIUrl(
         urlType = if (placementsConfiguration.rtpsData?.prescreenId == null) APIUrlType.PreScreen else APIUrlType.VirtualLookup
     ).url
@@ -115,15 +125,12 @@ fun BreadPartnersSDK.preScreenLookupCall(
                     onSuccess = { response ->
                         val returnResultType = response.returnCode
                         val prescreenResult = getPrescreenResult(returnResultType)
-                        placementsConfiguration.rtpsData.prescreenId = response.prescreenId
+//                        placementsConfiguration.rtpsData.prescreenId = response.prescreenId
+                        placementsConfiguration.rtpsData.cardType = response.cardType
+
                         Logger.printLog("PreScreenID:Result: $prescreenResult")
 
-                        /**
-                         * This call runs in the background without user interaction.
-                         * If the result is not "approved" or prescreenID is null,
-                         * we simply return without taking any further action.
-                         */
-                        if (prescreenResult != PrescreenResult.APPROVED || placementsConfiguration.rtpsData.prescreenId == null) {
+                        if ((prescreenResult != PrescreenResult.APPROVED && prescreenResult != PrescreenResult.ACCOUNT_FOUND) || placementsConfiguration.rtpsData.prescreenId == null) {
                             callback(
                                 BreadPartnerEvent.SdkError(
                                     error = Exception(
@@ -131,11 +138,17 @@ fun BreadPartnersSDK.preScreenLookupCall(
                                     )
                                 )
                             )
-                        } else {
-                            fetchRTPSData(
-                                merchantConfiguration, placementsConfiguration, viewContext, callback
-                            )
                         }
+
+                        val updatedMerchantConfiguration =
+                            response.updateMerchantConfiguration(merchantConfiguration)
+
+                        fetchRTPSData(
+                            updatedMerchantConfiguration,
+                            placementsConfiguration,
+                            viewContext,
+                            callback,
+                        )
                     },
                     onError = { error ->
                         callback(
@@ -195,11 +208,19 @@ fun BreadPartnersSDK.fetchRTPSData(
         urlType = APIUrlType.GeneratePlacements
     ).url
 
-    val rtpsWebURL = CommonUtils().buildRTPSWebURL(
-        integrationKey = integrationKey,
-        merchantConfiguration = merchantConfiguration,
-        rtpsConfig = placementsConfiguration.rtpsData!!,
-    )?.toString()
+    val webUrl: String? = if (placementsConfiguration.rtpsData?.customerAcceptedOffer == true) {
+        CommonUtils().buildBpsWebURL(
+            integrationKey = integrationKey,
+            merchantConfiguration = merchantConfiguration,
+            placementsConfiguration,
+        )?.toString()
+    } else {
+        CommonUtils().buildRTPSWebURL(
+            integrationKey = integrationKey,
+            merchantConfiguration = merchantConfiguration,
+            rtpsConfig = placementsConfiguration.rtpsData!!,
+        )?.toString()
+    }
 
     val placementRequest = PlacementRequest(
         placements = listOf(
@@ -207,7 +228,7 @@ fun BreadPartnersSDK.fetchRTPSData(
                 context = ContextRequestBody(
                     ENV = merchantConfiguration.env?.value.takeIfNotEmpty(),
                     LOCATION = "RTPS-Approval",
-                    embeddedUrl = rtpsWebURL
+                    embeddedUrl = webUrl
                 )
             )
         ), brandId = integrationKey
@@ -278,7 +299,8 @@ fun BreadPartnersSDK.handleRTPSResponse(
                 )
 
             // Update location from render context
-            val location = placementsResponse.placements?.first()?.renderContext?.LOCATION.toString()
+            val location =
+                placementsResponse.placements?.first()?.renderContext?.LOCATION.toString()
             val updatedModel = popupPlacementModel.copy(location = location)
 
             // Determine overlay type

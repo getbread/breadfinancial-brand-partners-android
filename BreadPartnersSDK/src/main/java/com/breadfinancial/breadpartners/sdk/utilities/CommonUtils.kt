@@ -17,6 +17,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
+import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.RTPSData
 import com.breadfinancial.breadpartners.sdk.networking.APIUrl
 import com.breadfinancial.breadpartners.sdk.networking.APIUrlType
@@ -87,6 +88,101 @@ class CommonUtils(
 
         return try {
             val urlComponents = URL(APIUrl(urlType = APIUrlType.RTPSWebURL("offer")).url)
+            val queryString =
+                queryParams.filterValues { it != null }.map { "${it.key}=${it.value}" }
+                    .joinToString("&")
+
+            URL("$urlComponents?$queryString")
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+
+    /**
+     * Builds a URL for BPS (Batch Prescreen) Web based on the provided integration and configuration details.
+     * - Parameters:
+     *  - integrationKey: The unique integration key for the request.
+     *  - merchantConfiguration: The merchant configuration containing buyer and merchant-specific data.
+     *  - placementConfiguration: The placement configuration containing placement or RTPS data.
+     * - Returns: A URL constructed with the given parameters, or null if the URL could not be built.
+     */
+    fun buildBpsWebURL(
+        integrationKey: String,
+        merchantConfiguration: MerchantConfiguration,
+        placementsConfiguration: PlacementsConfiguration,
+    ): URL? {
+
+        val mockResponseValue = placementsConfiguration.rtpsData?.mockResponse?.value
+
+        val buyer = merchantConfiguration.buyer
+        val billingAddress = buyer?.billingAddress
+
+        val order = placementsConfiguration.rtpsData?.order ?: placementsConfiguration.placementData?.order
+
+        val location = placementsConfiguration.rtpsData?.locationType ?: placementsConfiguration.placementData?.locationType
+
+        val channel = placementsConfiguration.rtpsData?.channel ?: merchantConfiguration.channel
+
+        val subchannel= placementsConfiguration.rtpsData?.subChannel ?: merchantConfiguration.subchannel
+
+        val queryParams = mapOf(
+            "mockMO" to mockResponseValue.takeIfNotEmpty(),
+            "mockPA" to mockResponseValue.takeIfNotEmpty(),
+            "mockVL" to mockResponseValue.takeIfNotEmpty(),
+            "embedded" to "true",
+            "clientKey" to integrationKey,
+            "prescreenId" to placementsConfiguration.rtpsData?.prescreenId,
+            "firstName" to buyer?.givenName,
+            "middleInitial" to buyer?.additionalName,
+            "lastName" to buyer?.familyName,
+            "address1" to billingAddress?.address1,
+            "address2" to billingAddress?.address2,
+            "city" to billingAddress?.locality,
+            "state" to billingAddress?.region,
+            "zip" to billingAddress?.postalCode,
+            "emailAddress" to buyer?.email,
+            "mobilePhone" to buyer?.phone,
+            "alternativePhone" to buyer?.alternativePhone,
+            "cardType" to placementsConfiguration.rtpsData?.cardType,
+            "storeNumber" to merchantConfiguration.storeNumber,
+            "loyaltyNumber" to merchantConfiguration.loyaltyID,
+            "customerNumber" to null,
+            "cartAmount" to order?.subTotal?.value?.toString(),
+            "productAmount" to order?.items?.first()?.unitPrice?.value.toString(),
+            "productAmount" to order?.items?.first()?.unitPrice?.value.toString(),
+            "checkoutAmount" to order?.totalPrice?.value.toString(),
+            "urlPath" to null,
+            "location" to location,
+            "category" to order?.items?.first()?.category,
+            "sku" to order?.items?.first()?.sku,
+            "correlationData" to placementsConfiguration.rtpsData?.correlationData,
+            "epId" to null,
+            "epPlacementId" to null,
+            "epSessionId" to null,
+            "epMessageId" to null,
+            "channel" to channel,
+            "subchannel" to subchannel,
+            "clientVariable1" to merchantConfiguration.clientVariable1,
+            "clientVariable2" to merchantConfiguration.clientVariable2,
+            "clientVariable3" to merchantConfiguration.clientVariable3,
+            "clientVariable4" to merchantConfiguration.clientVariable4,
+            "selectedCardKey" to placementsConfiguration.placementData?.selectedCardKey,
+            "defaultSelectedCardKey" to placementsConfiguration.placementData?.defaultSelectedCardKey,
+            "departmentId" to merchantConfiguration.departmentId,
+            "overrideKey" to merchantConfiguration.overrideKey,
+            "cardChoiceCode" to null,
+            "associateId" to merchantConfiguration.clerkId,
+            "carrier" to null,
+            "keyword" to null,
+            "shortCode" to null,
+            "channelId" to null,
+            "applicationSubType" to null,
+            "splitPayment" to null
+        )
+
+        return try {
+            val urlComponents = URL(APIUrl(urlType = APIUrlType.BatchPreScreen).url)
             val queryString =
                 queryParams.filterValues { it != null }.map { "${it.key}=${it.value}" }
                     .joinToString("&")
