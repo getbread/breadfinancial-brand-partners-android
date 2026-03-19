@@ -14,8 +14,6 @@ package com.breadfinancial.breadpartners.sdk.utilities
 
 import android.graphics.Color
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.PlacementsConfiguration
 import com.breadfinancial.breadpartners.sdk.core.models.RTPSData
@@ -115,16 +113,22 @@ class CommonUtils(
 
         val mockResponseValue = placementsConfiguration.rtpsData?.mockResponse?.value
 
+        // Extract buyer information
         val buyer = merchantConfiguration.buyer
         val billingAddress = buyer?.billingAddress
 
-        val order = placementsConfiguration.rtpsData?.order ?: placementsConfiguration.placementData?.order
+        // Extract order data from RTPS or placement data
+        val order =
+            placementsConfiguration.rtpsData?.order ?: placementsConfiguration.placementData?.order
 
-        val location = placementsConfiguration.rtpsData?.locationType ?: placementsConfiguration.placementData?.locationType
+        // Extract location - prioritize RTPS location over placement location
+        val location = placementsConfiguration.rtpsData?.locationType
+            ?: placementsConfiguration.placementData?.locationType
 
+        // Extract channel - prioritize RTPS channel over merchant channel
         val channel = placementsConfiguration.rtpsData?.channel ?: merchantConfiguration.channel
-
-        val subchannel= placementsConfiguration.rtpsData?.subChannel ?: merchantConfiguration.subchannel
+        val subchannel =
+            placementsConfiguration.rtpsData?.subChannel ?: merchantConfiguration.subchannel
 
         val queryParams = mapOf(
             "mockMO" to mockResponseValue.takeIfNotEmpty(),

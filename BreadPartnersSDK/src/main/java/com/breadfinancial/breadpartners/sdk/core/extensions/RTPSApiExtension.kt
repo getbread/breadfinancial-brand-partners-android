@@ -87,6 +87,7 @@ fun BreadPartnersSDK.rtpsCall(
     viewContext: Context,
     callback: (BreadPartnerEvent) -> Unit,
 ) {
+    // Check for Batch Prescreen Flow when prescreen id has to be entered by user.
     if (placementsConfiguration.rtpsData?.customerAcceptedOffer == true) {
         fetchRTPSData(
             merchantConfiguration = merchantConfiguration,
@@ -96,8 +97,10 @@ fun BreadPartnersSDK.rtpsCall(
         )
     }
 
+    // Check if it is a regular RTPS flow or Batch Prescreen (prescreenId is known).
     val isPrescreen = placementsConfiguration.rtpsData?.prescreenId == null
 
+    // Validate required fields for prescreen requests
     if (isPrescreen) {
         val buyer = merchantConfiguration.buyer
         val billingAddress = buyer?.billingAddress
@@ -110,11 +113,14 @@ fun BreadPartnersSDK.rtpsCall(
         val region = billingAddress?.region
         val postalCode = billingAddress?.postalCode
 
+        // Check if firstname, lastname, and complete address are provided
         if (givenName.isNullOrEmpty() || familyName.isNullOrEmpty() ||
             address1.isNullOrEmpty() || country.isNullOrEmpty() ||
             locality.isNullOrEmpty() || region.isNullOrEmpty() ||
             postalCode.isNullOrEmpty()
         ) {
+            Logger.printLog("buyer details or billing address details are missing for pre-screen API call. Please ensure all required fields are provided.")
+
             return callback(
                 BreadPartnerEvent.SdkError(
                     error = Exception(
@@ -126,12 +132,13 @@ fun BreadPartnersSDK.rtpsCall(
         }
     }
 
-
+    // Only obtain reCaptcha token for prescreen requests
     val reCaptchaToken = if (isPrescreen) {
         executeSecurityCheck(
             merchantConfiguration = merchantConfiguration
         )
     } else {
+        Logger.printLog("reCaptchaToken is empty for virtual lookup as security check is only required for pre-screen.")
         ""
     }
 
@@ -158,14 +165,20 @@ fun BreadPartnersSDK.rtpsCall(
             is Result.Success -> {
                 CommonUtils().decodeJSON(result.data.toString(),
                     RTPSResponse::class.java,
-                    onSuccess = { response ->
-                        val returnResultType = response.returnCode
+                    onSuccess = { rtpsResponse ->
+                        val returnResultType = rtpsResponse.returnCode
                         val prescreenResult = getPrescreenResult(returnResultType)
-                        placementsConfiguration.rtpsData.prescreenId = response.prescreenId
-                        placementsConfiguration.rtpsData.cardType = response.cardType
+
+                        // Map response data back to configurations.
+                        placementsConfiguration.rtpsData.prescreenId = rtpsResponse.prescreenId
+                        placementsConfiguration.rtpsData.cardType = rtpsResponse.cardType
 
                         Logger.printLog("PreScreenID:Result: $prescreenResult")
 
+                        // Since this call runs in the background without user interaction,
+                        // if the result is not "approved"(in case of regular prescreen call) and not "account found" (in case of lookup call)
+                        // or prescreenId is nill (in case user is approved, but already has an account),
+                        // we simply return without taking any further action.
                         if ((prescreenResult != PrescreenResult.APPROVED && prescreenResult != PrescreenResult.ACCOUNT_FOUND)
                             || placementsConfiguration.rtpsData.prescreenId == null
                         ) {
@@ -178,11 +191,8 @@ fun BreadPartnersSDK.rtpsCall(
                             )
                         }
 
-                        val updatedMerchantConfiguration =
-                            response.updateMerchantConfiguration(merchantConfiguration)
-
                         fetchRTPSData(
-                            updatedMerchantConfiguration,
+                            rtpsResponse.updateMerchantConfiguration(merchantConfiguration),
                             placementsConfiguration,
                             viewContext,
                             callback,
