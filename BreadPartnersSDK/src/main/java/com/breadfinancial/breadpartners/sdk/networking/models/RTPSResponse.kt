@@ -69,5 +69,4 @@ data class RTPSResponse(
     val hasExistingAccount: Boolean?,
     val errorMessage: String?,
     val errorCode: Int?,
-
 )

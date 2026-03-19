@@ -39,6 +39,7 @@ import com.breadfinancial.breadpartners.sdk.security.RecaptchaManager
 import com.breadfinancial.breadpartners.sdk.utilities.BreadPartnersExtensions.takeIfNotEmpty
 import com.breadfinancial.breadpartners.sdk.utilities.CommonUtils
 import com.breadfinancial.breadpartners.sdk.utilities.Constants
+import com.breadfinancial.breadpartners.sdk.utilities.Constants.prescreenRequiredFieldsError
 import com.breadfinancial.breadpartners.sdk.utilities.Logger
 import com.google.android.recaptcha.RecaptchaAction
 import kotlinx.coroutines.GlobalScope
@@ -48,12 +49,11 @@ import kotlinx.coroutines.launch
  * Performs a bot behavior check using the Recaptcha v3 SDK
  * to protect against malicious attacks.
  */
-fun BreadPartnersSDK.executeSecurityCheck(
+private fun BreadPartnersSDK.executeSecurityCheck(
     merchantConfiguration: MerchantConfiguration,
-    placementsConfiguration: PlacementsConfiguration,
-    viewContext: Context,
-    callback: (BreadPartnerEvent) -> Unit
-) {
+): String {
+    var reCaptchaToken = ""
+
     GlobalScope.launch {
         val siteKey = brandConfiguration?.config?.getRecaptchaKey(
             merchantConfiguration.env ?: BreadPartnersEnvironment.PROD
@@ -64,19 +64,13 @@ fun BreadPartnersSDK.executeSecurityCheck(
             action = RecaptchaAction.custom(customAction = "checkout")
         ) { result ->
             result.onSuccess {
-                preScreenLookupCall(
-                    merchantConfiguration = merchantConfiguration,
-                    placementsConfiguration = placementsConfiguration,
-                    viewContext = viewContext,
-                    callback = callback,
-                    token = it
-                )
+                reCaptchaToken = it
             }
             result.onFailure {
-                return@executeReCaptcha
             }
         }
     }
+    return reCaptchaToken
 }
 
 /**
@@ -87,14 +81,12 @@ fun BreadPartnersSDK.executeSecurityCheck(
  * - Otherwise, calls the pre-screen endpoint to fetch the `prescreenId`.
  * - Both endpoints require user details to build the request payload.
  */
-fun BreadPartnersSDK.preScreenLookupCall(
+fun BreadPartnersSDK.rtpsCall(
     merchantConfiguration: MerchantConfiguration,
     placementsConfiguration: PlacementsConfiguration,
     viewContext: Context,
     callback: (BreadPartnerEvent) -> Unit,
-    token: String
 ) {
-
     if (placementsConfiguration.rtpsData?.customerAcceptedOffer == true) {
         fetchRTPSData(
             merchantConfiguration = merchantConfiguration,
@@ -104,11 +96,52 @@ fun BreadPartnersSDK.preScreenLookupCall(
         )
     }
 
+    val isPrescreen = placementsConfiguration.rtpsData?.prescreenId == null
+
+    if (isPrescreen) {
+        val buyer = merchantConfiguration.buyer
+        val billingAddress = buyer?.billingAddress
+
+        val givenName = buyer?.givenName
+        val familyName = buyer?.familyName
+        val address1 = billingAddress?.address1
+        val country = billingAddress?.country
+        val locality = billingAddress?.locality
+        val region = billingAddress?.region
+        val postalCode = billingAddress?.postalCode
+
+        if (givenName.isNullOrEmpty() || familyName.isNullOrEmpty() ||
+            address1.isNullOrEmpty() || country.isNullOrEmpty() ||
+            locality.isNullOrEmpty() || region.isNullOrEmpty() ||
+            postalCode.isNullOrEmpty()
+        ) {
+            return callback(
+                BreadPartnerEvent.SdkError(
+                    error = Exception(
+                        prescreenRequiredFieldsError
+                    )
+                )
+            )
+
+        }
+    }
+
+
+    val reCaptchaToken = if (isPrescreen) {
+        executeSecurityCheck(
+            merchantConfiguration = merchantConfiguration
+        )
+    } else {
+        ""
+    }
+
     val apiUrl = APIUrl(
-        urlType = if (placementsConfiguration.rtpsData?.prescreenId == null) APIUrlType.PreScreen else APIUrlType.VirtualLookup
+        urlType = if (isPrescreen) APIUrlType.PreScreen else APIUrlType.VirtualLookup
     ).url
     val rtpsRequestBuilder = RTPSRequestBuilder(
-        merchantConfiguration, placementsConfiguration.rtpsData!!, reCaptchaToken = token
+        merchantConfiguration,
+        placementsConfiguration.rtpsData!!,
+        reCaptchaToken = reCaptchaToken
     )
     val rtpsRequest = rtpsRequestBuilder.build()
     val headers = mapOf(
@@ -116,7 +149,10 @@ fun BreadPartnersSDK.preScreenLookupCall(
         Constants.headerRequestedWithKey to Constants.headerRequestedWithValue
     )
     APIClient().request(
-        urlString = apiUrl, method = HTTPMethod.POST, body = rtpsRequest, headers = headers
+        urlString = apiUrl,
+        method = HTTPMethod.POST,
+        body = rtpsRequest,
+        headers = headers
     ) { result ->
         when (result) {
             is Result.Success -> {
@@ -125,12 +161,14 @@ fun BreadPartnersSDK.preScreenLookupCall(
                     onSuccess = { response ->
                         val returnResultType = response.returnCode
                         val prescreenResult = getPrescreenResult(returnResultType)
-//                        placementsConfiguration.rtpsData.prescreenId = response.prescreenId
+                        placementsConfiguration.rtpsData.prescreenId = response.prescreenId
                         placementsConfiguration.rtpsData.cardType = response.cardType
 
                         Logger.printLog("PreScreenID:Result: $prescreenResult")
 
-                        if ((prescreenResult != PrescreenResult.APPROVED && prescreenResult != PrescreenResult.ACCOUNT_FOUND) || placementsConfiguration.rtpsData.prescreenId == null) {
+                        if ((prescreenResult != PrescreenResult.APPROVED && prescreenResult != PrescreenResult.ACCOUNT_FOUND)
+                            || placementsConfiguration.rtpsData.prescreenId == null
+                        ) {
                             callback(
                                 BreadPartnerEvent.SdkError(
                                     error = Exception(
@@ -171,12 +209,11 @@ fun BreadPartnersSDK.preScreenLookupCall(
                         baseUrl = apiUrl.substringBefore("/api"),
                         onComplete = {
                             // Retry the API call after challenge completion
-                            preScreenLookupCall(
+                            rtpsCall(
                                 merchantConfiguration,
                                 placementsConfiguration,
                                 viewContext,
                                 callback,
-                                token
                             )
                         }
                     )
@@ -204,9 +241,7 @@ fun BreadPartnersSDK.fetchRTPSData(
     viewContext: Context,
     callback: (BreadPartnerEvent) -> Unit
 ) {
-    val apiUrl = APIUrl(
-        urlType = APIUrlType.GeneratePlacements
-    ).url
+    val apiUrl = APIUrl(urlType = APIUrlType.GeneratePlacements).url
 
     val webUrl: String? = if (placementsConfiguration.rtpsData?.customerAcceptedOffer == true) {
         CommonUtils().buildBpsWebURL(
@@ -231,7 +266,8 @@ fun BreadPartnersSDK.fetchRTPSData(
                     embeddedUrl = webUrl
                 )
             )
-        ), brandId = integrationKey
+        ),
+        brandId = integrationKey
     )
 
     APIClient().request(
