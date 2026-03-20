@@ -88,7 +88,7 @@ internal fun BreadPartnersSDK.rtpsCall(
 ) {
     // Check for Batch Prescreen Flow when prescreen id has to be entered by user.
     if (placementsConfiguration.rtpsData?.customerAcceptedOffer == true) {
-        fetchRTPSData(
+        return fetchRTPSData(
             merchantConfiguration = merchantConfiguration,
             placementsConfiguration = placementsConfiguration,
             viewContext = viewContext,
