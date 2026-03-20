@@ -66,7 +66,7 @@ private suspend fun BreadPartnersSDK.executeSecurityCheck(
             reCaptchaToken = it
         }
         result.onFailure {
-            Logger.printLog("reCaptchaToken is empty for virtual lookup as security check is only required for pre-screen.")
+            return@executeReCaptcha
         }
     }
     return reCaptchaToken
