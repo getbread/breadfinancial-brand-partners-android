@@ -44,7 +44,8 @@ class RTPSRequestBuilder(
                 subchannel = merchantConfiguration.subchannel.takeIfNotEmpty(),
                 reCaptchaToken = reCaptchaToken.takeIfNotEmpty(),
                 mockResponse = rtpsData.mockResponse?.value,
-                overrideConfig = RTPSRequest.OverrideConfig(enhancedPresentment = true)
+                overrideConfig = RTPSRequest.OverrideConfig(enhancedPresentment = true),
+                customerAcceptedOffer = rtpsData.customerAcceptedOffer
             )
         } else {
             // Validate PreScreenID using virtuallookup
@@ -54,7 +55,8 @@ class RTPSRequestBuilder(
                 channel = merchantConfiguration.channel.takeIfNotEmpty(),
                 subchannel = merchantConfiguration.subchannel.takeIfNotEmpty(),
                 mockResponse = rtpsData.mockResponse?.value,
-                overrideConfig = RTPSRequest.OverrideConfig(enhancedPresentment = true)
+                overrideConfig = RTPSRequest.OverrideConfig(enhancedPresentment = true),
+                customerAcceptedOffer = rtpsData.customerAcceptedOffer
             )
         }
 

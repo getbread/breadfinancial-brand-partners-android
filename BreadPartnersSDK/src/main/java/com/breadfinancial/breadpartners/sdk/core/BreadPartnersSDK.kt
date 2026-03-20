@@ -16,8 +16,8 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
 import android.util.Log
-import com.breadfinancial.breadpartners.sdk.core.extensions.executeSecurityCheck
 import com.breadfinancial.breadpartners.sdk.core.extensions.fetchPlacementData
+import com.breadfinancial.breadpartners.sdk.core.extensions.rtpsCall
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnerEvent
 import com.breadfinancial.breadpartners.sdk.core.models.BreadPartnersEnvironment
 import com.breadfinancial.breadpartners.sdk.core.models.MerchantConfiguration
@@ -108,6 +108,7 @@ class BreadPartnersSDK private constructor() {
                             brandConfigDeferred.complete(Unit)
                         })
                 }
+
                 is Result.Failure -> {
                     Log.i("", "")
                     brandConfigDeferred.complete(Unit)
@@ -118,8 +119,11 @@ class BreadPartnersSDK private constructor() {
 
     private fun checkInitialized(callback: (BreadPartnerEvent) -> Unit): Boolean {
         if (!isInitialized) {
-            callback(BreadPartnerEvent.SdkError(
-                Exception("SDK not initialized. Call setup() first.")))
+            callback(
+                BreadPartnerEvent.SdkError(
+                    Exception("SDK not initialized. Call setup() first.")
+                )
+            )
             return false
         }
         return true
@@ -187,7 +191,7 @@ class BreadPartnersSDK private constructor() {
                 placementsConfiguration.popUpStyling =
                     BreadPartnerDefaults.shared.createPopUpStyling(viewContext)
             }
-            executeSecurityCheck(
+            rtpsCall(
                 merchantConfiguration, placementsConfiguration, viewContext, callback
             )
         }

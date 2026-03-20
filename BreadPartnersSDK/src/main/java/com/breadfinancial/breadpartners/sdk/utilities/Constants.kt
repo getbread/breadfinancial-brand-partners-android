@@ -76,6 +76,8 @@ object Constants {
     const val missingTextPlacementError = "Unhandled text placement type."
     const val noTextPlacementError = "No text placement type found."
     const val textPlacementParsingError = "Unable to parse text placement."
+    const val prescreenRequiredFieldsError =
+        "Error: Prescreen requires customer information: firstname, lastname, and complete billing address must be provided in MerchantConfiguration."
 
     const val popupPlacementParsingError = "$error Unable to parse popup placement."
     const val missingPopupPlacementError = "Unhandled popup placement type."

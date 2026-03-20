@@ -55,5 +55,18 @@ fun getPrescreenResult(apiResponse: String?): PrescreenResult {
  */
 data class RTPSResponse(
     val returnCode: String?,
-    val prescreenId: Long?
+    val prescreenId: Long?,
+    val firstName: String?,
+    val middleInitial: String?,
+    val lastName: String?,
+    val address1: String?,
+    val address2: String?,
+    val city: String?,
+    val state: String?,
+    val zip: String?,
+    val cardType: String?,
+    val isExpired: Boolean?,
+    val hasExistingAccount: Boolean?,
+    val errorMessage: String?,
+    val errorCode: Int?,
 )
