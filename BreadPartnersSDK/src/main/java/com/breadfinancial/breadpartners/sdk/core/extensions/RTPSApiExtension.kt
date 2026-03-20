@@ -80,7 +80,7 @@ private suspend fun BreadPartnersSDK.executeSecurityCheck(
  * - Otherwise, calls the pre-screen endpoint to fetch the `prescreenId`.
  * - Both endpoints require user details to build the request payload.
  */
-fun BreadPartnersSDK.rtpsCall(
+internal fun BreadPartnersSDK.rtpsCall(
     merchantConfiguration: MerchantConfiguration,
     placementsConfiguration: PlacementsConfiguration,
     viewContext: Context,
