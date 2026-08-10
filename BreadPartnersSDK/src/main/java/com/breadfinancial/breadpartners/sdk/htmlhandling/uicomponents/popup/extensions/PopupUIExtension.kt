@@ -118,6 +118,12 @@ fun PopupDialog.setupUI() {
     disclosureLabel.text = popupModel.disclosure
     disclosureLabel.applyTextStyle(popupStyle.disclosurePopupTextStyle)
     disclosureLabel.applySuperscriptSize()
+    disclosureLabel.setPadding(
+        disclosureLabel.paddingLeft,
+        (24 * resources.displayMetrics.density).toInt(),
+        disclosureLabel.paddingRight,
+        disclosureLabel.paddingBottom
+    )
     if (popupModel.overlayContainerBarHeading.isEmpty()) {
         headerView.visibility = View.GONE
     } else {
