@@ -98,6 +98,7 @@ class PopupDialog(
         shapeDrawable.paint.color = Color.GRAY
 
         dialog?.window?.setBackgroundDrawable(shapeDrawable)
+        dialog?.setCanceledOnTouchOutside(false)
 
         dialog?.window?.setLayout(
             (requireContext().resources.displayMetrics.widthPixels * 0.9).toInt(),
